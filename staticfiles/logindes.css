@@ -1,0 +1,72 @@
+body {
+    font-family: 'Noto Serif', serif;
+    margin: 0;
+    padding: 0;
+    background-image: url("/static/playground/loginbg.jpg");
+}
+
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.left-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.right-container {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.right-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.right-container span {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.username,
+.password {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.username svg,
+.password svg {
+    margin-right: 10px;
+    width: 24px;
+    height: 24px;
+}
+
+input[type="text"],
+input[type="password"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    width: 200px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}

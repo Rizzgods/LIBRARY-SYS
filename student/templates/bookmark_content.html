@@ -1,0 +1,619 @@
+{% extends 'student.html' %}
+
+{% block title %} Bookmark {% endblock %}
+
+{% block notification %}
+<div class="notification-icon">
+    <span class="material-symbols-outlined" id="notification-bell">notifications</span>
+    <span class="notification-badge" id="notification-count">0</span>
+    <div class="dropdown" id="notification-dropdown">
+        <span class="dropdown-item-text" id="no-notifications">No notifications</span>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    .notification-time {
+        font-size: 0.8rem;
+        color: grey;
+        margin-left: auto;
+    }
+    .content {
+        padding: 0 50px;
+        margin-top: 150px;
+    }
+    .active {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .bookmark-head {
+        display: flex;
+        justify-content:center;
+        align-items: center;
+    }
+    .bookmark-title {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .bookmark-content {
+        padding: 20px 50px;
+    }
+    .container {
+        padding: 20px;
+        animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: .3s ease;
+        overflow: hidden;
+        width: 300px;
+    }
+    .card:hover {
+        transform: translateY(-10px);
+    }
+    .card-img-top {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        transition: transform 0.3s;
+        width: 300px;
+        height: 350px;
+    }
+    .card-text {
+        color: #555;
+    }
+    .card-footer {
+        display: flex;
+        justify-content: center;
+    }
+    @media (max-width: 768px) {
+        .navbar-left img {
+            height: 40px;
+        }
+    }
+    @media (max-width: 576px) {
+        .navbar-right {
+            gap: 10px;
+        }
+    }
+    .preview-title {
+        max-height: 75px;
+        min-height: 75px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+    }
+    .card-preview-title {
+        line-height: 50px;
+    }
+    .book-image {
+        min-width: 300px;
+        max-width: 300px;
+        margin: 0 25px;
+    }
+    .book-info {
+        display: flex;
+        gap: 50px;
+    }
+    .book-image {
+        border: 5px solid rgba(74, 128, 210, 0.5);
+        border-radius: 10px;
+    }
+    .book-details {
+        display: flex;
+        align-items: end;
+        height: 300px;
+    }
+    .text1 {
+        margin-top: 50px;
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    .text2 {
+        margin-top: 20px;
+        font-size: 1.5rem;
+    }
+    .modal-book-text {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .modalHeader {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-title {
+        font-size: 2.5rem;
+        margin-left: auto;
+    }
+    .modalButtons {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .btn-mdl {
+        background-color: rgb(74, 128, 210);
+        padding: 10px 20px;
+        border: 1px solid white;
+        border-radius: 5px;
+        color: white;
+        font-weight: bold;
+    }
+    .btn-mdl:hover {
+        background-color: rgba(74, 128, 210, .8);
+    }
+    .spinner-border {
+        display: none;
+        width: 3rem;
+        height: 3rem;
+        border-width: .3rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .notification-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 5px 10px;
+        font-size: 12px;
+        transform: translate(10px, -10px);
+    }
+    .dropdown {
+        display: none;
+        position: absolute;
+        top: 45px;
+        right: 0;
+        background-color: white;
+        color: black;
+        min-width: 300px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+     .dropdown-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #f1f1f1;
+    }
+    
+    .dropdown-item.read {
+        font-weight: normal;
+    }
+    .dropdown-item:not(.read) {
+        font-weight: bold;
+    }
+    .notification-icon, .notification-icon-2 {
+        width: 45px;
+        height: 45px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+    .notification-icon {
+        margin-right: 75px;
+        border-radius: 50%;
+        background-color: #e9ecef;
+    }
+    .notif-message{
+        margin: 0 10px;
+    }
+    .notification-icon .badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+    }
+    .material-symbols-outlined {
+        font-size: 35px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .material-symbols-outlined:hover {
+        color: #808080;
+    }
+    .btn-close{
+        width: 10px;
+        height: 10px;
+    }
+    .card{
+        cursor: pointer;
+    }
+    .card-title{
+        line-height: 2;
+        text-transform: capitalize;
+    }
+    .card-body{
+        display: flex;
+        justify-content: space-between;
+    }
+    .bookmark-remove{
+        font-size: 1.75rem;
+        color:  white;
+        border: 1px solid white;
+        border-radius: 20px;
+        background-color: rgb(74, 128, 210);
+        padding: 5px;
+    }
+    .bookmark-remove:hover{
+        color: rgb(74, 128, 210);
+        border: 2px solid rgb(74, 128, 210);
+        background-color: white;
+    }
+    .notif-message{
+        padding-right: 10px;
+        border-right: 1px solid rgba(0,0,0,0.3);
+    }
+    .no-notif{
+        font-size: 1rem;
+        padding: 10px 25px;
+    }
+        
+</style>
+{% endblock %}
+
+{% block nav %}
+<a href="{% url 'view' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
+<a href="{% url 'bookmark' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
+<a href="{% url 'request_history' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="request">request_page</span>Borrow History</li></a>
+<a href="#" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="help">help</span>Help</li></a>
+{% endblock %}
+
+{% block body %}
+{% load static %}
+<div class="bookmark-head">
+    <div class="bookmark-title">
+        <h1 class="">Bookmarks</h1>
+        <button id="unbookmark-all" class="btn-mdl">Unbookmark All</button>
+    </div>
+</div>
+<div class="bookmark-content row">
+    {% for book in all_books %}
+    <div class="col-sm-3 mb-4" id="book-card-{{ book.id }}">
+        <div class="card">
+            <span class="special" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
+                  data-title="{{ book.BookTitle }}"
+                  data-author="{{ book.Author }}"
+                  data-description="{{ book.Description }}"
+                  data-date="{{ book.Date }}"
+                  data-category="{{ book.Category.all|join:', ' }}"
+                  data-language="{{ book.Language }}"
+                  data-image="{{ book.BookImage.url }}"
+                  data-views="{{ book.PageViews }}"
+                  data-id="{{ book.id }}"
+                  data-available="{{ book.available|yesno:"true,false" }}">
+                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
+            </span>
+            <div class="card-body">
+                <h5 class="card-title">{{ book.BookTitle }}</h5>
+                <a class="bookmark-link" id="RemoveNotifBtn" data-book-id="{{ book.id }}"><span class="material-symbols-outlined bookmark-remove" >bookmark_remove</span></a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!--Bookmark Removed Notif-->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="RemoveNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Bookmark Removed</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        <p>Bookmark has been successfully removed.</p>
+      </div>
+    </div>
+</div>
+<!--Bookmark Removed Notif-->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="RemoveNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Bookmark Removed</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        <p>Bookmark has been successfully removed.</p>
+      </div>
+    </div>
+</div>
+
+<!-- Remove All Bookmark Modal -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmation</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to unbookmark all books?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmUnbookmark">Unbookmark All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="RemoveAll" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Removed All Bookmarks</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        <p>All Bookmarks has been successfully removed.</p>
+      </div>
+    </div>
+</div>
+
+
+<!-- Modal Structure -->
+<div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header modalHeader">
+                <h5 class="modal-title">Book Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="book-info">
+                    <div class="book-img">
+                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
+                    </div>
+                    <div class="book-data">
+                        <div class="modal-book-text">
+                            <h4 id="modal-book-title" class="book-text text1"></h4>
+                            <h5 class="book-text text2"><strong>Author: </strong><a href="#" id="modal-book-author"></a></h5>
+                            <h6 class="book-text"><strong>Description: </strong><span id="modal-book-description"></span></h6>
+                        </div>
+                        <div class="book-details">
+                            <div class="wrap row">
+                                <p class="col-8"><strong>Date:</strong> <span id="modal-book-date"></span></p>
+                                <p class="col-8"><strong>Category:</strong> <span id="modal-book-category"></span></p>
+                            </div>
+                            <div class="wrap row">
+                                <p class="col-8"><strong>Language:</strong> <span id="modal-book-language"></span></p>
+                                <p class="col-8"><strong>Views:</strong> <span id="modal-book-views"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer modalButtons">
+                <a href="#" id="modal-borrow-link" class="btn-mdl">Borrow</a>
+                <a href="#" id="modal-preview-link" class="btn-mdl">Preview</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Spinner -->
+<div id="loading-spinner" class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var bookDetailModal = document.getElementById('bookDetailModal');
+        var loadingSpinner = document.getElementById('loading-spinner');
+
+        bookDetailModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var title = button.getAttribute('data-title');
+            var author = button.getAttribute('data-author');
+            var description = button.getAttribute('data-description');
+            var date = button.getAttribute('data-date');
+            var category = button.getAttribute('data-category');
+            var language = button.getAttribute('data-language');
+            var image = button.getAttribute('data-image');
+            var views = button.getAttribute('data-views');
+            var bookId = button.getAttribute('data-id');
+            var available = button.getAttribute('data-available') === 'true';
+
+            var modalImage = bookDetailModal.querySelector('#modal-book-image');
+            var modalBookTitle = bookDetailModal.querySelector('#modal-book-title');
+            var modalBookAuthor = bookDetailModal.querySelector('#modal-book-author');
+            var modalBookDescription = bookDetailModal.querySelector('#modal-book-description');
+            var modalBookDate = bookDetailModal.querySelector('#modal-book-date');
+            var modalBookCategory = bookDetailModal.querySelector('#modal-book-category');
+            var modalBookLanguage = bookDetailModal.querySelector('#modal-book-language');
+            var modalBookViews = bookDetailModal.querySelector('#modal-book-views');
+            var modalBorrowLink = bookDetailModal.querySelector('#modal-borrow-link');
+            var modalPreviewLink = bookDetailModal.querySelector('#modal-preview-link');
+
+            modalImage.src = image;
+            modalBookTitle.textContent = title;
+            modalBookAuthor.textContent = author;
+            modalBookDescription.textContent = description;
+            modalBookDate.textContent = date;
+            modalBookCategory.textContent = category;
+            modalBookLanguage.textContent = language;
+            modalBookViews.textContent = views;
+            modalPreviewLink.href = `/student/preview/${bookId}/`;
+            modalBorrowLink.href = available ? `{% url 'borrow_request' book_id=0 %}`.replace('0', bookId) : '#';
+            modalBorrowLink.classList.toggle('disabled', !available);
+        });
+        
+        document.getElementById('modal-book-title').style.setProperty('text-transform', 'capitalize', 'important');
+        document.getElementById('modal-book-author').style.setProperty('text-transform', 'capitalize', 'important');
+
+        // Handle bookmark toggle
+        $('.bookmark-link').on('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const bookId = $(this).data('book-id');
+            const removeBookmark = document.getElementById('RemoveNotifBtn');
+            const removeNotif = document.getElementById('RemoveNotif');
+
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'bookmark_toggle' %}",
+                data: {
+                    'book_id': bookId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.bookmarked) {
+                        $(`#book-card-${bookId} .bookmark-link`).text('Unbookmark');
+                    } else {
+                        const toastBootstrap = new bootstrap.Toast(removeNotif);
+                        toastBootstrap.show();
+                        $(`#book-card-${bookId}`).remove();
+                        
+                    }
+                },
+                error: function() {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+        document.getElementById('unbookmark-all').addEventListener('click', function() {
+            $('#confirmModal').modal('show');
+        });
+
+
+        
+        document.getElementById('confirmUnbookmark').addEventListener('click', function() {
+            const removeAllNotif = document.getElementById('RemoveAll');
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'unbookmark_all' %}",
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        document.querySelectorAll('.col-sm-3').forEach(function(bookCard) {
+                            bookCard.remove();
+                        });
+                        const notifRA = new bootstrap.Toast(removeAllNotif);
+                        notifRA.show();
+                        $('#confirmModal').modal('hide');
+                    } else {
+                        alert('An error occurred while unbookmarking.');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while unbookmarking.');
+                }
+            });
+        });
+
+    });
+
+    {% comment %} notif js {% endcomment %}
+    document.addEventListener('DOMContentLoaded', function() {
+        function fetchNotifications() {
+            $.get("{% url 'fetch_notifications' %}", function(data) {
+                $('#notification-dropdown').empty();
+                if (data.length > 0) {
+                    $('#notification-count').text(data.length).show();
+                    $('#no-notifications').hide();
+                data.forEach(function(notification) {
+                    var item = $('<div class="dropdown-item">')
+                        .html(`<div class="notification-icon-2">
+                            <span class="material-symbols-outlined">notification_important</span>
+                        </div>
+                        <div class="notif-message">
+                            ${notification.message}
+                            <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
+                        </div>
+                        `)
+                        .attr('data-id', notification.id)
+                        .toggleClass('read', notification.read)
+                        .click(function() {
+                            markAsRead(notification.id);
+                        });
+
+                    var deleteButton = $('<button class="btn btn-close ms-auto">')
+                        .html('')
+                        .click(function(event) {
+                            event.stopPropagation();
+                            deleteNotification(notification.id);
+                        });
+
+                    item.append(deleteButton);
+                    $('#notification-dropdown').append(item);
+                });
+            } else {
+                $('#notification-dropdown').html('<span class="dropdown-item-text no-notif" id="no-notifications">No notifications</span>');
+                $('#notification-count').hide();
+            }
+            });
+        }
+
+        function markAsRead(notificationId) {
+            $.post("{% url 'mark_notification_read' 0 %}".replace('0', notificationId), {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function() {
+                fetchNotifications();
+            });
+        }
+
+        function deleteNotification(notificationId) {
+            $.post("{% url 'delete_notification' 0 %}".replace('0', notificationId), {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function() {
+                fetchNotifications();
+            });
+        }
+
+        $('#notification-bell').on('click', function() {
+            $('#notification-dropdown').toggle();
+        });
+
+        setInterval(fetchNotifications, 60000); // Fetch every 60 seconds
+        fetchNotifications();
+    });
+
+    // Hide dropdown when clicking outside
+    $(document).click(function(event) {
+        if (!$(event.target).closest('.notification-icon').length) {
+            $('#notification-dropdown').hide();
+        }
+    });
+    
+</script>
+{% endblock %}

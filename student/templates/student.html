@@ -1,0 +1,646 @@
+{% load custom_tags %}
+
+{% if user.is_authenticated and user|is_student %}
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+    <link rel="icon" href={% static "playground/school_Logo.png" %}>
+
+    <!--search-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--help-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--ebook icon-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--article icon-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--research Paper-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--Bookmark-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <!--Remove Bookmark-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--Close-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<style>
+    .notification-time {
+        font-size: 0.8rem;
+        color: grey;
+        margin-left: auto;
+    }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    
+    body {
+        position: relative;
+    }
+    
+    #search {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+    }
+    .main-container {
+        display: grid;
+        grid-template-columns: 250px 1fr;
+        grid-template-rows: 1px 1fr;
+        grid-template-areas:
+        "header header"
+        "content content";
+    }
+    
+    .form-inline {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .form-control {
+        margin: 5px;
+    }
+    .main-container.with-sidebar {
+        grid-template-areas:
+            "header header"
+            "sidebar content";
+            animation: resizeContainer .2s ease;
+    }
+    
+    .content {
+        grid-area: content;
+    }
+    
+    .side-bar {
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        align-item: center;
+        background-color: rgb(74, 128, 210);
+        position: fixed;
+        width: 250px;
+        height: 90%;
+        z-index: 1;
+        animation: slideOutSidebar 1s ease forwards;
+    }
+    .side-bar.show {
+        animation: slideInSidebar .5s ease forwards;
+    }
+    .side-bar.hide {
+        animation: slideOutSidebar 1s ease forwards;
+    }
+
+    .sidebar-nav{
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        flex-direction: column;
+        list-style: none;
+        margin: none;
+        padding: 20px 0;
+    }
+    .sidebar-nav li{
+        width: 100%;
+        padding: 20px 0px;
+        padding-left: 20px;
+        color: white;
+    }
+    .bookmark{
+        color:white;
+    }
+    .header{
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        padding-left: 25px;
+        background-color: rgb(74, 128, 210);
+        top: 0;
+        position: fixed;
+        z-index: 2;
+        grid-area: header;
+        width:100%;
+        height: 100px;
+        animation: fadeInHeader 0.5s ease forwards;
+    }
+    {% comment %} navbar css {% endcomment %}
+    .navbar-title{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 80%;
+    }
+    .navbar-title span{
+        font-size: 1.8rem;
+        color: white;
+    }
+    .navbar-text{
+        font-weight: bold;
+    }
+    .navbar-icon{
+        padding-right: 3px;
+    }
+    .navbar-text, .navbar-icon{
+        text-decoration: none;
+        transition: color 0.3s;
+        vertical-align: middle;
+    }
+    .navbar-text:hover, .bookmark:hover, .navbar-icon:hover{
+        color: lightgray;
+        cursor: pointer;
+    }
+    .navbar-desc{
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        width: 100%;
+    }
+    .sidebar-nav li:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+    }
+    .logout{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        width:100%;
+        padding: 10px 0;
+        margin-top: auto;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+    }
+    .logout:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: background-color 0.3s ease;
+        cursor: pointer;
+    }
+    .active{
+        background-color:rgba(255, 255, 255, 0.1);
+    }
+
+
+    {% comment %} main body {% endcomment %}
+    .carousel{
+        margin-top: 4%;
+        margin-bottom: 2.5%;
+        width: 100%;
+        animation: fadeInCarousel 1s ease;
+    }
+    .carousel-item {
+        transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .carousel-item.active {
+        transform: translateX(0);
+    }
+
+    .slide-in {
+        transform: translateX(100px) !important;
+    }
+    {% comment %} BAGO SA CAROUSEL NG BOOKS {% endcomment %}
+    .card-img-top{
+        width: 200px;
+        height: 250px;
+    }
+    .top-bar{
+        display: flex;
+        justify-content: space-between;
+    }
+    
+
+    /* Define animation keyframes for carousel */
+    @keyframes fadeInCarousel {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Add animation to the book containers */
+    .container-xl {
+        margin-bottom: 3%;
+        /* Apply animation */
+        animation: slideInBooks 1s ease forwards;
+    }
+
+    /* Define animation keyframes for books */
+    @keyframes slideInBooks {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    /* Add animation to the boxes when hovering */
+    .container-xl:hover {
+        transform: translateY(-5px); /* Adjust as per your preference */
+        transition: transform 0.3s ease;
+    }
+    .card-link{
+        text-decoration: none;
+        cursor: pointer
+    }
+    a{
+        text-decoration: none;
+        color: black;
+        transition: color .2s
+    }
+    a:hover{
+        color: lightgray;
+    }
+    .top-bar{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: .5%;
+    }
+    .books_view-more{
+        text-decoration: none;
+        background-color: rgb(74, 128, 210);
+        color: white;
+        font-weight: bold;
+        padding: .5% .5%;
+        border: 2px solid rgb(74, 128, 210);
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+    .books_view-more:hover{
+        background-color: #3D6DB6;
+        transform: translateY(-5%);
+    }
+    .search-container {
+        flex: 2;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    .search-input {
+        width: 100%;
+        max-width: 400px;
+        padding: 10px 20px;
+        border: 2px solid rgb(74, 128, 210);
+        border-radius: 30px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+        border-color: #3D6DB6;
+        box-shadow: 0 0 10px rgba(61, 109, 182, 0.2);
+        outline: none;
+    }
+    .search-content{
+        font-size: 1.5rem;
+        border: none;
+        padding: 5px 10px;
+        border: solid 3px  rgb(74, 128, 210);
+        border-radius: 10px;
+    }
+    .search-icon{
+        font-size: 2.5rem
+    }
+    .suggestion-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+    }
+    
+    .suggestion-item img {
+        max-width: 50px;
+        margin-right: 10px;
+    }
+    
+    .suggestion-item:hover {
+        background: #f0f0f0;
+        cursor: pointer;
+    }
+    .suggestions {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 400px;
+        border: 1px solid #ccc;
+        background: #fff;
+        z-index: 10;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .search-icon:hover{
+        color: lightgray;
+        cursor: pointer;
+    }
+    .item{
+        transition: .3s ease;
+    }
+    .item:hover{
+        transform: translateY(-10px);
+    }
+    .offcanvas-start{
+        height: 0%;
+    }
+    
+    
+    @keyframes slideInSidebar {
+        from {
+            transform: translateX(-100%);
+            transform: translateY(100px);
+        }
+        to {
+            transform: translateX(0);
+            transform: translateY(100px);
+        }
+    }
+
+    @keyframes filterAnimation{
+        from{
+            opacity: 0;
+        }
+        to{
+            opacity: 1;
+        }
+    }
+</style>
+
+{% block style %}
+{% endblock %}
+
+<body>
+    <div class="main-container with-sidebar" id="main-container">
+        <header class="header">
+            <span id="sidebar-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                <svg width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 18L20 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M4 12L20 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M4 6L20 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <div class="logo">
+                <a href="{% url 'view' %}">
+                    <img src="{% static 'playground/Logo.png' %}" alt="Logo" height="80px" id="logo">
+                </a>
+            </div>
+            <div class="search-container">
+                <input type="text" class="search-input" id="search-input" placeholder="Search for books...">
+                <div class="suggestions" id="suggestions"></div>
+            </div>
+            {% block notification %}{% endblock %}
+        </header>
+        <div class="offcanvas offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+            <div class="offcanvas-body side-bar show">
+                <ul class="sidebar-nav">
+                    {% block nav %}{% endblock %}
+                </ul>
+                <div class="logout">
+                    <a href="{% url 'logout_user' %}" class="navbar-text"><span class="material-symbols-outlined navbar-icon">logout</span>LOG OUT</a>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header modalHeader">
+                    <h5 class="modal-title">Book Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="book-info">
+                        <div class="book-img">
+                            <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
+                        </div>
+                        <div class="book-data">
+                            <div class="modal-book-text">
+                                <h4 id="modal-book-title" class="book-text text1"></h4>
+                                <h5 class="book-text text2"><strong>Author: </strong><a href="#" id="modal-book-author"></a></h5>
+                                <h6 class="book-text"><strong>Description: </strong><span id="modal-book-description"></span></h6>
+                            </div>
+                            <div class="book-details">
+                                <div class="wrap row">
+                                    <p class="col-8"><strong>Date:</strong> <span id="modal-book-date"></span></p>
+                                    <p class="col-8"><strong>Category:</strong> <span id="modal-book-category"></span></p>
+                                </div>
+                                <div class="wrap row">
+                                    <p class="col-8"><strong>Language:</strong> <span id="modal-book-language"></span></p>
+                                    <p class="col-8"><strong>Views:</strong> <span id="modal-book-views"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer modalButtons">
+                    <a href="#" id="modal-borrow-link" class="btn-mdl">Borrow</a>
+                    <a href="#" id="modal-preview-link" class="btn-mdl">Preview</a>
+                    <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="">Bookmark</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        // Search functionality
+        $('#search-input').on('input', function() {
+            var query = $(this).val();
+            if (query.length >= 3) {
+                $.get("{% url 'search_suggestions' %}", { q: query }, function(data) {
+                    $('#suggestions').empty();
+                    data.forEach(function(book) {
+                        var suggestion = $('<div class="suggestion-item" data-bs-toggle="modal" data-bs-target="#bookDetailModal">')
+                            .attr('data-title', book.title)
+                            .attr('data-author', book.author)
+                            .attr('data-description', book.description)
+                            .attr('data-date', book.date)
+                            .attr('data-category', book.category)
+                            .attr('data-language', book.language)
+                            .attr('data-image', book.image_url)
+                            .attr('data-views', book.views)
+                            .attr('data-id', book.id)
+                            .attr('data-available', book.available)
+                            .append($('<img>').attr('src', book.image_url))
+                            .append($('<span>').text(book.title + ' by ' + book.author));
+                        $('#suggestions').append(suggestion);
+                    });
+                    $('#suggestions').show();
+                });
+            } else {
+                $('#suggestions').hide();
+            }
+        });
+
+        $(document).click(function(event) {
+            if (!$(event.target).closest('#search-input').length) {
+                $('#suggestions').hide();
+            }
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        var bookDetailModal = document.getElementById('bookDetailModal');
+
+        bookDetailModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var title = button.getAttribute('data-title');
+            var author = button.getAttribute('data-author');
+            var description = button.getAttribute('data-description');
+            var date = button.getAttribute('data-date');
+            var category = button.getAttribute('data-category');
+            var language = button.getAttribute('data-language');
+            var image = button.getAttribute('data-image');
+            var views = button.getAttribute('data-views');
+            var bookId = button.getAttribute('data-id');
+            var available = button.getAttribute('data-available') === 'true';
+
+            var modalImage = bookDetailModal.querySelector('#modal-book-image');
+            var modalBookTitle = bookDetailModal.querySelector('#modal-book-title');
+            var modalBookAuthor = bookDetailModal.querySelector('#modal-book-author');
+            var modalBookDescription = bookDetailModal.querySelector('#modal-book-description');
+            var modalBookDate = bookDetailModal.querySelector('#modal-book-date');
+            var modalBookCategory = bookDetailModal.querySelector('#modal-book-category');
+            var modalBookLanguage = bookDetailModal.querySelector('#modal-book-language');
+            var modalBookViews = bookDetailModal.querySelector('#modal-book-views');
+            var modalBorrowLink = bookDetailModal.querySelector('#modal-borrow-link');
+            var modalPreviewLink = bookDetailModal.querySelector('#modal-preview-link');
+            var modalBookmarkLink = bookDetailModal.querySelector('#modal-bookmark-link');
+
+            modalImage.src = image;
+            modalBookTitle.textContent = title;
+            modalBookAuthor.textContent = author;
+            modalBookDescription.textContent = description;
+            modalBookDate.textContent = date;
+            modalBookCategory.textContent = category;
+            modalBookLanguage.textContent = language;
+            modalBookViews.textContent = views;
+            modalPreviewLink.href = `/student/preview/${bookId}/`;
+            modalBookmarkLink.setAttribute('data-book-id', bookId);
+            modalBorrowLink.href = available ? `{% url 'borrow_request' book_id=0 %}`.replace('0', bookId) : '#';
+            modalBorrowLink.classList.toggle('disabled', !available);
+
+            // Check bookmark status
+            $.ajax({
+                type: 'GET',
+                url: `{% url 'bookmark_status' 0 %}`.replace('0', bookId),
+                success: function(response) {
+                    if (response.bookmarked) {
+                        modalBookmarkLink.textContent = 'Unbookmark';
+                    } else {
+                        modalBookmarkLink.textContent = 'Bookmark';
+                    }
+                }
+            });
+        });
+    });
+    document.addEventListener('DOMContentLoaded', function () {
+        var bookDetailModal = document.getElementById('bookDetailModal');
+
+        bookDetailModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var title = button.getAttribute('data-title');
+            var author = button.getAttribute('data-author');
+            var description = button.getAttribute('data-description');
+            var date = button.getAttribute('data-date');
+            var category = button.getAttribute('data-category');
+            var language = button.getAttribute('data-language');
+            var image = button.getAttribute('data-image');
+            var views = button.getAttribute('data-views');
+            var bookId = button.getAttribute('data-id');
+            var available = button.getAttribute('data-available') === 'true';
+
+            var modalImage = bookDetailModal.querySelector('#modal-book-image');
+            var modalBookTitle = bookDetailModal.querySelector('#modal-book-title');
+            var modalBookAuthor = bookDetailModal.querySelector('#modal-book-author');
+            var modalBookDescription = bookDetailModal.querySelector('#modal-book-description');
+            var modalBookDate = bookDetailModal.querySelector('#modal-book-date');
+            var modalBookCategory = bookDetailModal.querySelector('#modal-book-category');
+            var modalBookLanguage = bookDetailModal.querySelector('#modal-book-language');
+            var modalBookViews = bookDetailModal.querySelector('#modal-book-views');
+            var modalBorrowLink = bookDetailModal.querySelector('#modal-borrow-link');
+            var modalPreviewLink = bookDetailModal.querySelector('#modal-preview-link');
+            var modalBookmarkLink = bookDetailModal.querySelector('#modal-bookmark-link');
+
+            modalImage.src = image;
+            modalBookTitle.textContent = title;
+            modalBookAuthor.textContent = author;
+            modalBookDescription.textContent = description;
+            modalBookDate.textContent = date;
+            modalBookCategory.textContent = category;
+            modalBookLanguage.textContent = language;
+            modalBookViews.textContent = views;
+            modalPreviewLink.href = `/student/preview/${bookId}/`;
+            modalBookmarkLink.setAttribute('data-book-id', bookId);
+            modalBorrowLink.href = available ? `{% url 'borrow_request' book_id=0 %}`.replace('0', bookId) : '#';
+            modalBorrowLink.classList.toggle('disabled', !available);
+
+            // Check bookmark status
+            $.ajax({
+                type: 'GET',
+                url: `{% url 'bookmark_status' 0 %}`.replace('0', bookId),
+                success: function(response) {
+                    if (response.bookmarked) {
+                        modalBookmarkLink.textContent = 'Unbookmark';
+                    } else {
+                        modalBookmarkLink.textContent = 'Bookmark';
+                    }
+                }
+            });
+        });
+
+        // Handle bookmark toggle
+        $('#modal-bookmark-link').on('click', function (event) {
+            event.preventDefault();
+            const bookId = $(this).data('book-id');
+
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'bookmark_toggle' %}",
+                data: {
+                    'book_id': bookId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.bookmarked) {
+                        $('#modal-bookmark-link').text('Unbookmark');
+                    } else {
+                        $('#modal-bookmark-link').text('Bookmark');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+    {% block script %}{% endblock %}
+</body>
+</html>
+{%endif%}

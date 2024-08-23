@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Page Views Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            display: flex;
+        }
+        #sidebar-wrapper {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+            background-color: #343a40;
+            color: #fff;
+            padding-top: 20px;
+        }
+        .sidebar-heading {
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .list-group-item {
+            color: #fff;
+            background-color: #343a40;
+        }
+        .list-group-item:hover {
+            background-color: #495057;
+        }
+        #page-content-wrapper {
+            margin-left: 250px;
+            padding: 20px;
+            width: 100%;
+        }
+        .navbar {
+            width: 100%;
+            padding-right: 0;
+            padding-left: 0;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .chart-container {
+            position: relative;
+            height: 700px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+        <div class="sidebar-heading">Dashboard</div>
+        <div class="list-group list-group-flush">
+            <a href="#" class="list-group-item list-group-item-action" id="overview-link">Overview</a>
+            <a href="#" class="list-group-item list-group-item-action" id="active-link">Activity</a>
+            <a href="#" class="list-group-item list-group-item-action" id="analytics-link">User List</a>
+            <a href="#" class="list-group-item list-group-item-action" id="Create-link">Create Account</a>
+        </div>
+    </div>
+    <!-- /Sidebar -->
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <!-- Top Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#"></a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <br>
+        <!-- Overview Section -->
+        <div id="overview-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="card text-white bg-success">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Users</h5>
+                            <p class="card-text">{{ user_total }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-white bg-warning">
+                        <div class="card-body">
+                            <h5 class="card-title">Users This Month</h5>
+                            <p class="card-text">{{ distinct_users_count_this_month }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Most Viewed Material</h5>
+                            <div class="chart-container" >
+                                <canvas id="pageViewsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Top E-Books Borrowed</h5>
+                            <div class="chart-container" >
+                                <canvas id="topBooksChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Active Users</h5>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Login Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for activity in user_activities %}
+                                    <tr>
+                                        <td>{{ activity.user.username }}</td>
+                                        <td>{{ activity.login_time }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="3">No user activities</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Placeholder for other sections -->
+        <div id="active-section" style="display: none;">
+            <h2>USER ACTIVITY LOGS</h2>
+        
+            <!-- Dropdown filter for selecting the month -->
+            <label for="month-filter">Filter by Month:</label>
+            <select id="month-filter" onchange="filterTableByMonth()">
+                <option value="">All Months</option>
+                <option value="01">January</option>
+                <option value="02">February</option>
+                <option value="03">March</option>
+                <option value="04">April</option>
+                <option value="05">May</option>
+                <option value="06">June</option>
+                <option value="07">July</option>
+                <option value="08">August</option>
+                <option value="09">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+        
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Login Time</th>
+                        <th>Logout Time</th>
+                    </tr>
+                </thead>
+                <tbody id="activity-log-tbody">
+                    {% for user_logs in user_logs %}
+                    <tr>
+                        <td>{{ user_logs.user.username }}</td>
+                        <td>{{ user_logs.login_time }}</td>
+                        <td>{{ user_logs.logout_time }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3">No user activities</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <script>
+        function filterTableByMonth() {
+            var filterValue = document.getElementById("month-filter").value;
+            var table = document.getElementById("activity-log-tbody");
+            var rows = table.getElementsByTagName("tr");
+            var monthMapping = {
+                "Jan.": "01", "Feb.": "02", "March": "03", "April": "04", 
+                "May": "05", "June": "06", "July": "07", "Aug.": "08", 
+                "Sept.": "09", "Oct.": "10", "Nov.": "11", "Dec.": "12"
+            };
+        
+            for (var i = 0; i < rows.length; i++) {
+                var loginTime = rows[i].getElementsByTagName("td")[1]; // Assuming login time is in the second column
+                if (loginTime) {
+                    var dateParts = loginTime.innerHTML.split(' ');
+                    var shortMonth = dateParts[0];
+                    var monthIndex = monthMapping[shortMonth];
+                    if (filterValue === "" || monthIndex === filterValue) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+        </script>
+        
+        
+<!-- Template: book_page_views.html -->
+        <div id="analytics-section">
+            <h2>User List</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Active</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr id="user-row-{{ user.id }}">
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.first_name }}, {{ user.last_name }}</td>
+                            <td id="user-status-{{ user.id }}">{{ user.is_active }}</td>
+                            <td>
+                                <button 
+                                    class="btn {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#confirmDisableModal" 
+                                    data-user-id="{{ user.id }}" 
+                                    data-user-status="{{ user.is_active }}">
+                                    {% if user.is_active %}Disable{% else %}Activate{% endif %}
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    
+                </table>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="confirmDisableModal" tabindex="-1" aria-labelledby="confirmDisableModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDisableModalLabel">Confirm Action</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to <span id="action-text">disable</span> this account?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                        <button type="button" class="btn btn-primary" id="confirmAction">Yes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include jQuery and Bootstrap JS for handling the modal -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Include Bootstrap Bundle (includes Bootstrap JS and Popper.js) -->
+
+        <script>
+            $(document).ready(function(){
+                var userId, userStatus;
+            
+                $('#confirmDisableModal').on('show.bs.modal', function (event) {
+                    var button = $(event.relatedTarget);
+                    userId = button.data('user-id');
+                    userStatus = button.data('user-status');
+                    var actionText = userStatus ? 'disable' : 'activate';
+                    $('#action-text').text(actionText);
+                });
+            
+                $('#confirmAction').click(function(){
+                    $.ajax({
+                        url: '{% url "toggle_user_status" %}',
+                        method: 'POST',
+                        data: {
+                            'user_id': userId,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response){
+                            if(response.status == 'success'){
+                                var newStatus = response.new_status;
+                                $('#user-status-' + userId).text(newStatus);
+                                var newButtonText = newStatus ? 'Disable' : 'Activate';
+                                var newButtonClass = newStatus ? 'btn btn-danger' : 'btn btn-success';
+                                $('button[data-user-id="' + userId + '"]').text(newButtonText).removeClass('btn-success btn-danger').addClass(newButtonClass);
+                                $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
+                                $('#confirmDisableModal').modal('hide');    
+                            }
+                        }
+                    });
+                });
+            });
+            </script>
+
+        <div id="Create-section">
+            <div class="container">
+                <div class="row justify-content-center mt-5">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Account Creation</h2>
+                                
+                                <select class="form-select" id="role" name="role" onchange="toggleForm()">
+                                    <option value="Student">Student</option>
+                                    <option value="Librarian">Librarian</option>
+                                </select>
+                            </div>
+                            <div class="card-body">
+                                <!-- Student Form -->
+                                <form id="student-form" method="post" action="{% url 'create_account' %}">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label for="lrn" class="form-label">LRN</label>
+                                        <input type="text" class="form-control" id="lrn" name="lrn">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="fname" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="fname" name="fname">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="lname" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="lname" name="lname">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="address" class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="address" name="address">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="birthday" class="form-label">Birthday</label>
+                                        <input type="date" class="form-control" id="birthday" name="birthday">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="age" class="form-label">Age</label>
+                                        <input type="number" class="form-control" id="age" name="age">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+                                </form>
+            
+                                <!-- Librarian Form -->
+                                <form id="librarian-form" method="post" action="{% url 'create_librarian' %}">
+                                    {% csrf_token %}
+                                    <!-- Your Librarian form fields here -->
+                                    <div class="mb-3">
+                                        <label for="Username" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="username" name="Username">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="fname" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="fname" name="fname">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="lname" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="lname" name="lname">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="Bday" class="form-label">Birthday</label>
+                                        <input type="date" class="form-control" id="bday" name="Bday">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block">Create Librarian</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- /Page Content -->
+
+    <!-- Script to manage content display -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Function to show the overview content
+            function showOverview() {
+                document.getElementById('overview-section').style.display = 'block';
+                document.getElementById('active-section').style.display = 'none';
+                document.getElementById('analytics-section').style.display = 'none';
+                document.getElementById('Create-section').style.display = 'none';
+            }
+    
+            // Function to show the active content
+            function showActive() {
+                document.getElementById('overview-section').style.display = 'none';
+                document.getElementById('active-section').style.display = 'block';
+                document.getElementById('analytics-section').style.display = 'none';
+                document.getElementById('Create-section').style.display = 'none';
+            }
+    
+            // Function to show the analytics content
+            function showAnalytics() {
+                document.getElementById('overview-section').style.display = 'none';
+                document.getElementById('active-section').style.display = 'none';
+                document.getElementById('analytics-section').style.display = 'block';
+                document.getElementById('Create-section').style.display = 'none';
+            }
+    
+            // Function to show the create section
+            function showCreate() {
+                document.getElementById('overview-section').style.display = 'none';
+                document.getElementById('active-section').style.display = 'none';
+                document.getElementById('analytics-section').style.display = 'none';
+                document.getElementById('Create-section').style.display = 'block';
+            }
+    
+            // Show the overview content by default
+            showOverview();
+    
+            // Add click event listeners to sidebar links
+            document.getElementById('overview-link').addEventListener('click', function () {
+                showOverview();
+            });
+    
+            document.getElementById('active-link').addEventListener('click', function () {
+                showActive();
+            });
+    
+            document.getElementById('analytics-link').addEventListener('click', function () {
+                showAnalytics();
+            });
+    
+            document.getElementById('Create-link').addEventListener('click', function () {
+                showCreate();
+            });
+        });
+
+        // Chart.js configuration
+        const bookTitles = {{ book_titles|safe }};
+        const pageViews = {{ page_views|safe }};
+
+        var ctx = document.getElementById('pageViewsChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: bookTitles,
+                datasets: [{
+                    label: 'Book Page Views',
+                    data: pageViews,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        function toggleForm() {
+            var role = document.getElementById('role').value;
+            var studentForm = document.getElementById('student-form');
+            var librarianForm = document.getElementById('librarian-form');
+
+            if (role === 'Student') {
+                studentForm.style.display = 'block';
+                librarianForm.style.display = 'none';
+            } else if (role === 'Librarian') {
+                studentForm.style.display = 'none';
+                librarianForm.style.display = 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            toggleForm(); // Call once to set the initial state
+        });
+
+
+        const ebook_titles = {{ ebook_titles|safe }};
+        const times_borrowed = {{ borrow|safe }};
+        
+        var ctx = document.getElementById('topBooksChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ebook_titles,
+                datasets: [{
+                    label: 'Book Page Views',
+                    data: times_borrowed,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+        
+        
+    </script>
+   
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

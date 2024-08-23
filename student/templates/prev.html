@@ -1,0 +1,392 @@
+{% load custom_tags %}
+{% load static %}
+
+{% if user.is_authenticated%}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.BookTitle }} - Preview</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #pdf-container {
+            width: 80vw;
+            height: 80vh;
+            overflow: hidden;
+            white-space: nowrap;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            cursor: grab;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        canvas {
+            display: inline-block;
+            margin: 0;
+            vertical-align: top;
+        }
+        #zoom-controls, #page-controls, #speaker-controls {
+            margin-top: 10px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #page-input {
+            margin-top: 10px;
+            padding: 5px;
+            width: 50px;
+            text-align: center;
+        }
+        #back-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+</head>
+<body>
+    <a href="#" id="back-button" onclick="history.go(-1); return false;">Back</a>
+    <p>Page Views: {{ book.PageViews }}</p>
+    <div id="pdf-container" onmousedown="startDragging(event)" onmousemove="drag(event)" onmouseup="stopDragging(event)" oncontextmenu="return false;"></div>
+    <div id="zoom-controls">
+        <button onclick="zoomOut()">-</button>
+        <button onclick="zoomIn()">+</button>
+    </div>
+    <div id="page-controls">
+        <button onclick="prevPage()">Previous</button>
+        <span id="page-counter" aria-live="polite"></span>
+        <button onclick="nextPage()">Next</button>
+        <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
+    </div>
+    <div id="speaker-controls">
+        <button onclick="readPage()">🔊 Read Page</button>
+        <button id="pauseResumeButton" onclick="togglePauseResume()">⏸ Pause</button>
+        <button onclick="stopReading()">⏹ Stop</button>
+
+        <div id="notification" class="alert alert-info alert-dismissible fade show" role="alert" style="display: none;">
+            Text to Speech has started
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        let pdfDoc = null;
+        let pageNum = 1;
+        let scale = 1.0;
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+        let utterance = null;
+        let recognition = null;
+    
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const pdfContainer = document.getElementById("pdf-container");
+        const pageCounter = document.getElementById("page-counter");
+        const pageInput = document.getElementById("page-input");
+    
+        // Function to speak command success message
+        function speakCommandSuccess(message) {
+            utterance = new SpeechSynthesisUtterance(message);
+            speechSynthesis.speak(utterance);
+        }
+    
+        function nextPage() {
+            stopReading(); // Stop TTS before navigating
+            if (pageNum < pdfDoc.numPages) {
+                pageNum++;
+                renderPage(pageNum, scale, false); // Set shouldRead to false
+                
+            }
+        }
+    
+        function prevPage() {
+            stopReading(); // Stop TTS before navigating
+            if (pageNum > 1) {
+                pageNum--;
+                renderPage(pageNum, scale, false); // Set shouldRead to false
+                
+            }
+        }
+    
+        function renderPage(pageNum, scale, shouldRead = false) {
+            pdfDoc.getPage(pageNum).then(function(page) {
+                const viewport = page.getViewport({ scale: scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                page.render(renderContext).promise.then(() => {
+                    // Add watermark
+                    ctx.save();
+                    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any transformations
+                    ctx.font = `${30}px Arial`; // Base font size
+                    ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
+                    ctx.textAlign = "center";
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(-Math.PI / 4);
+                    ctx.scale(scale, scale); // Scale the watermark based on the zoom level
+                    ctx.fillText("PROPERTY OF LAWANG BATO NATIONAL HIGH SCHOOL", 0, 0);
+                    ctx.restore();
+        
+                    if (!pdfContainer.contains(canvas)) {
+                        pdfContainer.appendChild(canvas);
+                    }
+                });
+                page.getTextContent().then(function(textContent) {
+                    const textItems = textContent.items;
+                    let finalText = '';
+                    for (let i = 0; i < textItems.length; i++) {
+                        finalText += textItems[i].str + ' ';
+                    }
+                    canvas.setAttribute('data-text', finalText);
+                    if (shouldRead) {
+                        readPage();
+                    }
+                });
+            }).catch(error => {
+                console.error('Error rendering page:', error);
+            });
+            pageCounter.textContent = `${pageNum} / ${pdfDoc.numPages}`;
+            pageInput.value = pageNum;
+        }
+        
+    
+        function readPage() {
+            const text = canvas.getAttribute('data-text');
+            if (text) {
+                if (utterance) {
+                    speechSynthesis.cancel(); // Cancel any ongoing speech
+                }
+                utterance = new SpeechSynthesisUtterance(text);
+                speechSynthesis.speak(utterance);
+                $('#notification').fadeIn(); // Show the notification
+                setTimeout(function() {
+                    $('#notification').fadeOut(); // Hide the notification after a delay
+                }, 3000); // 3000 milliseconds = 3 seconds
+            } else {
+                console.error('No text found to read.');
+            }
+        }
+    
+        function stopReading() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+        }
+    
+        function zoomOut() {
+            if (scale > 0.25) {
+                scale -= 0.25;
+                renderPage(pageNum, scale);
+            }
+        }
+    
+        function zoomIn() {
+            if (scale < 4.0) {
+                scale += 0.25;
+                renderPage(pageNum, scale);
+            }
+        }
+    
+        function startDragging(e) {
+            isDragging = true;
+            startX = e.clientX - pdfContainer.offsetLeft;
+            startY = e.clientY - pdfContainer.offsetTop;
+            scrollLeft = pdfContainer.scrollLeft;
+            scrollTop = pdfContainer.scrollTop;
+        }
+    
+        function stopDragging() {
+            isDragging = false;
+        }
+    
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.clientX - pdfContainer.offsetLeft;
+            const y = e.clientY - pdfContainer.offsetTop;
+            const walkX = x - startX;
+            const walkY = y - startY;
+            pdfContainer.scrollLeft = scrollLeft - walkX;
+            pdfContainer.scrollTop = scrollTop - walkY;
+        }
+    
+        function jumpToPage(e) {
+            if (e.key === 'Enter') {
+                const page = parseInt(pageInput.value);
+                if (page > 0 && page <= pdfDoc.numPages) {
+                    pageNum = page;
+                    renderPage(pageNum, scale);
+                }
+            }
+        }
+    
+        function togglePauseResume() {
+            const button = document.getElementById('pauseResumeButton');
+            if (speechSynthesis.speaking) {
+                if (speechSynthesis.paused) {
+                    speechSynthesis.resume(); // If paused, resume
+                    button.textContent = "⏸ Pause";
+                } else {
+                    speechSynthesis.pause(); // If speaking, pause
+                    button.textContent = "▶️ Resume";
+                }
+            }
+        }
+
+        function goToPage(pageNumber) {
+            stopReading(); // Stop TTS before navigating
+            if (pageNumber >= 1 && pageNumber <= pdfDoc.numPages) {
+                pageNum = pageNumber;
+                renderPage(pageNum, scale, false); // Set shouldRead to false
+            } else {
+                console.error('Invalid page number:', pageNumber);
+            }
+        }
+        
+    
+        // Add CSS transition
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.getElementById('pauseResumeButton');
+            button.style.transition = "all 0.3s ease";
+        });
+    
+        window.addEventListener('beforeunload', function(event) {
+            stopReading();
+        });
+    
+        pdfjsLib.getDocument("{{ book.BookFile.url }}").promise.then(function(pdf) {
+            pdfDoc = pdf;
+            renderPage(pageNum, scale);
+        }).catch(error => {
+            console.error('Error loading PDF:', error);
+        });
+    
+        // Speech recognition setup
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US'; // Set language to English
+            recognition.continuous = false; // Stop listening after one phrase is recognized
+    
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript.trim().toLowerCase();
+                console.log('Recognized:', transcript);
+                if (transcript === 'next.') {
+                    nextPage();
+                    speakCommandSuccess('Next page navigated.');
+                } else if (transcript === 'stop.') {
+                    stopReading();
+                    speakCommandSuccess('Reading stopped.');
+                } else if (transcript === 'read.') {
+                    readPage();
+                    speakCommandSuccess('Reading started.');
+                } else if (transcript === 'previous.') {
+                    prevPage();
+                    speakCommandSuccess('Previous page navigated.');
+                } else if (transcript.startsWith('go to page')) {
+                    const words = transcript.split(' ');
+                    const pageNumberIndex = words.indexOf('page') + 1; // Find the index of the word "page"
+                    if (pageNumberIndex !== 0 && pageNumberIndex < words.length) {
+                        const pageNumber = parseInt(words[pageNumberIndex]);
+                        if (!isNaN(pageNumber)) {
+                            goToPage(pageNumber);
+                            speakCommandSuccess(`Navigated to page ${pageNumber}.`);
+                        } else {
+                            console.error('Invalid page number:', words[pageNumberIndex]);
+                        }
+                    } else {
+                        console.error('Page number not found in transcript:', transcript);
+                    }
+                }
+                else if (transcript === 'pause.' || 'wait.') {
+                    speakCommandSuccess('Reading pause');
+                    togglePauseResume();
+                    
+                } else if (transcript === 'resume.' || 'go on.') {
+                    speakCommandSuccess('Reading continue');
+                    togglePauseResume();
+                    
+                }
+                else if (transcript === 'zoom in.' || 'in.') {
+                    zoomIn();
+                    speakCommandSuccess('Zooming In');
+                }
+                else if (transcript === 'zoom out.') {
+                    zoomOut();
+                    speakCommandSuccess('Zooming out');
+                }
+            };
+    
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+            };
+    
+            recognition.onend = function() {
+                // Restart recognition after it ends
+                recognition.start();
+            };
+    
+            // Start recognition
+            recognition.start();
+        } else {
+            console.error('Speech recognition not supported in this browser.');
+        }
+    </script>
+    
+    
+    
+    
+    
+
+    
+</body>
+</html>
+{% endif %}
+
+           
