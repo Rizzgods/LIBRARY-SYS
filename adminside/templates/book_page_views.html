@@ -418,9 +418,27 @@
             </div>
         </div>
     <!-- /Page Content -->
-    <div id = "csv-section">
-        
+    <div id="csv-section">
+        <form method="post" enctype="multipart/form-data" action="{% url 'import_csv' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="csvFile" class="form-label">Upload CSV File</label>
+                <input class="form-control" type="file" id="csvFile" name="csv_file" accept=".csv">
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
     </div>
+    
+    
     <!-- Script to manage content display -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {

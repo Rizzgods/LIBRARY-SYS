@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'student',
     'adminside',
     'stud_app',
+    'import_export',
 ]
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'

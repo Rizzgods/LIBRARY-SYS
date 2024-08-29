@@ -11,4 +11,6 @@ urlpatterns = [
     path('create-account/', views.create_account, name='create_account'),
     path('create-librarian/', views.create_librarian, name='create_librarian'),
     path('toggle_user_status/', views.toggle_user_status, name='toggle_user_status'),
+    path('import-csv/', views.import_csv, name='import_csv'),
+
     ]
