@@ -206,8 +206,12 @@
         align-items: center;
         animation: filterAnimation 1.2s ease;
     }
-    .filter-title{
-        font-weight: bold;
+    .filter-option{
+        display:flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+
     }
     .notif-message{
         padding-right: 10px;
@@ -263,7 +267,51 @@
         justify-content: center;
         align-items: center;
     }
+    .search-contain {
+        position: relative;
+        display: flex;
+        justify-content: center;
+    }
+    .search-inputs{
+        padding: 10px 150px 10px 20px;
+        border-radius: 20px;
+        border: 2px solid black;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    } 
+    .form-control{
+        width:30%;
+    }
+    .suggestion-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+    }
     
+    .suggestion-item img {
+        max-width: 50px;
+        margin-right: 10px;
+    }
+    
+    .suggestion-item:hover {
+        background: #f0f0f0;
+        cursor: pointer;
+    }
+    .suggestions {
+        position: absolute;
+        top: 85%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 350px;
+        border: 1px solid #ccc;
+        background: #fff;
+        z-index: 10;
+        border-radius: 0 0 10px 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 </style>
 
 {% endblock %}
@@ -272,7 +320,18 @@
 <a href="{% url 'view' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
 <a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
 <a href="{% url 'request_history' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="request">request_page</span>Borrow History</li></a>
-<a href="#" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="help">help</span>Help</li></a>
+<a>
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      Dropdown button
+    </button>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="#">Action</a></li>
+      <li><a class="dropdown-item" href="#">Another action</a></li>
+      <li><a class="dropdown-item" href="#">Something else here</a></li>
+    </ul>
+</div>
+</a>
 {% endblock %}
 
 {% block body %}
@@ -309,27 +368,32 @@
 
 <!-- Filter Form -->
 <div class="filter-container">
-    <h3 class="filter-title"> Filter By: </h3>
-    <form method="get" id="filterForm" class="form-inline mb-4">
-        <select name="year" class="form-control" id="yearFilter">
-            <option value="" >All Year</option>
-            {% for year in years %}
-            <option value="{{ year.year }}" {% if filter_params.year == year.year|stringformat:"s" %}selected{% endif %}>{{ year.year }}</option>
-            {% endfor %}
-        </select>
-        <select name="category" class="form-control" id="categoryFilter">
-            <option value="">All Category</option>
-            {% for category in categories %}
-            <option value="{{ category.id }}" {% if filter_params.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
-            {% endfor %}
-        </select>
-        <select name="language" id="languageFilter" class="form-control">
-            <option value="">All Language</option>
-            {% for code, name in language_choices %}
-            <option value="{{ code }}" {% if filter_params.language == code %}selected{% endif %}>{{ name }}</option>
-            {% endfor %}
-        </select>
-    </form>
+    <div class="search-contain">
+        <input type="text" class="search-inputs" id="search-inputs" placeholder="Search for books...">
+        <div class="suggestions" id="suggestions"></div>
+    </div>
+    <div class="filter-option">
+        <form method="get" id="filterForm" class="form-inline mb-1">
+            <select name="year" class="form-control" id="yearFilter">
+                <option value="" >All Year</option>
+                {% for year in years %}
+                <option value="{{ year.year }}" {% if filter_params.year == year.year|stringformat:"s" %}selected{% endif %}>{{ year.year }}</option>
+                {% endfor %}
+            </select>
+            <select name="category" class="form-control" id="categoryFilter">
+                <option value="">All Category</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if filter_params.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="language" id="languageFilter" class="form-control">
+                <option value="">All Language</option>
+                {% for code, name in language_choices %}
+                <option value="{{ code }}" {% if filter_params.language == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
 </div>
 
 <!-- Top Viewed Books Section -->
@@ -847,7 +911,7 @@ function copyCitation() {
                                     <span class="material-symbols-outlined">notification_important</span>
                                 </div>
                                 <div class="notif-message">
-                                    ${notification.message}
+                                    <a href="">${notification.message}</a>
                                     <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
                                 </div>
                             `)
@@ -930,6 +994,43 @@ function copyCitation() {
     $(document).ready(function() {
         $(".draggable").draggable({
             handle: ".modal-header" // Specify the header as the handle for dragging
+        });
+    });
+
+    $(document).ready(function() {
+        // Search functionality
+        $('#search-inputs').on('input', function() {
+            var query = $(this).val();
+            if (query.length >= 3) {
+                $.get("{% url 'search_suggestions' %}", { q: query }, function(data) {
+                    $('#suggestions').empty();
+                    data.forEach(function(book) {
+                        var suggestion = $('<div class="suggestion-item" data-bs-toggle="modal" data-bs-target="#bookDetailModal">')
+                            .attr('data-title', book.title)
+                            .attr('data-author', book.author)
+                            .attr('data-description', book.description)
+                            .attr('data-date', book.date)
+                            .attr('data-category', book.category)
+                            .attr('data-language', book.language)
+                            .attr('data-image', book.image_url)
+                            .attr('data-views', book.views)
+                            .attr('data-id', book.id)
+                            .attr('data-available', book.available)
+                            .append($('<img>').attr('src', book.image_url))
+                            .append($('<span>').text(book.title + ' by ' + book.author));
+                        $('#suggestions').append(suggestion);
+                    });
+                    $('#suggestions').show();
+                });
+            } else {
+                $('#suggestions').hide();
+            }
+        });
+
+        $(document).click(function(event) {
+            if (!$(event.target).closest('#search-input').length) {
+                $('#suggestions').hide();
+            }
         });
     });
     

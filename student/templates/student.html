@@ -122,6 +122,7 @@
     }
     .header{
         display: flex;
+        justify-content: space-between;
         align-items: center;
         gap: 25px;
         padding-left: 25px;
@@ -318,35 +319,6 @@
     .search-icon{
         font-size: 2.5rem
     }
-    .suggestion-item {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        display: flex;
-        align-items: center;
-    }
-    
-    .suggestion-item img {
-        max-width: 50px;
-        margin-right: 10px;
-    }
-    
-    .suggestion-item:hover {
-        background: #f0f0f0;
-        cursor: pointer;
-    }
-    .suggestions {
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        max-width: 400px;
-        border: 1px solid #ccc;
-        background: #fff;
-        z-index: 10;
-        border-radius: 0 0 10px 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
     .search-icon:hover{
         color: lightgray;
         cursor: pointer;
@@ -359,6 +331,9 @@
     }
     .offcanvas-start{
         height: 0%;
+    }
+    .logo-img{
+        margin-left: 10px;
     }
     
     
@@ -389,21 +364,17 @@
 <body>
     <div class="main-container with-sidebar" id="main-container">
         <header class="header">
-            <span id="sidebar-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
-                <svg width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 18L20 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M4 12L20 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M4 6L20 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-            </span>
             <div class="logo">
-                <a href="{% url 'view' %}">
+                <span id="sidebar-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                    <svg width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 18L20 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4 12L20 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4 6L20 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <a href="{% url 'view' %}"class="logo-img">
                     <img src="{% static 'playground/Logo.png' %}" alt="Logo" height="80px" id="logo">
                 </a>
-            </div>
-            <div class="search-container">
-                <input type="text" class="search-input" id="search-input" placeholder="Search for books...">
-                <div class="suggestions" id="suggestions"></div>
             </div>
             {% block notification %}{% endblock %}
         </header>
@@ -470,42 +441,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        // Search functionality
-        $('#search-input').on('input', function() {
-            var query = $(this).val();
-            if (query.length >= 3) {
-                $.get("{% url 'search_suggestions' %}", { q: query }, function(data) {
-                    $('#suggestions').empty();
-                    data.forEach(function(book) {
-                        var suggestion = $('<div class="suggestion-item" data-bs-toggle="modal" data-bs-target="#bookDetailModal">')
-                            .attr('data-title', book.title)
-                            .attr('data-author', book.author)
-                            .attr('data-description', book.description)
-                            .attr('data-date', book.date)
-                            .attr('data-category', book.category)
-                            .attr('data-language', book.language)
-                            .attr('data-image', book.image_url)
-                            .attr('data-views', book.views)
-                            .attr('data-id', book.id)
-                            .attr('data-available', book.available)
-                            .append($('<img>').attr('src', book.image_url))
-                            .append($('<span>').text(book.title + ' by ' + book.author));
-                        $('#suggestions').append(suggestion);
-                    });
-                    $('#suggestions').show();
-                });
-            } else {
-                $('#suggestions').hide();
-            }
-        });
-
-        $(document).click(function(event) {
-            if (!$(event.target).closest('#search-input').length) {
-                $('#suggestions').hide();
-            }
-        });
-    });
     document.addEventListener('DOMContentLoaded', function () {
         var bookDetailModal = document.getElementById('bookDetailModal');
 

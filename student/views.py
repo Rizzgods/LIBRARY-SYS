@@ -277,6 +277,16 @@ def request_history_view(request):
 
     return render(request, 'requesthistory.html', context)
 
+@login_required
+def borrowed_books_view(request):
+    borrowed_books = ApprovedRequest.objects.filter(requested_by=request.user)
+
+    context = {
+        'borrowed_books': borrowed_books,
+    }
+
+    return render(request, 'borrowed_books.html', context)
+
 def logout_user(request):
     logout(request)
     messages.success(request, ("You were Logged Out!"))
