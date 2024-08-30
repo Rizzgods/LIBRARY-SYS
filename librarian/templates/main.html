@@ -662,13 +662,15 @@
             <div class="form-group col-md-2">
                 <label for="categoryFilter">Category</label>
                 <select class="form-control" id="categoryFilter" name="category">
-                    <option value="">All Categories123</option>
+                    <option value="">All Categories</option>
                     {% for category in categories %}
                         <option value="{{ category.name }}" {% if request.GET.category == category.name %}selected{% endif %}>{{ category.name }}</option>
                     {% endfor %}
                 </select>
             </div>
+            <form id="searchForm" onsubmit="showContent('books'); return false;">
                 <button type="submit" class="btn btn-primary" style="margin-top: 32px;">Search</button>
+            </form>
                 <a href="{% url 'reset_filters' %}" class="btn btn-secondary">Reset</a>
         </div>
     </form>
@@ -1246,7 +1248,13 @@
         var activeContent = localStorage.getItem('activeContent') || 'home';
         showContent(activeContent);
     };
-
+        // Hide all sections
+        document.querySelectorAll('.content-section').forEach(function(section) {
+            section.style.display = 'none';
+        });
+    
+        // Show the selected section
+        document.getElementById(section).style.display = 'block';
 
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);

@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .models import ApprovedRequest, Books, Category, LANGUAGE_CHOICES, BorrowRequest, DeclinedRequest, SubCategory, Out, ReturnLog
-from django.db.models.functions import TruncYear
+from django.db.models.functions import TruncYear, ExtractYear
 from librarian.utils import delete_expired_borrow_requests
 
 
@@ -31,7 +31,7 @@ def main(request):
     return_logs = ReturnLog.objects.all()
     language_choices = LANGUAGE_CHOICES
 
-    years = Books.objects.annotate(year=TruncYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
+    years = Books.objects.annotate(year=ExtractYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
 
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
