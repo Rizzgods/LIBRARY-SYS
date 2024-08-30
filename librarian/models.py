@@ -38,6 +38,13 @@ class SubCategory(models.Model):
     code = models.CharField(max_length=100, default="")
     def __str__(self):
         return  self.code + '-' + self.name
+    
+class SubSection(models.Model):
+    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100, default="Def")
+    code = models.CharField(max_length=100, default="")
+    def __str__(self):
+        return  self.code + '-' + self.name
 
 class Books(models.Model):
     BookTitle = models.CharField(max_length=100)

@@ -1,8 +1,47 @@
+import csv
+import io
+from import_export.formats.base_formats import CSV
+
 from django.shortcuts import render
 from librarian.models import Books
 from userauth.models import Account,Librarian
 from django.contrib.auth.models import User
+from tablib import Dataset
+from .resources import AccountResource
+from django.contrib import messages
 # Create your views here.
+
+def import_csv(request):
+    if request.method == 'POST':
+        if 'csv_file' in request.FILES:
+            csv_file = request.FILES['csv_file']
+            if csv_file.name.endswith('.csv'):
+                try:
+                    # Create a resource instance
+                    resource = AccountResource()
+
+                    # Use the CSV format class to handle the file
+                    file_format = CSV()
+                    dataset = file_format.create_dataset(csv_file.read().decode('utf-8'))
+
+                    # Use the resource to import the data
+                    result = resource.import_data(dataset, format=file_format, raise_errors=True)
+
+                    # Check for import errors
+                    if result.has_errors():
+                        messages.error(request, 'There were errors importing the CSV file.')
+                    else:
+                        messages.success(request, 'CSV file has been successfully imported.')
+                except Exception as e:
+                    messages.error(request, f'Error importing CSV file: {str(e)}')
+            else:
+                messages.error(request, 'Please upload a valid CSV file.')
+        else:
+            messages.error(request, 'No file was uploaded.')
+        return redirect('book_page_views')  # Redirect to the import CSV page
+
+    return render(request, 'import_csv.html')  # Render the form template
+
 def adminPage(request):
 
    return render(request,'admin.html', {})

@@ -7,7 +7,7 @@ from librarian.models import Books
 
 # Create your models here.
 class Account(models.Model):
-    lrn = models.CharField(max_length=12)
+    lrn = models.CharField(max_length=12, unique= True)
     fname = models.CharField(max_length=50, verbose_name=("First Name"))
     lname = models.CharField(max_length=50, verbose_name=("Last Name"))
     address = models.CharField(max_length=50)
