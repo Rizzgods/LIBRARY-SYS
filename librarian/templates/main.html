@@ -662,7 +662,7 @@
             <div class="form-group col-md-2">
                 <label for="categoryFilter">Category</label>
                 <select class="form-control" id="categoryFilter" name="category">
-                    <option value="">All Categories</option>
+                    <option value="">All Categories123</option>
                     {% for category in categories %}
                         <option value="{{ category.name }}" {% if request.GET.category == category.name %}selected{% endif %}>{{ category.name }}</option>
                     {% endfor %}
