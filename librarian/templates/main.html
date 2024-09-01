@@ -1245,19 +1245,7 @@
         document.getElementById(contentId).style.display = 'block';
         localStorage.setItem('activeContent', contentId);
     }
-
-    window.onload = function() {
-        var activeContent = localStorage.getItem('activeContent') || 'home';
-        showContent(activeContent);
-    };
-        // Hide all sections
-        document.querySelectorAll('.content-section').forEach(function(section) {
-            section.style.display = 'none';
-        });
-
-        // Show the selected section
-        document.getElementById(section).style.display = 'block';
-
+        
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);
         bookRow.style.display = 'none';
@@ -1400,6 +1388,7 @@
     function deleteAllBooks() {
         document.getElementById("deleteAllForm").submit();
     }
+    
 
     $(document).ready(function() {
         $('#deleteModalBook').on('show.bs.modal', function(event) {
@@ -1491,6 +1480,17 @@
             modal.style.display = 'none';
         }
     }
+    window.onload = function() {
+        var activeContent = localStorage.getItem('activeContent') || 'home';
+        showContent(activeContent);
+    };
+        // Hide all sections
+        document.querySelectorAll('.content-section').forEach(function(section) {
+            section.style.display = 'none';
+        });
+
+        // Show the selected section
+        document.getElementById(section).style.display = 'block';
 </script>
 
 </body>
