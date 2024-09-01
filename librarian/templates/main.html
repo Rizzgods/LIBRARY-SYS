@@ -1249,7 +1249,7 @@
     window.onload = function() {
         var activeContent = localStorage.getItem('activeContent') || 'home';
         showContent(activeContent);
-
+    };
         // Hide all sections
         document.querySelectorAll('.content-section').forEach(function(section) {
             section.style.display = 'none';
@@ -1257,7 +1257,6 @@
 
         // Show the selected section
         document.getElementById(section).style.display = 'block';
-    };
 
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);
@@ -1352,6 +1351,7 @@
             $('#id_Subcategories').val(''); // Reset subcategory selection
         });
     });
+    
 
     function confirmDeleteAll() {
         if (confirm("Are you sure you want to delete all books?")) {
