@@ -281,7 +281,7 @@
         margin-bottom: 10px;
     } 
     .form-control{
-        width:30%;
+        width:50%;
     }
     .suggestion-item {
         padding: 10px;
@@ -808,15 +808,16 @@
                     if (response.bookmarked) {
                         $('#modal-bookmark-link').text('Unbookmark');
                         const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
-                        
+                        toastBootstrap.show();
                         
                     } else {
                         $('#modal-bookmark-link').text('Bookmark');
                         const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
+                        toastBootstrap.show();
                         
                     }
                     location.reload();
-                    toastBootstrap.show();
+                    
                 },
                 error: function(xhr, status, error) {
                     console.error('Bookmark toggle failed:', error);
@@ -1114,41 +1115,7 @@ function copyCitation() {
         });
     });
 
-    {% comment %} bookmark added notif {% endcomment %}
-    $('.bookmark-link').on('click', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        const bookId = $(this).data('book-id');
-        const addNotif = document.getElementById('AddNotif');
-        const removeNotif = document.getElementById('RemoveNotif');
     
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'bookmark_toggle' %}",
-            data: {
-                'book_id': bookId,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-                if ($(event.target).text() === 'Bookmark') {
-                    const toastBootstrap = new bootstrap.Toast(addNotif);
-                    toastBootstrap.show();
-                    $(`#book-card-${bookId} .bookmark-link`).text('Unbookmark');
-                } else {
-                    const toastBootstrap = new bootstrap.Toast(removeNotif);
-                    toastBootstrap.show();
-                    $(`#book-card-${bookId} .bookmark-link`).text('Bookmark');
-                }
-            },
-            error: function() {
-                alert('An error occurred. Please try again.');
-            },
-            complete: function() {
-                // Prevent page refresh
-                return false;
-            }
-        });
-    });
     
         
 </script>

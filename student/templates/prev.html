@@ -1,404 +1,1016 @@
-{% extends 'student.html' %}
-
-{% block title %} {{ book.BookTitle }} - Preview {% endblock %}
-
-{% block notification %}
-
-<div class="notification-icon">
-    <span class="material-symbols-outlined" id="notification-bell">notifications</span>
-    <span class="notification-badge" id="notification-count">0</span>
-    <div class="dropdown" id="notification-dropdown">
-        <span class="dropdown-item-text" id="no-notifications">No notifications</span>
-    </div>
-</div>
-{% endblock %}
-
-{% block style %}
-
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-        font-family: Arial, sans-serif;
-        overflow: hidden;
-    }
-    #pdf-container {
-        width: 80vw;
-        height: 80vh;
-        overflow: hidden;
-        white-space: nowrap;
-        background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        cursor: grab;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-    }
-    canvas {
-        display: inline-block;
-        margin: 0;
-        vertical-align: top;
-    }
-    #zoom-controls, #page-controls, #speaker-controls {
-        margin-top: 10px;
-    }
-    button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px;
-        margin: 5px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-    button:hover {
-        background-color: #0056b3;
-    }
-    #page-input {
-        margin-top: 10px;
-        padding: 5px;
-        width: 50px;
-        text-align: center;
-    }
-    #back-button {
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        z-index: 1000;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        padding: 10px;
-        margin: 5px;
-        cursor: pointer;
-        border-radius: 5px;
-    }
-    #back-button:hover {
-        background-color: #0056b3;
-    }
-</style>
-
-{% endblock %}
-
-{% block nav %}
-<a href="{% url 'view' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
-<a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-<li id="li-dropdown"><div>
-    <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
-    </button>
-    <ul class="dropdown-menu animate-dropdown">
-        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
-        <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
-    </ul>
-  </div>
-</li>
-{% endblock %}
-
-{% block body %}
+{% load custom_tags %}
 {% load static %}
-<a href="#" id="back-button" onclick="history.go(-1); return false;">Back</a>
-    <p>Page Views: {{ book.PageViews }}</p>
-    <div id="pdf-container" onmousedown="startDragging(event)" onmousemove="drag(event)" onmouseup="stopDragging(event)" oncontextmenu="return false;"></div>
-    <div id="zoom-controls">
-        <button onclick="zoomOut()">-</button>
-        <button onclick="zoomIn()">+</button>
-    </div>
-    <div id="page-controls">
-        <button onclick="prevPage()">Previous</button>
-        <span id="page-counter" aria-live="polite"></span>
-        <button onclick="nextPage()">Next</button>
-        <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
-    </div>
-    <div id="speaker-controls">
-        <button onclick="readPage()">🔊 Read Page</button>
-        <button id="pauseResumeButton" onclick="togglePauseResume()">⏸ Pause</button>
-        <button onclick="stopReading()">⏹ Stop</button>
 
-        <div id="notification" class="alert alert-info alert-dismissible fade show" role="alert" style="display: none;">
-            Text to Speech has started
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+{% if user.is_authenticated%}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.BookTitle }} - Preview</title>
+    <link rel="icon" href={% static "playground/school_Logo.png" %}>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!--Back arrow-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--next arrow-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--previous arrow-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--zoom in-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--zoom out-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--pause-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--stop-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--resume-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--text to speech-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!--notif-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <style>
+        .notification-time {
+            font-size: 0.8rem;
+            color: grey;
+            margin-left: auto;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        body {
+            position: relative;
+        }
+        
+        #search {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .main-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            grid-template-rows: 1px 1fr;
+            grid-template-areas:
+            "header header"
+            "content content";
+        }
+        
+        .form-inline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .form-control {
+            margin: 5px;
+        }
+        .main-container.with-sidebar {
+            grid-template-areas:
+                "header header"
+                "sidebar content";
+                animation: resizeContainer .2s ease;
+        }
+        
+        .content {
+            margin-top: 80px;
+            grid-area: content;
+            postion: relative;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .side-bar {
+            display: flex;
+            flex-direction: column;
+            justify-content: start;
+            align-item: center;
+            background-color: rgb(74, 128, 210);
+            position: fixed;
+            width: 250px;
+            height: 90%;
+            z-index: 1;
+            animation: slideOutSidebar 1s ease forwards;
+        }
+        .side-bar.show {
+            animation: slideInSidebar .5s ease forwards;
+        }
+        .side-bar.hide {
+            animation: slideOutSidebar 1s ease forwards;
+        }
+    
+        .sidebar-nav{
+            display: flex;
+            justify-content: center;
+            align-items: start;
+            flex-direction: column;
+            list-style: none;
+            margin: none;
+            padding: 20px 0;
+        }
+        .sidebar-nav li{
+            width: 100%;
+            padding: 20px 0px;
+            padding-left: 32px;
+            color: white;
+        }
+        .bookmark{
+            color:white;
+        }
+        .header{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 25px;
+            padding-left: 25px;
+            background-color: rgb(74, 128, 210);
+            top: 0;
+            position: fixed;
+            z-index: top;
+            grid-area: header;
+            width:100%;
+            height: 100px;
+            animation: fadeInHeader 0.5s ease forwards;
+        }
+        {% comment %} navbar css {% endcomment %}
+        .navbar-title{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+        }
+        .navbar-title span{
+            font-size: 1.8rem;
+            color: white;
+        }
+        .navbar-text{
+            font-weight: bold;
+            font-size: .8rem;
+            color: white;
+        }
+        .navbar-icon{
+            padding-right: 3px;
+        }
+        .navbar-text, .navbar-icon{
+            text-decoration: none;
+            vertical-align: middle;
+        }
+        .navbar-text:hover, .bookmark:hover, .navbar-icon:hover{
+            cursor: pointer;
+        }
+        .navbar-text:hover{
+            border-radius:10px;
+            border: 2px solid transparent;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease;
+            padding: 5px 10px 5px 10px;
+        }
+        .navbar-desc{
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+        }
+        .sidebar-nav li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        .logout{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            width:100%;
+            padding: 10px 0;
+            margin-top: auto;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        .logout:hover {
+            cursor: pointer;
+        }
+        .active{
+            background-color:rgba(255, 255, 255, 0.1);
+        }
+    
+    
+        {% comment %} main body {% endcomment %}
+        .carousel{
+            margin-top: 4%;
+            margin-bottom: 2.5%;
+            width: 100%;
+            animation: fadeInCarousel 1s ease;
+        }
+        .carousel-item {
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+    
+        .carousel-item.active {
+            transform: translateX(0);
+        }
+    
+        .slide-in {
+            transform: translateX(100px) !important;
+        }
+        {% comment %} BAGO SA CAROUSEL NG BOOKS {% endcomment %}
+        .card-img-top{
+            width: 200px;
+            height: 250px;
+        }
+        .top-bar{
+            display: flex;
+            justify-content: space-between;
+        }
+        
+    
+        /* Define animation keyframes for carousel */
+        @keyframes fadeInCarousel {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    
+        /* Add animation to the book containers */
+        .container-xl {
+            margin-bottom: 3%;
+            /* Apply animation */
+            animation: slideInBooks 1s ease forwards;
+        }
+    
+        /* Define animation keyframes for books */
+        @keyframes slideInBooks {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    
+        /* Add animation to the boxes when hovering */
+        .container-xl:hover {
+            transform: translateY(-5px); /* Adjust as per your preference */
+            transition: transform 0.3s ease;
+        }
+        .card-link{
+            text-decoration: none;
+            cursor: pointer
+        }
+        a{
+            text-decoration: none;
+            color: black;
+            transition: color .2s
+        }
+        .top-bar{
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: .5%;
+        }
+        .books_view-more{
+            text-decoration: none;
+            background-color: rgb(74, 128, 210);
+            color: white;
+            font-weight: bold;
+            padding: .5% .5%;
+            border: 2px solid rgb(74, 128, 210);
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+        .books_view-more:hover{
+            background-color: #3D6DB6;
+            transform: translateY(-5%);
+        }
+        .search-container {
+            flex: 2;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 20px;
+            border: 2px solid rgb(74, 128, 210);
+            border-radius: 30px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #3D6DB6;
+            box-shadow: 0 0 10px rgba(61, 109, 182, 0.2);
+            outline: none;
+        }
+        .search-content{
+            font-size: 1.5rem;
+            border: none;
+            padding: 5px 10px;
+            border: solid 3px  rgb(74, 128, 210);
+            border-radius: 10px;
+        }
+        .search-icon{
+            font-size: 2.5rem
+        }
+        .search-icon:hover{
+            color: lightgray;
+            cursor: pointer;
+        }
+        .item{
+            transition: .3s ease;
+        }
+        .item:hover{
+            transform: translateY(-10px);
+        }
+        .offcanvas-start{
+            height: 0%;
+        }
+        .logo-img{
+            margin-left: 10px;
+        }
+    
+        
+        
+        @keyframes slideInSidebar {
+            from {
+                transform: translateX(-100%);
+                transform: translateY(100px);
+            }
+            to {
+                transform: translateX(0);
+                transform: translateY(100px);
+            }
+        }
+    
+        @keyframes filterAnimation{
+            from{
+                opacity: 0;
+            }
+            to{
+                opacity: 1;
+            }
+        }
+
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 12px;
+            transform: translate(10px, -10px);
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background-color: white;
+            color: black;
+            min-width: 400px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1;
+        }
+    
+         .dropdown-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .dropdown-item.read {
+            font-weight: normal;
+        }
+        .dropdown-item:not(.read) {
+            font-weight: bold;
+        }
+        .notification-icon, .notification-icon-2 {
+            width: 45px;
+            height: 45px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .icon-2:hover{
+            color: white;
+        }
+        .notification-icon {
+            margin-right: 75px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+        }
+        .notification-icon .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+        }
+        .material-symbols-outlined {
+            font-size: 35px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+    
+        .material-symbols-outlined:hover {
+            color: #808080;
+        }
+        .btn-close{
+            width: 10px;
+            height: 10px;
+        }
+    </style>
+    
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #pdf-container {
+            margin: 0px 10px;
+            margin-top: 20px;
+            width: 50vw;
+            height: 80vh;
+            overflow: hidden;
+            white-space: nowrap;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            cursor: grab;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            postion: inline;
+            box-sizing: border-box;
+        }
+        canvas {
+            display: inline-block;
+            margin: 0;
+            vertical-align: top;
+        }
+        #zoom-controls, #page-controls, #speaker-controls {
+            margin-top: 10px;
+        }
+        #zoom-controls{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .button-design{
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 7.5px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            max-height:50px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #page-input {
+            margin-top: 10px;
+            padding: 5px;
+            width: 50px;
+            text-align: center;
+        }
+        .pdf-controls{
+            position: absolute;
+            top: 100px;
+            left: 75%;
+        }
+        .pdf-controls-2{
+            position: absolute;
+            top: 850px;
+            left: 480px;
+        }
+        .static-div{
+            postion:relative;
+        }
+        .page-count{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .back-icon{
+            width: 35px;
+            color: white;
+            transform: translateY(15px);
+        }
+        .back-icon:hover{
+            color: rgba(255, 255, 255, .7)
+        }
+        .nav-arrow{
+            border: none;
+            background-color: transparent;
+        }
+        .nav-arrow:hover{
+            background-color: transparent;
+        }
+        .icons{
+            font-weight: light;
+        }
+        .icons:hover{
+            color: white;
+        }
+        .icon-2:hover{
+            color: black;
+        }
+        .notif-link{
+            display: flex;
+            flex-direction: row;
+            border-right: 1px solid rgba(0, 0, 0, 0.3);
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        .text-to-speech{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+        }
+        .page-views-count{
+            background-color: rgba(255, 255, 255, 0.3);
+            border: 1px solid transparent;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+
+    </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+</head>
+<body>
+    <header class="header fixed-top">
+        <div class="logo">
+            <a href="#" id="back-button" onclick="history.go(-1); return false;"><span class="material-symbols-outlined back-icon">arrow_back</span></a>
+            <a href="{% url 'view' %}"class="logo-img">
+                <img src="{% static 'playground/Logo.png' %}" alt="Logo" height="80px" id="logo">
+            </a>
+        </div>
+        <p class="page-views-count">Page Views: {{ book.PageViews }}</p>
+        <div class="notification-icon">
+            <span class="material-symbols-outlined" id="notification-bell">notifications</span>
+            <span class="notification-badge" id="notification-count">0</span>
+            <div class="dropdown" id="notification-dropdown">
+                <span class="dropdown-item-text" id="no-notifications">No notifications</span>
+            </div>
+        </div>
+    </header>
+        <div class="prev-container">
+            <div class="pdf-controls">
+                <div id="zoom-controls">
+                    <button onclick="zoomIn()" class="button-design"><span class="material-symbols-outlined icons">zoom_in</span></button>
+                    <button onclick="zoomOut()" class="button-design"><span class="material-symbols-outlined icons">zoom_out</span></button>
+                </div>
+            </div>
+            <div class="pdf-controls-2">
+                <div id="speaker-controls">
+                    <button onclick="readPage()" class="button-design" data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title="Play Text to Speech.">
+                        <span class="material-symbols-outlined icons text-to-speech">text_to_speech</span>
+                    </button>
+                    <button onclick="togglePauseResume()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">pause</span></button>
+                    <button onclick="stopReading()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">stop</span></button>
+
+                    <div id="notification" class="alert alert-info alert-dismissible fade show" role="alert" style="display: none;">
+                        Text to Speech has started
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+            <div class="static-div">
+                <button onclick="prevPage()" class="nav-arrow"><span class="material-symbols-outlined">arrow_back_ios</span></button>
+            </div>
+            <div>
+                <div id="pdf-container" onmousedown="startDragging(event)" onmousemove="drag(event)" onmouseup="stopDragging(event)" oncontextmenu="return false;"></div>
+                <div class="static-div page-count">
+                    <span id="page-counter" aria-live="polite"></span>
+                    <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
+                </div>
+            </div>
+            <div>
+            </div>
+            <div class="static-div">
+                <button onclick="nextPage()" class="nav-arrow"><span class="material-symbols-outlined">arrow_forward_ios</span></button>
         </div>
     </div>
 
-{% endblock %}
 
-{% block script %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<script>
-    let pdfDoc = null;
-    let pageNum = 1;
-    let scale = 1.0;
-    let isDragging = false;
-    let startX, startY, scrollLeft, scrollTop;
-    let utterance = null;
-    let recognition = null;
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const pdfContainer = document.getElementById("pdf-container");
-    const pageCounter = document.getElementById("page-counter");
-    const pageInput = document.getElementById("page-input");
-
-    // Function to speak command success message
-    function speakCommandSuccess(message) {
-        utterance = new SpeechSynthesisUtterance(message);
-        speechSynthesis.speak(utterance);
-    }
-
-    function nextPage() {
-        stopReading(); // Stop TTS before navigating
-        if (pageNum < pdfDoc.numPages) {
-            pageNum++;
-            renderPage(pageNum, scale, false); // Set shouldRead to false
-            
-        }
-    }
-
-    function prevPage() {
-        stopReading(); // Stop TTS before navigating
-        if (pageNum > 1) {
-            pageNum--;
-            renderPage(pageNum, scale, false); // Set shouldRead to false
-            
-        }
-    }
-
-    function renderPage(pageNum, scale, shouldRead = false) {
-        pdfDoc.getPage(pageNum).then(function(page) {
-            const viewport = page.getViewport({ scale: scale });
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-            const renderContext = {
-                canvasContext: ctx,
-                viewport: viewport
-            };
-            page.render(renderContext).promise.then(() => {
-                // Add watermark
-                ctx.save();
-                ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any transformations
-                ctx.font = `${30}px Arial`; // Base font size
-                ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
-                ctx.textAlign = "center";
-                ctx.translate(canvas.width / 2, canvas.height / 2);
-                ctx.rotate(-Math.PI / 4);
-                ctx.scale(scale, scale); // Scale the watermark based on the zoom level
-                ctx.fillText("PROPERTY OF LAWANG BATO NATIONAL HIGH SCHOOL", 0, 0);
-                ctx.restore();
+    <script>
+        let pdfDoc = null;
+        let pageNum = 1;
+        let scale = 1.0;
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+        let utterance = null;
+        let recognition = null;
     
-                if (!pdfContainer.contains(canvas)) {
-                    pdfContainer.appendChild(canvas);
-                }
-            });
-            page.getTextContent().then(function(textContent) {
-                const textItems = textContent.items;
-                let finalText = '';
-                for (let i = 0; i < textItems.length; i++) {
-                    finalText += textItems[i].str + ' ';
-                }
-                canvas.setAttribute('data-text', finalText);
-                if (shouldRead) {
-                    readPage();
-                }
-            });
-        }).catch(error => {
-            console.error('Error rendering page:', error);
-        });
-        pageCounter.textContent = `${pageNum} / ${pdfDoc.numPages}`;
-        pageInput.value = pageNum;
-    }
-    
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const pdfContainer = document.getElementById("pdf-container");
+        const pageCounter = document.getElementById("page-counter");
+        const pageInput = document.getElementById("page-input");
 
-    function readPage() {
-        const text = canvas.getAttribute('data-text');
-        if (text) {
-            if (utterance) {
-                speechSynthesis.cancel(); // Cancel any ongoing speech
-            }
-            utterance = new SpeechSynthesisUtterance(text);
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    
+        // Function to speak command success message
+        function speakCommandSuccess(message) {
+            utterance = new SpeechSynthesisUtterance(message);
             speechSynthesis.speak(utterance);
-            $('#notification').fadeIn(); // Show the notification
-            setTimeout(function() {
-                $('#notification').fadeOut(); // Hide the notification after a delay
-            }, 3000); // 3000 milliseconds = 3 seconds
-        } else {
-            console.error('No text found to read.');
         }
-    }
-
-    function stopReading() {
-        if (speechSynthesis.speaking) {
-            speechSynthesis.cancel();
+    
+        function nextPage() {
+            stopReading(); // Stop TTS before navigating
+            if (pageNum < pdfDoc.numPages) {
+                pageNum++;
+                renderPage(pageNum, scale, false); // Set shouldRead to false
+                
+            }
         }
-    }
-
-    function zoomOut() {
-        if (scale > 0.25) {
-            scale -= 0.25;
-            renderPage(pageNum, scale);
+    
+        function prevPage() {
+            stopReading(); // Stop TTS before navigating
+            if (pageNum > 1) {
+                pageNum--;
+                renderPage(pageNum, scale, false); // Set shouldRead to false
+                
+            }
         }
-    }
-
-    function zoomIn() {
-        if (scale < 4.0) {
-            scale += 0.25;
-            renderPage(pageNum, scale);
+    
+        function renderPage(pageNum, scale, shouldRead = false) {
+            pdfDoc.getPage(pageNum).then(function(page) {
+                const viewport = page.getViewport({ scale: scale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                page.render(renderContext).promise.then(() => {
+                    // Add watermark
+                    ctx.save();
+                    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any transformations
+                    ctx.font = `${30}px Arial`; // Base font size
+                    ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
+                    ctx.textAlign = "center";
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate(-Math.PI / 4);
+                    ctx.scale(scale, scale); // Scale the watermark based on the zoom level
+                    ctx.fillText("PROPERTY OF LAWANG BATO NATIONAL HIGH SCHOOL", 0, 0);
+                    ctx.restore();
+        
+                    if (!pdfContainer.contains(canvas)) {
+                        pdfContainer.appendChild(canvas);
+                    }
+                });
+                page.getTextContent().then(function(textContent) {
+                    const textItems = textContent.items;
+                    let finalText = '';
+                    for (let i = 0; i < textItems.length; i++) {
+                        finalText += textItems[i].str + ' ';
+                    }
+                    canvas.setAttribute('data-text', finalText);
+                    if (shouldRead) {
+                        readPage();
+                    }
+                });
+            }).catch(error => {
+                console.error('Error rendering page:', error);
+            });
+            pageCounter.textContent = `${pageNum} / ${pdfDoc.numPages}`;
+            pageInput.value = pageNum;
         }
-    }
-
-    function startDragging(e) {
-        isDragging = true;
-        startX = e.clientX - pdfContainer.offsetLeft;
-        startY = e.clientY - pdfContainer.offsetTop;
-        scrollLeft = pdfContainer.scrollLeft;
-        scrollTop = pdfContainer.scrollTop;
-    }
-
-    function stopDragging() {
-        isDragging = false;
-    }
-
-    function drag(e) {
-        if (!isDragging) return;
-        e.preventDefault();
-        const x = e.clientX - pdfContainer.offsetLeft;
-        const y = e.clientY - pdfContainer.offsetTop;
-        const walkX = x - startX;
-        const walkY = y - startY;
-        pdfContainer.scrollLeft = scrollLeft - walkX;
-        pdfContainer.scrollTop = scrollTop - walkY;
-    }
-
-    function jumpToPage(e) {
-        if (e.key === 'Enter') {
-            const page = parseInt(pageInput.value);
-            if (page > 0 && page <= pdfDoc.numPages) {
-                pageNum = page;
+        
+    
+        function readPage() {
+            const text = canvas.getAttribute('data-text');
+            if (text) {
+                if (utterance) {
+                    speechSynthesis.cancel(); // Cancel any ongoing speech
+                }
+                utterance = new SpeechSynthesisUtterance(text);
+                speechSynthesis.speak(utterance);
+                $('#notification').fadeIn(); // Show the notification
+                setTimeout(function() {
+                    $('#notification').fadeOut(); // Hide the notification after a delay
+                }, 3000); // 3000 milliseconds = 3 seconds
+            } else {
+                console.error('No text found to read.');
+            }
+        }
+    
+        function stopReading() {
+            if (speechSynthesis.speaking) {
+                speechSynthesis.cancel();
+            }
+        }
+    
+        function zoomOut() {
+            if (scale > 0.25) {
+                scale -= 0.25;
                 renderPage(pageNum, scale);
             }
         }
-    }
-
-    function togglePauseResume() {
-        const button = document.getElementById('pauseResumeButton');
-        if (speechSynthesis.speaking) {
-            if (speechSynthesis.paused) {
-                speechSynthesis.resume(); // If paused, resume
-                button.textContent = "⏸ Pause";
-            } else {
-                speechSynthesis.pause(); // If speaking, pause
-                button.textContent = "▶️ Resume";
+    
+        function zoomIn() {
+            if (scale < 4.0) {
+                scale += 0.25;
+                renderPage(pageNum, scale);
             }
         }
-    }
-
-    function goToPage(pageNumber) {
-        stopReading(); // Stop TTS before navigating
-        if (pageNumber >= 1 && pageNumber <= pdfDoc.numPages) {
-            pageNum = pageNumber;
-            renderPage(pageNum, scale, false); // Set shouldRead to false
-        } else {
-            console.error('Invalid page number:', pageNumber);
-        }
-    }
     
-
-    // Add CSS transition
-    document.addEventListener('DOMContentLoaded', function() {
-        const button = document.getElementById('pauseResumeButton');
-        button.style.transition = "all 0.3s ease";
-    });
-
-    window.addEventListener('beforeunload', function(event) {
-        stopReading();
-    });
-
-    pdfjsLib.getDocument("{{ book.BookFile.url }}").promise.then(function(pdf) {
-        pdfDoc = pdf;
-        renderPage(pageNum, scale);
-    }).catch(error => {
-        console.error('Error loading PDF:', error);
-    });
-
-    // Speech recognition setup
-    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'en-US'; // Set language to English
-        recognition.continuous = false; // Stop listening after one phrase is recognized
-
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript.trim().toLowerCase();
-            console.log('Recognized:', transcript);
-            if (transcript === 'next.') {
-                nextPage();
-                speakCommandSuccess('Next page navigated.');
-            } else if (transcript === 'stop.') {
-                stopReading();
-                speakCommandSuccess('Reading stopped.');
-            } else if (transcript === 'read.') {
-                readPage();
-                speakCommandSuccess('Reading started.');
-            } else if (transcript === 'previous.') {
-                prevPage();
-                speakCommandSuccess('Previous page navigated.');
-            } else if (transcript.startsWith('go to page')) {
-                const words = transcript.split(' ');
-                const pageNumberIndex = words.indexOf('page') + 1; // Find the index of the word "page"
-                if (pageNumberIndex !== 0 && pageNumberIndex < words.length) {
-                    const pageNumber = parseInt(words[pageNumberIndex]);
-                    if (!isNaN(pageNumber)) {
-                        goToPage(pageNumber);
-                        speakCommandSuccess(`Navigated to page ${pageNumber}.`);
-                    } else {
-                        console.error('Invalid page number:', words[pageNumberIndex]);
-                    }
-                } else {
-                    console.error('Page number not found in transcript:', transcript);
+        function startDragging(e) {
+            isDragging = true;
+            startX = e.clientX - pdfContainer.offsetLeft;
+            startY = e.clientY - pdfContainer.offsetTop;
+            scrollLeft = pdfContainer.scrollLeft;
+            scrollTop = pdfContainer.scrollTop;
+        }
+    
+        function stopDragging() {
+            isDragging = false;
+        }
+    
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.clientX - pdfContainer.offsetLeft;
+            const y = e.clientY - pdfContainer.offsetTop;
+            const walkX = x - startX;
+            const walkY = y - startY;
+            pdfContainer.scrollLeft = scrollLeft - walkX;
+            pdfContainer.scrollTop = scrollTop - walkY;
+        }
+    
+        function jumpToPage(e) {
+            if (e.key === 'Enter') {
+                const page = parseInt(pageInput.value);
+                if (page > 0 && page <= pdfDoc.numPages) {
+                    pageNum = page;
+                    renderPage(pageNum, scale);
                 }
             }
-            else if (transcript === 'pause.' || 'wait.') {
-                speakCommandSuccess('Reading pause');
-                togglePauseResume();
-                
-            } else if (transcript === 'resume.' || 'go on.') {
-                speakCommandSuccess('Reading continue');
-                togglePauseResume();
-                
+        }
+    
+        function togglePauseResume() {
+            const button = document.getElementById('pauseResumeButton');
+            if (speechSynthesis.speaking) {
+                if (speechSynthesis.paused) {
+                    speechSynthesis.resume(); // If paused, resume
+                    button.textContent = "pause";
+                } else {
+                    speechSynthesis.pause(); // If speaking, pause
+                    button.textContent = "resume";
+                }
             }
-            else if (transcript === 'zoom in.' || 'in.') {
-                zoomIn();
-                speakCommandSuccess('Zooming In');
-            }
-            else if (transcript === 'zoom out.') {
-                zoomOut();
-                speakCommandSuccess('Zooming out');
-            }
-        };
+        }
 
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error:', event.error);
-        };
-
-        recognition.onend = function() {
-            // Restart recognition after it ends
+        function goToPage(pageNumber) {
+            stopReading(); // Stop TTS before navigating
+            if (pageNumber >= 1 && pageNumber <= pdfDoc.numPages) {
+                pageNum = pageNumber;
+                renderPage(pageNum, scale, false); // Set shouldRead to false
+            } else {
+                console.error('Invalid page number:', pageNumber);
+            }
+        }
+        
+    
+        // Add CSS transition
+        document.addEventListener('DOMContentLoaded', function() {
+            const button = document.getElementById('pauseResumeButton');
+            button.style.transition = "all 0.3s ease";
+        });
+    
+        window.addEventListener('beforeunload', function(event) {
+            stopReading();
+        });
+    
+        pdfjsLib.getDocument("{{ book.BookFile.url }}").promise.then(function(pdf) {
+            pdfDoc = pdf;
+            renderPage(pageNum, scale);
+        }).catch(error => {
+            console.error('Error loading PDF:', error);
+        });
+    
+        // Speech recognition setup
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US'; // Set language to English
+            recognition.continuous = false; // Stop listening after one phrase is recognized
+    
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript.trim().toLowerCase();
+                console.log('Recognized:', transcript);
+                if (transcript === 'next.') {
+                    nextPage();
+                    speakCommandSuccess('Next page navigated.');
+                } else if (transcript === 'stop.') {
+                    stopReading();
+                    speakCommandSuccess('Reading stopped.');
+                } else if (transcript === 'read.') {
+                    readPage();
+                    speakCommandSuccess('Reading started.');
+                } else if (transcript === 'previous.') {
+                    prevPage();
+                    speakCommandSuccess('Previous page navigated.');
+                } else if (transcript.startsWith('go to page')) {
+                    const words = transcript.split(' ');
+                    const pageNumberIndex = words.indexOf('page') + 1; // Find the index of the word "page"
+                    if (pageNumberIndex !== 0 && pageNumberIndex < words.length) {
+                        const pageNumber = parseInt(words[pageNumberIndex]);
+                        if (!isNaN(pageNumber)) {
+                            goToPage(pageNumber);
+                            speakCommandSuccess(`Navigated to page ${pageNumber}.`);
+                        } else {
+                            console.error('Invalid page number:', words[pageNumberIndex]);
+                        }
+                    } else {
+                        console.error('Page number not found in transcript:', transcript);
+                    }
+                }
+                else if (transcript === 'pause.' || 'wait.') {
+                    speakCommandSuccess('Reading pause');
+                    togglePauseResume();
+                    
+                } else if (transcript === 'resume.' || 'go on.') {
+                    speakCommandSuccess('Reading continue');
+                    togglePauseResume();
+                    
+                }
+                else if (transcript === 'zoom in.' || 'in.') {
+                    zoomIn();
+                    speakCommandSuccess('Zooming In');
+                }
+                else if (transcript === 'zoom out.') {
+                    zoomOut();
+                    speakCommandSuccess('Zooming out');
+                }
+            };
+    
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error:', event.error);
+            };
+    
+            recognition.onend = function() {
+                // Restart recognition after it ends
+                recognition.start();
+            };
+    
+            // Start recognition
             recognition.start();
-        };
+        } else {
+            console.error('Speech recognition not supported in this browser.');
+        }
 
-        // Start recognition
-        recognition.start();
-    } else {
-        console.error('Speech recognition not supported in this browser.');
-    }
-</script>
-{% endblock %}
+        {% comment %} notif js {% endcomment %}
+    $(document).ready(function() {
+        function fetchNotifications() {
+            $.get("{% url 'fetch_notifications' %}", function(data) {
+                $('#notification-dropdown').empty();
+                if (data.length > 0) {
+                    $('#notification-count').text(data.length).show();
+                    $('#no-notifications').hide();
+                    data.forEach(function(notification) {
+                        var item = $('<div class="dropdown-item">')
+                            .html(`
+                                    <a href="{% url 'borrowed_books' %}" class="notif-link">
+                                        <div class="notification-icon-2">
+                                            <span class="material-symbols-outlined icon-2">notification_important</span>
+                                        </div>
+                                        <div class="notif-message">
+                                            ${notification.message}
+                                            <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
+                                        </div>
+                                    </a>
+                            `)
+                            .attr('data-id', notification.id)
+                            .toggleClass('read', notification.read)
+                            .click(function() {
+                                markAsRead(notification.id);
+                            });
+    
+                            var deleteButton = $('<button class="btn btn-close ms-auto">')
+                                .html('')
+                                .click(function(event) {
+                                    event.stopPropagation();
+                                    deleteNotification(notification.id);
+                                });
+        
+    
+                        item.append(deleteButton);
+                        $('#notification-dropdown').append(item);
+                    });
+                } else {
+                    $('#notification-dropdown').html('<span class="dropdown-item-text no-notif" id="no-notifications">No notifications</span>');
+                    $('#notification-count').hide();
+                }
+            });
+        }
+    
+        function markAsRead(notificationId) {
+            $.post("{% url 'mark_notification_read' 0 %}".replace('0', notificationId), {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function() {
+                fetchNotifications();
+            });
+        }
+    
+        function deleteNotification(notificationId) {
+            $.post("{% url 'delete_notification' 0 %}".replace('0', notificationId), {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            }, function() {
+                fetchNotifications();
+            });
+        }
+    
+        $('#notification-bell').on('click', function() {
+            $('#notification-dropdown').toggle();
+        });
+    
+        setInterval(fetchNotifications, 60000); // Fetch every 60 seconds
+        fetchNotifications();
+    
+        $(document).click(function(event) {
+            if (!$(event.target).closest('#notification-bell').length) {
+                $('#notification-dropdown').hide();
+            }
+        });
+    });
+    
+    </script>
+    
+    
+    
+    
+    
+
+    
+</body>
+</html>
+{% endif %}
+
+           
