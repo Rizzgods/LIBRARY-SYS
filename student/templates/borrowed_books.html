@@ -82,7 +82,9 @@
         text-align: center;
     }
     .sec-mar {
-        margin-top: 50px;
+        margin-top: 20px;
+        font-size: 2rem;
+
     }
     .notification-badge {
         position: absolute;
@@ -176,14 +178,13 @@
         padding: 10px 25px;
     }
     .animate-dropdown {
-        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
         opacity: 0;
       }
       
       .dropdown-menu.show {
         transform: scaleY(0);
         opacity: 1;
-        transform: translate(16px, 200px);
+        transform: translate(0px, 0px);
         width: 218px;
         background-color: transparent;
         border: none;
@@ -230,6 +231,10 @@
       .icon-2:hover{
         color: black;
       }
+      .img-table{
+        display: flex;
+        justify-content: center;
+      }
         
 </style>
 {% endblock %}
@@ -241,7 +246,7 @@
     <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
     </button>
-    <ul class="dropdown-menu animate-dropdown">
+    <ul class="dropdown-menu animate-dropdown show">
         <a class="sub-nav" href="{% url 'borrowed_books' %}"><li class="active"><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
         <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
     </ul>
@@ -267,7 +272,7 @@
             <tbody>
                 {% for request in borrowed_books %}
                 <tr>
-                    <td ><a href="{% url 'prev_file' request.book.id  %}"><img class="borrowed-book-img" src="{{ request.book.BookImage.url }}"></a></td>
+                    <td class="img-table"><a href="{% url 'prev_file' request.book.id  %}"><img class="borrowed-book-img" src="{{ request.book.BookImage.url }}"></a></td>
                     <td class="borrowed-book-title"><a href="{% url 'prev_file' request.book.id  %}">{{ request.book.BookTitle }}<a/></td>
                     <td>{{ request.requested_at }}</td>
                     <td>{{ request.approved_at }}</td>

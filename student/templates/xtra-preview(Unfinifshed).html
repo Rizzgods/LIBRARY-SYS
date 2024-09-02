@@ -87,6 +87,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
 </head>
 <body>
+    
     <a href="#" id="back-button" onclick="history.go(-1); return false;">Back</a>
     <p>Page Views: {{ book.PageViews }}</p>
     <div id="pdf-container" onmousedown="startDragging(event)" onmousemove="drag(event)" onmouseup="stopDragging(event)" oncontextmenu="return false;"></div>
