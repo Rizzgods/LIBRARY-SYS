@@ -463,8 +463,11 @@
             width: 100%;
             height: 100%;
         }
-        .book-section{
-            
+        .over-flow{
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 100%;
         }
     </style>
     {% block style %}{% endblock %}
@@ -693,9 +696,9 @@
         <tbody>
             {% for book in books %}
                 <tr>
-                    <td>{{ book.BookTitle }}</td>
+                    <td class="over-flow">{{ book.BookTitle }}</td>
                     <td>{{ book.Author }}</td>
-                    <td>{{ book.Description }}</td>
+                    <td class="over-flow">{{ book.Description }}</td>
                     <td>{{ book.Date }}</td>
                     <td>
                         {% for category in book.Category.all %}
