@@ -1245,6 +1245,7 @@
         document.getElementById(contentId).style.display = 'block';
         localStorage.setItem('activeContent', contentId);
     }
+<<<<<<< HEAD
     window.onload = function() {
         var activeContent = localStorage.getItem('activeContent') || 'home';
         showContent(activeContent);
@@ -1257,6 +1258,9 @@
         // Show the selected section
         document.getElementById(section).style.display = 'block';
 
+=======
+        
+>>>>>>> 833ac41ceabad243a03d336862ef43579e766f6f
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);
         bookRow.style.display = 'none';
@@ -1398,6 +1402,7 @@
     function deleteAllBooks() {
         document.getElementById("deleteAllForm").submit();
     }
+    
 
     $(document).ready(function() {
         $('#deleteModalBook').on('show.bs.modal', function(event) {
@@ -1491,6 +1496,17 @@
             modal.style.display = 'none';
         }
     }
+    window.onload = function() {
+        var activeContent = localStorage.getItem('activeContent') || 'home';
+        showContent(activeContent);
+    };
+        // Hide all sections
+        document.querySelectorAll('.content-section').forEach(function(section) {
+            section.style.display = 'none';
+        });
+
+        // Show the selected section
+        document.getElementById(section).style.display = 'block';
 </script>
 </body>
 </html>
