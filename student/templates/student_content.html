@@ -133,8 +133,9 @@
 
      .dropdown-item {
         display: flex;
+        flex-direction: row;
         align-items: center;
-        padding: 20px;
+        padding: 10px;
         border-bottom: 1px solid #ddd;
     }
     
@@ -159,6 +160,9 @@
         align-items: center;
         justify-content: center;
         position: relative;
+    }
+    .icon-2:hover{
+        color: white;
     }
     .notification-icon {
         margin-right: 75px;
@@ -215,10 +219,6 @@
     }
     .notif-message{
         padding-right: 10px;
-        border-right: 1px solid rgba(0,0,0,0.3);
-        text-wrap: wrap;
-        margin: 0 10px;
-        width:100%;
     }
     .no-notif{
         font-size: 1rem;
@@ -312,6 +312,59 @@
         border-radius: 0 0 10px 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
+    .animate-dropdown {
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        opacity: 0;
+      }
+      
+      .dropdown-menu.show {
+        transform: scaleY(0);
+        opacity: 1;
+        transform: translate(16px, 200px);
+        width: 218px;
+        background-color: transparent;
+        border: none;
+        position: relative;
+        padding: 0;
+      }
+      #li-dropdown{
+        padding: 0;
+        margin: 20;
+      }
+      .dropdown-btn{
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        border: none;
+        color: white;
+        padding: 20px;
+      }
+      .sub-nav{
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        width: 100%;
+      }
+      .sub-icon{
+        font-size: 1.5rem;
+        vertical-align: middle;
+        padding-right: 5px;
+      }
+      .navbar-icon:hover {
+        color: white;
+      }
+      .icon-2:hover{
+        color: black;
+      }
+      .notif-link{
+        display: flex;
+        flex-direction: row;
+        border-right: 1px solid rgba(0, 0, 0, 0.3);
+        flex-grow: 1;
+        margin-right: 10px;
+      }
+
 </style>
 
 {% endblock %}
@@ -319,19 +372,16 @@
 {% block nav %}
 <a href="{% url 'view' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
 <a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-<a href="{% url 'request_history' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="request">request_page</span>Borrow History</li></a>
-<a>
-<div class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-      Dropdown button
+<li id="li-dropdown"><div>
+    <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
     </button>
-    <ul class="dropdown-menu">
-      <li><a class="dropdown-item" href="#">Action</a></li>
-      <li><a class="dropdown-item" href="#">Another action</a></li>
-      <li><a class="dropdown-item" href="#">Something else here</a></li>
+    <ul class="dropdown-menu animate-dropdown">
+        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
+        <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
     </ul>
-</div>
-</a>
+  </div>
+</li>
 {% endblock %}
 
 {% block body %}
@@ -583,9 +633,32 @@
             <div class="modal-footer modalButtons">
                 <a href="#" id="modal-borrow-link" class="btn-mdl" data-approved="{{ approved_requested }}">Borrow</a>
                 <a href="#" id="modal-preview-link" class="btn-mdl">Preview</a>
-                <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="">Bookmark</a>
+                <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="" id="AddNotifBtn">Bookmark</a>
                 <button type="button" id="generate-citation" class="btn-mdl">Generate APA Citation</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!--Bookmark Notifs-->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="AddNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Bookmark Added</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        <p>Book has been added to Bookmarks.</p>
+      </div>
+    </div>
+
+    <div id="RemoveNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Bookmark Removed</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <p>Bookmark has been successfully removed.</p>
         </div>
     </div>
 </div>
@@ -741,6 +814,7 @@
         });
     
 
+<<<<<<< HEAD
 // Handle bookmark toggle
 $('#modal-bookmark-link').on('click', function(event) {
     event.preventDefault();
@@ -781,6 +855,40 @@ $('#modal-bookmark-link').on('click', function(event) {
     });
 });
 
+=======
+        // Handle bookmark toggle
+        $('#modal-bookmark-link').on('click', function(event) {
+            event.preventDefault();
+            const bookId = $(this).data('book-id');
+        
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'bookmark_toggle' %}",
+                data: {
+                    'book_id': bookId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.bookmarked) {
+                        $('#modal-bookmark-link').text('Unbookmark');
+                        const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
+                        
+                        
+                    } else {
+                        $('#modal-bookmark-link').text('Bookmark');
+                        const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
+                        
+                    }
+                    location.reload();
+                    toastBootstrap.show();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Bookmark toggle failed:', error);
+                    alert('An error occurred while toggling the bookmark. Please try again.');
+                }
+            });
+        });
+>>>>>>> 6e62e0e967197fe21a73d444445674fc527c6dae
     document.getElementById('generate-citation').addEventListener('click', function () {
         var title = document.getElementById('modal-book-title').textContent;
         var author = document.getElementById('modal-book-author').textContent;
@@ -942,13 +1050,15 @@ function copyCitation() {
                     data.forEach(function(notification) {
                         var item = $('<div class="dropdown-item">')
                             .html(`
-                                <div class="notification-icon-2">
-                                    <span class="material-symbols-outlined">notification_important</span>
-                                </div>
-                                <div class="notif-message">
-                                    <a href="">${notification.message}</a>
-                                    <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
-                                </div>
+                                    <a href="{% url 'borrowed_books' %}" class="notif-link">
+                                        <div class="notification-icon-2">
+                                            <span class="material-symbols-outlined icon-2">notification_important</span>
+                                        </div>
+                                        <div class="notif-message">
+                                            ${notification.message}
+                                            <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
+                                        </div>
+                                    </a>
                             `)
                             .attr('data-id', notification.id)
                             .toggleClass('read', notification.read)
@@ -1065,6 +1175,42 @@ function copyCitation() {
         $(document).click(function(event) {
             if (!$(event.target).closest('#search-input').length) {
                 $('#suggestions').hide();
+            }
+        });
+    });
+
+    {% comment %} bookmark added notif {% endcomment %}
+    $('.bookmark-link').on('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const bookId = $(this).data('book-id');
+        const addNotif = document.getElementById('AddNotif');
+        const removeNotif = document.getElementById('RemoveNotif');
+    
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'bookmark_toggle' %}",
+            data: {
+                'book_id': bookId,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if ($(event.target).text() === 'Bookmark') {
+                    const toastBootstrap = new bootstrap.Toast(addNotif);
+                    toastBootstrap.show();
+                    $(`#book-card-${bookId} .bookmark-link`).text('Unbookmark');
+                } else {
+                    const toastBootstrap = new bootstrap.Toast(removeNotif);
+                    toastBootstrap.show();
+                    $(`#book-card-${bookId} .bookmark-link`).text('Bookmark');
+                }
+            },
+            error: function() {
+                alert('An error occurred. Please try again.');
+            },
+            complete: function() {
+                // Prevent page refresh
+                return false;
             }
         });
     });

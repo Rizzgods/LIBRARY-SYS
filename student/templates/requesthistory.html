@@ -171,14 +171,62 @@
     .book-title{
         text-transform: capitalize;
     }
-    .notif-message{
-        padding-right: 10px;
-        border-right: 1px solid rgba(0,0,0,0.3);
-    }
     .no-notif{
         font-size: 1rem;
         padding: 10px 25px;
     }
+    .animate-dropdown {
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        opacity: 0;
+      }
+      
+      .dropdown-menu.show {
+        transform: scaleY(0);
+        opacity: 1;
+        transform: translate(16px, 200px);
+        width: 218px;
+        background-color: transparent;
+        border: none;
+        position: relative;
+        padding: 0;
+      }
+      #li-dropdown{
+        padding: 0;
+        margin: 20;
+      }
+      .dropdown-btn{
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        border: none;
+        color: white;
+        padding: 20px;
+      }
+      .sub-nav{
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        width: 100%;
+      }
+      .sub-icon{
+        font-size: 1.5rem;
+        vertical-align: middle;
+        padding-right: 5px;
+      }
+      .navbar-icon:hover {
+        color: white;
+      }
+      .icon-2:hover{
+        color: black;
+      }
+      .notif-link{
+        display: flex;
+        flex-direction: row;
+        border-right: 1px solid rgba(0, 0, 0, 0.3);
+        flex-grow: 1;
+        margin-right: 10px;
+      }
         
 </style>
 {% endblock %}
@@ -186,8 +234,16 @@
 {% block nav %}
 <a href="{% url 'view' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
 <a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-<a href="{% url 'request_history' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined navbar-icon" alt="request">request_page</span>Borrow History</li></a>
-<a href="#" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="help">help</span>Help</li></a>
+<li id="li-dropdown" class="active"><div>
+    <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
+    </button>
+    <ul class="dropdown-menu animate-dropdown">
+        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
+        <a class="sub-nav" href="{% url 'request_history' %}"><li class="active"><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
+    </ul>
+  </div>
+</li>
 {% endblock %}
 
 {% block body %}
@@ -310,13 +366,15 @@
                     data.forEach(function(notification) {
                         var item = $('<div class="dropdown-item">')
                             .html(`
-                                <div class="notification-icon-2">
-                                    <span class="material-symbols-outlined">notification_important</span>
-                                </div>
-                                <div class="notif-message">
-                                    ${notification.message}
-                                    <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
-                                </div>
+                                <a href="{% url 'borrowed_books' %}" class="notif-link">
+                                        <div class="notification-icon-2">
+                                            <span class="material-symbols-outlined icon-2">notification_important</span>
+                                        </div>
+                                        <div class="notif-message">
+                                            ${notification.message}
+                                            <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
+                                        </div>
+                                </a>
                             `)
                             .attr('data-id', notification.id)
                             .toggleClass('read', notification.read)
