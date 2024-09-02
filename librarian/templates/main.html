@@ -1245,7 +1245,6 @@
         document.getElementById(contentId).style.display = 'block';
         localStorage.setItem('activeContent', contentId);
     }
-
     window.onload = function() {
         var activeContent = localStorage.getItem('activeContent') || 'home';
         showContent(activeContent);
@@ -1254,14 +1253,14 @@
         document.querySelectorAll('.content-section').forEach(function(section) {
             section.style.display = 'none';
         });
-
+    
         // Show the selected section
         document.getElementById(section).style.display = 'block';
 
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);
         bookRow.style.display = 'none';
-
+    
         var deletedBookRow = document.getElementById('deletedBookRow-' + bookId);
         deletedBookRow.style.display = 'table-row';
     }
@@ -1302,7 +1301,7 @@
             }
         });
     });
-
+    
     function toggleAvailability(bookId) {
         var availabilityBtn = document.getElementById('availabilityBtn-' + bookId);
         var isAvailable = availabilityBtn.classList.contains('btn-success');
@@ -1337,6 +1336,7 @@
         });
     }
 
+
     $(document).ready(function() {
         $('#id_Category').change(function() {
             var selectedCategoryId = $(this).val();
@@ -1352,7 +1352,6 @@
         });
     });
     
-
     function confirmDeleteAll() {
         if (confirm("Are you sure you want to delete all books?")) {
             document.getElementById("deleteAllForm").submit();
@@ -1372,27 +1371,26 @@
     window.onload = function() {
         showDeletedBooks();
     };
-
     function confirmDeleteDeclinedRequest(requestId) {
         if (confirm('Are you sure you want to delete this declined request?')) {
+            // Construct the form submission URL
             var deleteUrl = "{% url 'delete_declined_request' 0 %}".replace('0', requestId);
-
+            // Create a form element
             var form = document.createElement('form');
             form.setAttribute('method', 'post');
             form.setAttribute('action', deleteUrl);
-
+            // Add CSRF token
             var csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
             var csrfInput = document.createElement('input');
             csrfInput.setAttribute('type', 'hidden');
             csrfInput.setAttribute('name', 'csrfmiddlewaretoken');
             csrfInput.setAttribute('value', csrfToken);
             form.appendChild(csrfInput);
-
+            // Submit the form
             document.body.appendChild(form);
             form.submit();
         }
     }
-
     function confirmDeleteAll() {
         $('#deleteAllModal').modal('show');
     }
@@ -1419,6 +1417,7 @@
         });
     });
 
+    // Function to submit delete form
     function submitDeleteForm(bookId) {
         var form = $('#deleteFormBook-' + bookId);
         form.submit();
@@ -1430,11 +1429,12 @@
             var bookId = button.data('bookid');
             var modal = $(this);
             modal.find('#confirmDeleteBtnRecentDel').click(function() {
+                // Submit the form associated with the book to delete it
                 $('#deleteFormRecentDel-' + bookId).submit();
             });
         });
     });
-
+    
     document.addEventListener('DOMContentLoaded', function() {
         const buttons = document.querySelectorAll('.availabilityBtn');
         buttons.forEach(button => {
@@ -1492,7 +1492,6 @@
         }
     }
 </script>
-
 </body>
 </html>
 {% endif %}
