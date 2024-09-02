@@ -640,6 +640,28 @@
     </div>
     {% endif %}
 </div>
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="BookmarkNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Bookmark Added</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <p>Bookmark has been successfully added.</p>
+        </div>
+    </div>
+
+    <div id="RemoveNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Bookmark Removed</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <p>Bookmark has been successfully removed.</p>
+        </div>
+    </div>
+</div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -719,33 +741,46 @@
         });
     
 
-        // Handle bookmark toggle
-        $('#modal-bookmark-link').on('click', function(event) {
-            event.preventDefault();
-            const bookId = $(this).data('book-id');
+// Handle bookmark toggle
+$('#modal-bookmark-link').on('click', function(event) {
+    event.preventDefault();
+    const bookId = $(this).data('book-id');
 
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'bookmark_toggle' %}",
-                data: {
-                    'book_id': bookId,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                success: function(response) {
-                    if (response.bookmarked) {
-                        $('#modal-bookmark-link').text('Unbookmark');
-                    } else {
-                        $('#modal-bookmark-link').text('Bookmark');
-                    }
-                    // Refresh the page on success
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Bookmark toggle failed:', error);
-                    alert('An error occurred while toggling the bookmark. Please try again.');
-                }
-            });
-        });
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'bookmark_toggle' %}",
+        data: {
+            'book_id': bookId,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            if (response.bookmarked) {
+                $('#modal-bookmark-link').text('Unbookmark');
+
+                // Show the "Bookmark Added" toast
+                var toastElement = document.getElementById('BookmarkNotif');
+                var toast = new bootstrap.Toast(toastElement);
+                toast.show();
+
+            } else {
+                $('#modal-bookmark-link').text('Bookmark');
+
+                // Show the "Bookmark Removed" toast
+                var toastElement = document.getElementById('RemoveNotif');
+                var toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            }
+
+            // Refresh the page on success
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            console.error('Bookmark toggle failed:', error);
+            alert('An error occurred while toggling the bookmark. Please try again.');
+        }
+    });
+});
+
     document.getElementById('generate-citation').addEventListener('click', function () {
         var title = document.getElementById('modal-book-title').textContent;
         var author = document.getElementById('modal-book-author').textContent;
