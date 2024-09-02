@@ -365,6 +365,13 @@
     <button id="unbookmark-all" class="btn-mdl Unbook-All-Btn"><span class="material-symbols-outlined Unbook-Icon">delete</span></button>
 </div>
 
+<<<<<<< HEAD
+<div class="search-bar">
+    <input type="text" id="bookmarkSearch" placeholder="Search bookmarked books..." class="form-control">
+</div>
+
+=======
+>>>>>>> 6e62e0e967197fe21a73d444445674fc527c6dae
 <div class="bookmark-content row">
     {% for book in all_books %}
     <div class="col-sm-3 mb-4" id="book-card-{{ book.id }}">
@@ -482,6 +489,21 @@
 </div>
 
 <script>
+    document.getElementById('bookmarkSearch').addEventListener('input', function () {
+        const searchQuery = this.value.toLowerCase();
+        const bookCards = document.querySelectorAll('.bookmark-content .col-sm-3.mb-4');
+    
+        bookCards.forEach(function (card) {
+            const bookTitle = card.querySelector('.card-title').textContent.toLowerCase();
+            
+            if (bookTitle.includes(searchQuery)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+
     document.addEventListener('DOMContentLoaded', function() {
         var bookDetailModal = document.getElementById('bookDetailModal');
         var loadingSpinner = document.getElementById('loading-spinner');
