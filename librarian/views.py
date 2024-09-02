@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .models import ApprovedRequest, Books, Category, LANGUAGE_CHOICES, BorrowRequest, DeclinedRequest, SubCategory, Out, ReturnLog
-from django.db.models.functions import TruncYear
+from django.db.models.functions import TruncYear, ExtractYear
 from librarian.utils import delete_expired_borrow_requests
 
 
@@ -31,7 +31,7 @@ def main(request):
     return_logs = ReturnLog.objects.all()
     language_choices = LANGUAGE_CHOICES
 
-    years = Books.objects.annotate(year=TruncYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
+    years = Books.objects.annotate(year=ExtractYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
 
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
@@ -126,101 +126,6 @@ def main(request):
         'return_logs': return_logs
     }
     return render(request, 'main.html', context)
-    books = Books.objects.filter(deleted_at__isnull=True)
-    recently_deleted_books = Books.objects.filter(deleted_at__isnull=False)
-    borrow_requests = BorrowRequest.objects.filter(expires_at__gt=timezone.now())
-    approved_requests = ApprovedRequest.objects.all()
-    declined_requests = DeclinedRequest.objects.all()
-    books_to_be_returned = Out.objects.all()
-    
-    book_status_approved_requests = ApprovedRequest.objects.filter(book__research_paper=False)
-    book_status_books_to_be_returned = Out.objects.filter(book__research_paper=False)
-    return_logs = ReturnLog.objects.all()
-    language_choices = LANGUAGE_CHOICES
-
-    years = Books.objects.annotate(year=TruncYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
-
-    if request.method == 'POST':
-        book_id = request.POST.get('book_id')
-        if book_id:
-            book = Books.objects.get(pk=book_id)
-            book.deleted_at = timezone.now()
-            book.save()
-            return redirect('librarian')
-
-    year_filter = request.GET.get('year')
-    language_filter = request.GET.get('language')
-    file_type_filter = request.GET.get('file_type')
-    category_filter = request.GET.get('category')
-    search_query = request.GET.get('search')
-
-    if year_filter:
-        try:
-            year = int(year_filter)
-            books = books.filter(Date__year=year)
-        except ValueError:
-            pass
-
-    if language_filter:
-        books = books.filter(Language=language_filter)
-    if file_type_filter:
-        if file_type_filter == 'eBook':
-            books = books.filter(eBook=True)
-        elif file_type_filter == 'Research Paper':
-            books = books.filter(research_paper=True)
-    if category_filter:
-        books = books.filter(Category__name=category_filter)
-    if search_query:
-        books = books.filter(BookTitle__icontains=search_query)
-
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        books_data = []
-        for book in books:
-            books_data.append({
-                'BookTitle': book.BookTitle,
-                'Author': book.Author,
-                'Description': book.Description,
-                'Date': book.Date.strftime('%Y-%m-%d'),
-                'Category': [{'name': cat.name} for cat in book.Category.all()],
-                'SubCategory': [{'name': sub.name} for sub in book.SubCategory.all()],
-                'Language': book.Language,
-                'BookImage': book.BookImage.url if book.BookImage else None,
-                'get_file_type': book.get_file_type(),
-                'stock': book.stock,
-                'available': book.available,
-                'id': book.id
-            })
-        return JsonResponse({'books': books_data})
-
-    if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect('librarian')
-    else:
-        form = BookForm()
-    subcategories = SubCategory.objects.all()
-    categories = Category.objects.all()
-
-    context = {
-        'books': books,
-        'form': form,
-        'recently_deleted_books': recently_deleted_books,
-        'language_choices': language_choices,
-        'categories': categories,
-        'subcategories': subcategories,
-        'borrow_requests': borrow_requests,
-        'approved_requests': approved_requests,
-        'declined_requests': declined_requests,
-        'books_to_be_returned': books_to_be_returned,
-        'book_status_approved_requests': book_status_approved_requests,
-        'book_status_books_to_be_returned': book_status_books_to_be_returned,
-        'return_logs': return_logs,
-        'years': [date.year for date in years],
-    }
-
-    return render(request, 'main.html', context)
-
 
 def reset_filters(request):
     return redirect('librarian')
