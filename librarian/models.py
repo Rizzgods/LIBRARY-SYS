@@ -51,7 +51,7 @@ class Books(models.Model):
     Author = models.CharField(max_length=100)
     Description = models.TextField(null=True, blank=True)
     Date = models.DateField()
-    Category = models.ManyToManyField(Category)
+    Category = models.ManyToManyField(Category, null= True)
     SubCategory = models.ManyToManyField(SubCategory)
     Language = models.CharField(max_length=100, choices=LANGUAGE_CHOICES, default='english')
     BookFile = models.FileField(upload_to="books/files/", default='default_value.pdf')

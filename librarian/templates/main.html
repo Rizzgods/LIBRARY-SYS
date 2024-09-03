@@ -584,7 +584,7 @@
                             <select class="form-control" id="id_Subsection" name="SubSection" required>
                                 <option value="">Select a subsection</option>
                                 {% for subsection in subsections %}
-                                    <option value="{{ subsection.id }}" data-section-id="{{ subsection.section_id }}">{{ subsection.name }}</option>
+                                <option value="{{ subsection.id }}" data-section-id="{{ subsection.sub_category_id }}">{{ subsection.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>    
@@ -1258,7 +1258,37 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
+    $(document).ready(function() {
+        $('#id_Category').change(function() {
+            var selectedCategoryId = $(this).val();
+            $('#id_Subcategories option').each(function() {
+                var subcategoryCategoryId = $(this).data('category-id');
+                if (subcategoryCategoryId == selectedCategoryId || !selectedCategoryId) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+            $('#id_Subcategories').val(''); // Reset subcategory selection
+            $('#id_Subsection').val(''); // Reset subsection selection
+            $('#id_Subsection option').hide(); // Hide all subsections initially
+        });
+    
+        $('#id_Subcategories').change(function() {
+            var selectedSubCategoryId = $(this).val();
+            $('#id_Subsection option').each(function() {
+                var subsectionSubCategoryId = $(this).data('section-id');
+                if (subsectionSubCategoryId == selectedSubCategoryId || !selectedSubCategoryId) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+            $('#id_Subsection').val(''); // Reset subsection selection
+        });
+    });
 
+    
     let noOfCharac = 150;
     let contents = document.querySelectorAll(".book-description");
     contents.forEach(content => {
@@ -1383,20 +1413,7 @@
     }
 
 
-    $(document).ready(function() {
-        $('#id_Category').change(function() {
-            var selectedCategoryId = $(this).val();
-            $('#id_Subcategories option').each(function() {
-                var subcategoryCategoryId = $(this).data('category-id');
-                if (subcategoryCategoryId == selectedCategoryId || !selectedCategoryId) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-            $('#id_Subcategories').val(''); // Reset subcategory selection
-        });
-    });
+    
     
     function confirmDeleteAll() {
         if (confirm("Are you sure you want to delete all books?")) {

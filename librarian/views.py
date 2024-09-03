@@ -3,7 +3,7 @@ import os
 from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.db.models import Q
 from .forms import BookForm
@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
-from .models import ApprovedRequest, Books, Category, LANGUAGE_CHOICES, BorrowRequest, DeclinedRequest, SubCategory, Out, ReturnLog
+from .models import ApprovedRequest, Books, Category, LANGUAGE_CHOICES, BorrowRequest, DeclinedRequest, SubCategory, Out, ReturnLog, SubSection
 from django.db.models.functions import TruncYear, ExtractYear
 from librarian.utils import delete_expired_borrow_requests
 
@@ -108,7 +108,7 @@ def main(request):
         form = BookForm()
     subcategories = SubCategory.objects.all()
     categories = Category.objects.all()
-
+    subsections = SubSection.objects.all()
     context = {
         'books': books,
         'recently_deleted_books': recently_deleted_books,
@@ -123,7 +123,8 @@ def main(request):
         'form': form,
         'book_status_approved_requests': book_status_approved_requests,
         'book_status_books_to_be_returned': book_status_books_to_be_returned,
-        'return_logs': return_logs
+        'return_logs': return_logs,
+        'subsections':subsections
     }
     return render(request, 'main.html', context)
 
