@@ -580,10 +580,10 @@
                             </select>
                         </div>
                         <div class="form-group col">
-                            <label for="id_Subcategories">SubSection:</label>
-                            <select class="form-control" id="id_Subcategories" name="SubSection" required>
+                            <label for="id_Subsection">SubSection:</label>
+                            <select class="form-control" id="id_Subsection" name="SubSection" required>
                                 <option value="">Select a subsection</option>
-                                {% for subsection in subcategories %}
+                                {% for subsection in subsections %}
                                     <option value="{{ subsection.id }}" data-section-id="{{ subsection.section_id }}">{{ subsection.name }}</option>
                                 {% endfor %}
                             </select>
@@ -1291,7 +1291,6 @@
         document.getElementById(contentId).style.display = 'block';
         localStorage.setItem('activeContent', contentId);
     }
-<<<<<<< HEAD
     window.onload = function() {
         var activeContent = localStorage.getItem('activeContent') || 'home';
         showContent(activeContent);
@@ -1304,9 +1303,6 @@
         // Show the selected section
         document.getElementById(section).style.display = 'block';
 
-=======
-        
->>>>>>> 833ac41ceabad243a03d336862ef43579e766f6f
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);
         bookRow.style.display = 'none';
