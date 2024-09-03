@@ -100,15 +100,18 @@
         background-color: rgb(74, 128, 210);
         position: fixed;
         width: 250px;
-        height: 92%;
+        height: 100vh;
+        padding-bottom: 10vh;
         z-index: 1;
-        animation: slideOutSidebar 1s ease forwards;
+        animation: slideOutSidebar .1s ease forwards;
     }
     .side-bar.show {
-        animation: slideInSidebar .5s ease forwards;
+        animation: slideInSidebar .1s ease forwards;
+        position: fixed;
     }
     .side-bar.hide {
-        animation: slideOutSidebar 1s ease forwards;
+        animation: slideOutSidebar .1s ease forwards;
+        position: fixed;
     }
 
     .sidebar-nav{
@@ -354,11 +357,11 @@
     
     @keyframes slideInSidebar {
         from {
-            transform: translateX(-100%);
+            transform: translateX(-100%px);
             transform: translateY(100px);
         }
         to {
-            transform: translateX(0);
+            transform: translateX(0px);
             transform: translateY(100px);
         }
     }

@@ -178,6 +178,15 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label for="id_stock" class="title">Stock:</label>
+                            <input type="number" class="form-control" id="id_stock" name="stock" value="{{ form.stock.value }}">
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <label for="id_Category" class="title">Category:</label>
                             <select class="form-control" id="id_Category" name="Category" required>
                                 <option value="">Select a category</option>
@@ -187,9 +196,7 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
                             <label for="id_Subcategories" class="title">SubCategory:</label>
                             <select class="form-control" id="id_Subcategories" name="SubCategory" required>
@@ -199,14 +206,17 @@
                                     <option value="{{ subcategory_value }}">{{ subcategory_label }}</option>
                                 {% endfor %}
                             </select>
-
                         </div>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="form-group">
-                            <label for="id_stock" class="title">Stock:</label>
-                            <input type="number" class="form-control" id="id_stock" name="stock" value="{{ form.stock.value }}">
-                            
+                            <label for="id_Subsection" class="title">SubSection:</label>
+                            <select class="form-control" id="id_Subsection" name="SubSection" required>
+                                <option value="">Select a subsection</option>
+                                {% for subsection_value, subsection_label in form.subsection.field.choices %}
+                                    <option value="{{ subsection_value }}">{{ subsection_label }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -250,13 +260,17 @@
                     <div class="col-md-6">
                         <div class="form-group-bot">
                             <label for="id_BookImage" class="title">Book Image (JPG):</label>
-                            {{ form.BookImage }}
+                            {{ form.BookFile }}
                         </div>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary title">Upload</button>
             </form>
             <a href="{% url 'go_back' %}" class="title">Cancel</a>
+        </div>
+        <div class="preview-container">
+            <h1>Book Cover Preview</h1>
+            <img src="{{ form.BookImage }}" />
         </div>
     </div>
     

@@ -319,11 +319,11 @@
         color: white;
       }
       .bookmark-title{
-        margin-left: auto;
+        display:flex;
+        justify-content: center;
+        align-items: center;
       }
       .Unbook-All-Btn{
-        margin-left: auto;
-        padding: 10px 10px 5px 10px;
         border-radius: 10%;
       }
       .Unbook-Icon:hover{
@@ -360,13 +360,12 @@
 
 {% block body %}
 {% load static %}
-<div class="bookmark-head">
-    <h1 class="bookmark-title">Bookmarks</h1>
-    <button id="unbookmark-all" class="btn-mdl Unbook-All-Btn"><span class="material-symbols-outlined Unbook-Icon">delete</span></button>
-</div>
-
-<div class="search-bar">
-    <input type="text" id="bookmarkSearch" placeholder="Search bookmarked books..." class="form-control">
+<div class="bookmark-head rpw">
+    <button id="unbookmark-all" class="btn-mdl Unbook-All-Btn col-1"><span class="material-symbols-outlined Unbook-Icon">delete</span></button>
+    <h1 class="bookmark-title col">Bookmarks</h1>
+    <div class="search-bar col-2">
+        <input type="text" id="bookmarkSearch" placeholder="Search bookmarked books..." class="form-control">
+    </div>    
 </div>
 
 <div class="bookmark-content row">
