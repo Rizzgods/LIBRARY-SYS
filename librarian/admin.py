@@ -6,6 +6,7 @@ from .models import Books, Category, BorrowRequest,ApprovedRequest,DeclinedReque
 class SubsectionAdmin(ImportExportModelAdmin):
     list_display = ['sub_category', 'name', 'code']
 
+
 admin.site.register(Books)
 admin.site.register(Category)
 admin.site.register(SubCategory)
