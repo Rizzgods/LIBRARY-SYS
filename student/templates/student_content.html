@@ -312,15 +312,10 @@
         border-radius: 0 0 10px 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    .animate-dropdown {
-        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        opacity: 0;
-      }
       
       .dropdown-menu.show {
         transform: scaleY(0);
         opacity: 1;
-        transform: translate(16px, 200px);
         width: 218px;
         background-color: transparent;
         border: none;
@@ -818,6 +813,7 @@
         $('#modal-bookmark-link').on('click', function(event) {
             event.preventDefault();
             const bookId = $(this).data('book-id');
+            const delayInMilliseconds = 500;
         
             $.ajax({
                 type: 'POST',
@@ -832,13 +828,17 @@
                         const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
                         toastBootstrap.show();
                         
+                        
                     } else {
                         $('#modal-bookmark-link').text('Bookmark');
                         const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
                         toastBootstrap.show();
                         
                     }
-                    location.reload();
+                    setTimeout(function() {
+                        location.reload();
+                    }, delayInMilliseconds);
+                    
                     
                 },
                 error: function(xhr, status, error) {

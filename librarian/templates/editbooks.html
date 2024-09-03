@@ -145,6 +145,7 @@
             height: 100%;
             backdrop-filter: blur(2px);
         }
+        
     </style>
 </head>
 <body>
@@ -254,13 +255,13 @@
                     <div class="col-md-6">
                         <div class="form-group-bot">
                             <label for="id_BookFile" class="title">Book File (PDF):</label>
-                            {{ form.BookFile }}
+                            <input type="file" name="BookFile" id="id_BookFile" class="form-control">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group-bot">
                             <label for="id_BookImage" class="title">Book Image (JPG):</label>
-                            {{ form.BookFile }}
+                            <input type="file" name="BookImage" id="id_BookImage" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -268,13 +269,48 @@
             </form>
             <a href="{% url 'go_back' %}" class="title">Cancel</a>
         </div>
-        <div class="preview-container">
+        {% comment %} <div class="preview-container">
             <h1>Book Cover Preview</h1>
-            <img src="{{ form.BookImage }}" />
-        </div>
+            <!-- Check if there is an existing image URL and display it -->
+            {% if form.instance.BookImage %}
+                <img id="current-preview" src="{{ form.instance.BookImage.url }}" alt="Current Book Image" style="max-width: 100%; height: auto;" />
+            {% else %}
+                <p>No image available. Please upload one.</p>
+            {% endif %}
+            <!-- Placeholder for new image preview -->
+            <img id="new-preview" src="#" alt="New Image Preview" style="max-width: 100%; height: auto; display: none;" />
+        </div> {% endcomment %}
     </div>
     
     <script>
+        function previewImage(event) {
+            var input = event.target;
+            var reader = new FileReader();
+        
+            reader.onload = function() {
+                var dataURL = reader.result;  // Get the data URL of the selected file
+                var output = document.getElementById('new-preview');
+                output.src = dataURL;  // Update the src of the image preview
+                output.style.display = 'block';  // Show the new image preview
+                var currentPreview = document.getElementById('current-preview');
+                if (currentPreview) {
+                    currentPreview.style.display = 'none';  // Hide the existing image preview if it exists
+                }
+            };
+        
+            if (input.files && input.files[0]) {
+                reader.readAsDataURL(input.files[0]);  // Read the selected file as a data URL
+            } else {
+                var output = document.getElementById('new-preview');
+                output.style.display = 'none';  // Hide the new image preview if no file is selected
+                var currentPreview = document.getElementById('current-preview');
+                if (currentPreview) {
+                    currentPreview.style.display = 'block';  // Show the existing image preview if no new file is selected
+                }
+            }
+        };
+
+        
         function toggleCheckboxes(id1, id2) {
             var checkbox1 = document.getElementById(id1);
             var checkbox2 = document.getElementById(id2);
