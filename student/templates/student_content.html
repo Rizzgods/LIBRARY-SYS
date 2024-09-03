@@ -312,15 +312,10 @@
         border-radius: 0 0 10px 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-    .animate-dropdown {
-        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-        opacity: 0;
-      }
       
       .dropdown-menu.show {
         transform: scaleY(0);
         opacity: 1;
-        transform: translate(16px, 200px);
         width: 218px;
         background-color: transparent;
         border: none;
@@ -814,52 +809,11 @@
         });
     
 
-<<<<<<< HEAD
-// Handle bookmark toggle
-$('#modal-bookmark-link').on('click', function(event) {
-    event.preventDefault();
-    const bookId = $(this).data('book-id');
-
-    $.ajax({
-        type: 'POST',
-        url: "{% url 'bookmark_toggle' %}",
-        data: {
-            'book_id': bookId,
-            'csrfmiddlewaretoken': '{{ csrf_token }}'
-        },
-        success: function(response) {
-            if (response.bookmarked) {
-                $('#modal-bookmark-link').text('Unbookmark');
-
-                // Show the "Bookmark Added" toast
-                var toastElement = document.getElementById('BookmarkNotif');
-                var toast = new bootstrap.Toast(toastElement);
-                toast.show();
-
-            } else {
-                $('#modal-bookmark-link').text('Bookmark');
-
-                // Show the "Bookmark Removed" toast
-                var toastElement = document.getElementById('RemoveNotif');
-                var toast = new bootstrap.Toast(toastElement);
-                toast.show();
-            }
-
-            // Refresh the page on success
-            location.reload();
-        },
-        error: function(xhr, status, error) {
-            console.error('Bookmark toggle failed:', error);
-            alert('An error occurred while toggling the bookmark. Please try again.');
-        }
-    });
-});
-
-=======
         // Handle bookmark toggle
         $('#modal-bookmark-link').on('click', function(event) {
             event.preventDefault();
             const bookId = $(this).data('book-id');
+            const delayInMilliseconds = 500;
         
             $.ajax({
                 type: 'POST',
@@ -874,13 +828,17 @@ $('#modal-bookmark-link').on('click', function(event) {
                         const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
                         toastBootstrap.show();
                         
+                        
                     } else {
                         $('#modal-bookmark-link').text('Bookmark');
                         const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
                         toastBootstrap.show();
                         
                     }
-                    location.reload();
+                    setTimeout(function() {
+                        location.reload();
+                    }, delayInMilliseconds);
+                    
                     
                 },
                 error: function(xhr, status, error) {
@@ -889,7 +847,6 @@ $('#modal-bookmark-link').on('click', function(event) {
                 }
             });
         });
->>>>>>> 6e62e0e967197fe21a73d444445674fc527c6dae
     document.getElementById('generate-citation').addEventListener('click', function () {
         var title = document.getElementById('modal-book-title').textContent;
         var author = document.getElementById('modal-book-author').textContent;
