@@ -53,6 +53,7 @@ class Books(models.Model):
     Date = models.DateField()
     Category = models.ManyToManyField(Category, null= True)
     SubCategory = models.ManyToManyField(SubCategory)
+    SubSection = models.ManyToManyField(SubSection)
     Language = models.CharField(max_length=100, choices=LANGUAGE_CHOICES, default='english')
     BookFile = models.FileField(upload_to="books/files/", default='default_value.pdf')
     BookImage = models.ImageField(upload_to="books/images/", default='default_image.jpg')
