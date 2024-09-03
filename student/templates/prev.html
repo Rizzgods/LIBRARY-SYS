@@ -499,6 +499,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            align-self: flex-start;
         }
         .button-design{
             background-color: #007bff;
@@ -534,7 +535,6 @@
         }
         .page-count{
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
         }
@@ -584,6 +584,14 @@
             font-size: 1.1rem;
             margin-top: 10px;
         }
+        .pdf-viewer{
+            display: flex;
+            flex-direction: row;
+            margin-top: 10px;
+        }
+        .nav-arrow-back{
+            margin-right: 50px;
+        }
 
 
     </style>
@@ -609,39 +617,42 @@
         </div>
     </header>
         <div class="prev-container">
-            <div class="pdf-controls">
-                <div id="zoom-controls">
-                    <button onclick="zoomIn()" class="button-design"><span class="material-symbols-outlined icons">zoom_in</span></button>
-                    <button onclick="zoomOut()" class="button-design"><span class="material-symbols-outlined icons">zoom_out</span></button>
-                </div>
-            </div>
-            <div class="pdf-controls-2">
-                <div id="speaker-controls">
-                    <button onclick="readPage()" class="button-design" data-bs-toggle="tooltip" data-bs-placement="top"
-                        data-bs-custom-class="custom-tooltip"
-                        data-bs-title="Play Text to Speech.">
-                        <span class="material-symbols-outlined icons text-to-speech">text_to_speech</span>
-                    </button>
-                    <button onclick="togglePauseResume()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">pause</span></button>
-                    <button onclick="stopReading()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">stop</span></button>
-
-                    <div id="notification" class="alert alert-info alert-dismissible fade show" role="alert" style="display: none;">
-                        Text to Speech has started
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            
             <div class="content">
             <div class="static-div">
-                <button onclick="prevPage()" class="nav-arrow"><span class="material-symbols-outlined">arrow_back_ios</span></button>
+                <button onclick="prevPage()" class="nav-arrow nav-arrow-back"><span class="material-symbols-outlined">arrow_back_ios</span></button>
             </div>
             <div>
-                <div id="pdf-container" onmousedown="startDragging(event)" onmousemove="drag(event)" onmouseup="stopDragging(event)" oncontextmenu="return false;"></div>
-                <div class="static-div page-count">
-                    <span id="page-counter" aria-live="polite"></span>
-                    <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
+                <div class="pdf-viewer">
+                    <div id="pdf-container" onmousedown="startDragging(event)" onmousemove="drag(event)" onmouseup="stopDragging(event)" oncontextmenu="return false;"></div>
+                    <div id="zoom-controls">
+                        <button onclick="zoomIn()" class="button-design"><span class="material-symbols-outlined icons">zoom_in</span></button>
+                        <button onclick="zoomOut()" class="button-design"><span class="material-symbols-outlined icons">zoom_out</span></button>
+                    </div>
+                </div>
+                <div class="static-div page-count row">
+                    <div class="col">
+                        <div id="speaker-controls">
+                            <button onclick="readPage()" class="button-design" data-bs-toggle="tooltip" data-bs-placement="top"
+                                data-bs-custom-class="custom-tooltip"
+                                data-bs-title="Play Text to Speech.">
+                                <span class="material-symbols-outlined icons text-to-speech">text_to_speech</span>
+                            </button>
+                            <button onclick="togglePauseResume()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">pause</span></button>
+                            <button onclick="stopReading()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">stop</span></button>
+        
+                            <div id="notification" class="alert alert-info alert-dismissible fade show" role="alert" style="display: none;">
+                                Text to Speech has started
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-7">
+                        <span id="page-counter" aria-live="polite"></span>
+                        <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
+                    </div>
                 </div>
             </div>
             <div>

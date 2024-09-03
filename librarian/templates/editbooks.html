@@ -250,7 +250,7 @@
                     <div class="col-md-6">
                         <div class="form-group-bot">
                             <label for="id_BookImage" class="title">Book Image (JPG):</label>
-                            {{ form.BookImage }}
+                            
                         </div>
                     </div>
                 </div>
@@ -258,6 +258,10 @@
             </form>
             <a href="{% url 'go_back' %}" class="title">Cancel</a>
         </div>
+        {% comment %} <div class="preview-container">
+            <h1>Book Cover Preview</h1>
+            <img src="{{ form.BookImage.url }}" alt="{{ form.BookFile }}"/>
+        </div> {% endcomment %}
     </div>
     
     <script>
