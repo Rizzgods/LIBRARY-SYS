@@ -27,7 +27,7 @@ urlpatterns = [
     path('notifications/read/<int:notification_id>/', views.mark_notification_read, name='mark_notification_read'),
     path('notifications/delete/<int:notification_id>/', views.delete_notification, name='delete_notification'),
     path('borrowed-books/', views.borrowed_books_view, name='borrowed_books'),
- 
+    path('change-password/', views.change_password, name='change-password'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
