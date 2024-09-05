@@ -1292,26 +1292,22 @@
     let noOfCharac = 150;
     let contents = document.querySelectorAll(".book-description");
     contents.forEach(content => {
-        //If text length is less that noOfCharac... then hide the read more button
-        if(content.textContent.length < noOfCharac){
+        // If text length is less than noOfCharac, then hide the read more button
+        if (content.textContent.length < noOfCharac) {
             content.nextElementSibling.style.display = "none";
-        }
-        else{
-            let displayText = content.textContent.slice(0,noOfCharac);
+        } else {
+            let displayText = content.textContent.slice(0, noOfCharac);
             let moreText = content.textContent.slice(noOfCharac);
             content.innerHTML = `${displayText}<span class="dots">...</span><span class="hide more">${moreText}</span>`;
         }
     });
 
-    function readMore(btn){
+    function readMore(btn) {
         let post = btn.parentElement;
         post.querySelector(".dots").classList.toggle("hide");
         post.querySelector(".more").classList.toggle("hide");
         btn.textContent == "Read More" ? btn.textContent = "Read Less" : btn.textContent = "Read More";
     }
-    
-
-
 
     function showContent(contentId) {
         var contents = document.getElementsByClassName('content');
@@ -1321,22 +1317,24 @@
         document.getElementById(contentId).style.display = 'block';
         localStorage.setItem('activeContent', contentId);
     }
+
     window.onload = function() {
         var activeContent = localStorage.getItem('activeContent') || 'home';
         showContent(activeContent);
-    };
+
         // Hide all sections
         document.querySelectorAll('.content-section').forEach(function(section) {
             section.style.display = 'none';
         });
-    
+
         // Show the selected section
         document.getElementById(section).style.display = 'block';
+    };
 
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);
         bookRow.style.display = 'none';
-    
+
         var deletedBookRow = document.getElementById('deletedBookRow-' + bookId);
         deletedBookRow.style.display = 'table-row';
     }
@@ -1377,7 +1375,7 @@
             }
         });
     });
-    
+
     function toggleAvailability(bookId) {
         var availabilityBtn = document.getElementById('availabilityBtn-' + bookId);
         var isAvailable = availabilityBtn.classList.contains('btn-success');
@@ -1412,48 +1410,6 @@
         });
     }
 
-
-    
-    
-    function confirmDeleteAll() {
-        if (confirm("Are you sure you want to delete all books?")) {
-            document.getElementById("deleteAllForm").submit();
-        }
-    }
-
-    function confirmDeleteRecentlyDeleted(bookId) {
-        if (confirm("Are you sure you want to delete this book?")) {
-            document.getElementById("deleteForm" + bookId).submit();
-        }
-    }
-
-    function showDeletedBooks() {
-        document.getElementById('recently_deleted').style.display = 'table-row-group';
-    }
-
-    window.onload = function() {
-        showDeletedBooks();
-    };
-    function confirmDeleteDeclinedRequest(requestId) {
-        if (confirm('Are you sure you want to delete this declined request?')) {
-            // Construct the form submission URL
-            var deleteUrl = "{% url 'delete_declined_request' 0 %}".replace('0', requestId);
-            // Create a form element
-            var form = document.createElement('form');
-            form.setAttribute('method', 'post');
-            form.setAttribute('action', deleteUrl);
-            // Add CSRF token
-            var csrfToken = document.getElementsByName('csrfmiddlewaretoken')[0].value;
-            var csrfInput = document.createElement('input');
-            csrfInput.setAttribute('type', 'hidden');
-            csrfInput.setAttribute('name', 'csrfmiddlewaretoken');
-            csrfInput.setAttribute('value', csrfToken);
-            form.appendChild(csrfInput);
-            // Submit the form
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
     function confirmDeleteAll() {
         $('#deleteAllModal').modal('show');
     }
@@ -1461,16 +1417,6 @@
     function deleteAllBooks() {
         document.getElementById("deleteAllForm").submit();
     }
-    
-
-    $(document).ready(function() {
-        $('#deleteModalBook').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget);
-            var bookId = button.data('bookid');
-            var modal = $(this);
-            modal.find('#confirmDeleteBtnBook').attr('onclick', 'deleteBook(' + bookId + ')');
-        });
-    });
 
     $(document).ready(function() {
         $('#deleteModalBook').on('show.bs.modal', function(event) {
@@ -1479,26 +1425,22 @@
             var modal = $(this);
             modal.find('#confirmDeleteBtnBook').attr('onclick', 'submitDeleteForm(' + bookId + ')');
         });
-    });
 
-    // Function to submit delete form
-    function submitDeleteForm(bookId) {
-        var form = $('#deleteFormBook-' + bookId);
-        form.submit();
-    }
-
-    $(document).ready(function() {
         $('#deleteModalRecentDel').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var bookId = button.data('bookid');
             var modal = $(this);
             modal.find('#confirmDeleteBtnRecentDel').click(function() {
-                // Submit the form associated with the book to delete it
                 $('#deleteFormRecentDel-' + bookId).submit();
             });
         });
     });
-    
+
+    function submitDeleteForm(bookId) {
+        var form = $('#deleteFormBook-' + bookId);
+        form.submit();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const buttons = document.querySelectorAll('.availabilityBtn');
         buttons.forEach(button => {
@@ -1554,18 +1496,8 @@
         if (event.target == modal) {
             modal.style.display = 'none';
         }
-    }
-    window.onload = function() {
-        var activeContent = localStorage.getItem('activeContent') || 'home';
-        showContent(activeContent);
     };
-        // Hide all sections
-        document.querySelectorAll('.content-section').forEach(function(section) {
-            section.style.display = 'none';
-        });
 
-        // Show the selected section
-        document.getElementById(section).style.display = 'block';
 </script>
 </body>
 </html>

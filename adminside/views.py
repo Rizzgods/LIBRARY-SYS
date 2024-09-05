@@ -97,7 +97,7 @@ def batch_upload_view(request):
             if os.path.exists(temp_dir):
                 os.rmdir(temp_dir)
 
-        return redirect('home')
+        return redirect('batch-upload')
 
     return render(request, 'admin.html')
 

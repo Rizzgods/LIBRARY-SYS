@@ -47,7 +47,7 @@ class SubSection(models.Model):
         return  self.code + '-' + self.name
 
 class Books(models.Model):
-    BookTitle = models.CharField(max_length=100)
+    BookTitle = models.CharField(max_length=100, unique=True)
     Author = models.CharField(max_length=100)
     Description = models.TextField(null=True, blank=True)
     Date = models.DateField()
