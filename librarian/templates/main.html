@@ -532,6 +532,21 @@
 
             <!-- Upload Section-->
             <div id="upload" class="content" style="display: none;">
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                            <div class="alert alert-success">
+                                {{ message }}
+                            </div>
+                        {% elif message.tags == 'error' %}
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    <li>{{ message }}</li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
                 <h1 class="mt-4">Upload</h1>
                 <hr>
                 <form method="post" enctype="multipart/form-data" action="{% url 'librarian' %}">
@@ -584,7 +599,7 @@
                             <select class="form-control" id="id_Subsection" name="SubSection" required>
                                 <option value="">Select a subsection</option>
                                 {% for subsection in subsections %}
-                                <option value="{{ subsection.id }}" data-section-id="{{ subsection.sub_category_id }}">{{ subsection.name }}</option>
+                                    <option value="{{ subsection.id }}" data-section-id="{{ subsection.sub_category_id }}">{{ subsection.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>    

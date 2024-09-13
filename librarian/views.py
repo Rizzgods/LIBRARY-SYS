@@ -99,16 +99,25 @@ def main(request):
             })
         return JsonResponse({'books': books_data})
 
+    storage = messages.get_messages(request)
+    for _ in storage:
+        pass  # This clears existing messages
+
     if request.method == 'POST':
         form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            messages.success(request, 'The book was uploaded successfully.')
             return redirect('librarian')
+        else:
+            messages.error(request, 'There was an error uploading the book. Please check the form for errors and try again.')
     else:
         form = BookForm()
+    
     subcategories = SubCategory.objects.all()
     categories = Category.objects.all()
     subsections = SubSection.objects.all()
+    
     context = {
         'books': books,
         'recently_deleted_books': recently_deleted_books,
@@ -124,7 +133,7 @@ def main(request):
         'book_status_approved_requests': book_status_approved_requests,
         'book_status_books_to_be_returned': book_status_books_to_be_returned,
         'return_logs': return_logs,
-        'subsections':subsections
+        'subsections': subsections,
     }
     return render(request, 'main.html', context)
 
@@ -142,19 +151,6 @@ def edit_book(request, book_id):
         form = BookForm(instance=book)
     
     return render(request, 'editbooks.html', {'form': form, 'book': book})
-# @login_required
-# def upload_view(request):
-#     if request.method == 'POST':
-#         form = BookForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('librarian')
-#     else:
-#         form = BookForm()
-#     subcategories = SubCategory.objects.all()
-#     categories = Category.objects.all()
-    
-#     return render(request, 'main.html', {'form': form, 'categories': categories, 'subcategories':subcategories,})
 
 
 @login_required
