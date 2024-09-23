@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'librarian',
     'student',
     'adminside',
-    'stud_app',
+    
     'import_export',
 ]
 

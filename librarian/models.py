@@ -51,7 +51,7 @@ class Books(models.Model):
     Author = models.CharField(max_length=100)
     Description = models.TextField(null=True, blank=True)
     Date = models.DateField()
-    Category = models.ManyToManyField(Category, null= True)
+    Category = models.ManyToManyField(Category)
     SubCategory = models.ManyToManyField(SubCategory)
     SubSection = models.ManyToManyField(SubSection)
     Language = models.CharField(max_length=100, choices=LANGUAGE_CHOICES, default='english')

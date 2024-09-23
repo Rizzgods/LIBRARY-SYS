@@ -196,6 +196,7 @@ def delete_declined_request(request, request_id):
 def delete_book(request, book_id):
     book = Books.objects.get(pk=book_id)
     book.deleted_at = timezone.now()
+    book.available = False
     book.save()
     return redirect('librarian')
 
@@ -211,6 +212,7 @@ def delete_all_books(request):
 def restore_book(request, book_id):
     book = Books.objects.get(pk=book_id)
     book.deleted_at = None
+    book.available=True
     book.save()
     return redirect('librarian')    
 
