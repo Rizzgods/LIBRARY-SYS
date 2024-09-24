@@ -45,7 +45,7 @@ def student(request):
         'language': request.GET.get('language')
     }
 
-    books = Books.objects.all()
+    books = Books.objects.filter(available = True)
 
     if filter_params['year']:
         books = books.filter(Date__year=filter_params['year'])

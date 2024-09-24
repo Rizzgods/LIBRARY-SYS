@@ -27,7 +27,7 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path('userauth/',include('userauth.urls')),
     path('adminside/',include('adminside.urls')),
-    path('stud_app/',include('stud_app.urls')),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
