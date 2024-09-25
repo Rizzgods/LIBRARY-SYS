@@ -38,9 +38,24 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <!--Trash Icon-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
+    <!--lock icon-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
 </head>
 <style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    body {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
     .notification-time {
         font-size: 0.8rem;
         color: grey;
@@ -64,11 +79,13 @@
     }
     .main-container {
         display: grid;
-        grid-template-columns: 250px 1fr;
-        grid-template-rows: 1px 1fr;
+        grid-template-columns: 250px 1fr; 
+        grid-template-rows: 1px 1fr 150px;
         grid-template-areas:
         "header header"
-        "content content";
+        "content content"
+        "footer footer";
+        flex: 1;
     }
     
     .form-inline {
@@ -84,12 +101,22 @@
     .main-container.with-sidebar {
         grid-template-areas:
             "header header"
-            "sidebar content";
+            "sidebar content"
+            "sidebar footer";
             animation: resizeContainer .2s ease;
     }
     
     .content {
         grid-area: content;
+        padding-bottom: 50px;
+    }
+    
+    .footer {
+        grid-area: footer;
+        display: flex;
+        flex-direction: column;
+        background-color: rgba(217,217,217, .5);
+        padding: 0px 20px;
     }
     
     .side-bar {
@@ -282,9 +309,6 @@
         color: black;
         transition: color .2s
     }
-    {% comment %} a:hover{
-        color: lightgray;
-    } {% endcomment %}
     .top-bar{
         display: flex;
         justify-content: space-between;
@@ -352,6 +376,33 @@
     .logo-img{
         margin-left: 10px;
     }
+    .second-footer{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 50px;
+        margin-bottom: 10px;
+    }
+    .first-footer{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        font-weight:bold;
+        padding-top: 20px;
+    }
+    .footer-details{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        list-style: none;
+        gap: 30px
+    }
+    .footer-details li{
+        font-weight: bold;
+    }
 
     
     
@@ -410,8 +461,43 @@
         <div class="content">
             {% block body %}{% endblock %}
         </div>
+        <div class="footer">
+            <div class="first-footer">
+                <span>Contact Us: </span>
+                <ul class="footer-details">
+                    <li>
+                        <img src="{% static 'playground/email-icon.png' %}" width="30px"/>
+                        lawangbato.nhs@deped.gov.ph
+                    </li>
+                    <li>
+                        <img src="{% static 'playground/call-icon.png' %}" width="25px"/>
+                        Admin: (02)8983-9321
+                    </li>
+                    <li>
+                        <img src="{% static 'playground/email-icon.png' %}" width="30px"/>
+                        lawangbato_nationalhighschool@yahoo.com
+                   </li>
+                    <li>
+                        
+                        <img src="{% static 'playground/call-icon.png' %}" width="25px"/>
+                        Registrar: 09932737625
+                    </li>
+                </ul>
+            </div>  
+            <div class="second-footer">
+                <div>
+                    <a href="https://www.facebook.com/305440LBNHS" class="me-3">
+                        <img src="{% static 'playground/fb-logo.png' %}" width="45px"/>
+                    </a>
+                    <a href="https://www.google.com/maps/place/Lawang+Bato+National+High+School/@14.7296792,120.9912317,17z/data=!3m1!4b1!4m6!3m5!1s0x3397b17f71f6fd1b:0x3442c8fb7481b19a!8m2!3d14.7296792!4d120.9938066!16s%2Fm%2F06zknph?entry=ttu&g_ep=EgoyMDI0MDkxOC4xIKXMDSoASAFQAw%3D%3D" target="_blank">
+                        <img src="{% static 'playground/map-logo.png' %}" width="40px"/>
+                    </a>
+                </div>
+                <span style="font-size: .8rem">© 2024 LBLIB | Lawang Bato National Highschool</span>
+            </div>
+        </div>
     </div>
-
+    
     <!-- Modal Structure -->
     <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
