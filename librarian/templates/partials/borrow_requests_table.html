@@ -1,0 +1,32 @@
+<!-- Partials/borrow_requests_table.html -->
+{% if borrow_requests %}
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Book</th>
+                <th>Requested By</th>
+                <th>Requested At</th>
+                <th>Expires At</th>
+                <th>File Type</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in borrow_requests %}
+                <tr>
+                    <td>{{ request.book }}</td>
+                    <td>{{ request.requested_by }}</td>
+                    <td>{{ request.requested_at }}</td>
+                    <td>{{ request.expires_at }}</td>
+                    <td>{{ request.file_type }}</td>
+                    <td>
+                        <button type="button" class="btn btn-success">Approve</button>
+                        <button type="button" class="btn btn-danger">Decline</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <div class="alert alert-warning">No matching results found.</div>
+{% endif %}

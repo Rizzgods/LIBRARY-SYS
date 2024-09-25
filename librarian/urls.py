@@ -22,6 +22,8 @@ urlpatterns = [
     path('toggle_out_status/<int:out_id>/', views.toggle_out_status, name='toggle_out_status'),
     path('edit_book/<int:book_id>/', views.edit_book, name='edit_book'),
     path('reset_filters/', views.reset_filters, name='reset_filters'),
+ 
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
     

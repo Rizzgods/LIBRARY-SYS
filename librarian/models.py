@@ -92,7 +92,10 @@ class BorrowRequest(models.Model):
     
     def is_expired(self):
         return timezone.now() > self.expires_at
-    
+    class Meta:
+        indexes = [
+            models.Index(fields=['book', 'requested_by']),
+        ]
     
 
 
@@ -106,7 +109,10 @@ class ApprovedRequest(models.Model):
 
     def __str__(self):
         return f"{self.book} approved for {self.requested_by}"
-
+    class Meta:
+        indexes = [
+            models.Index(fields=['book', 'requested_by']),
+        ]
 
 def three_days_from_now():
     return now() + timedelta(days=3)
@@ -140,7 +146,11 @@ class DeclinedRequest(models.Model):
 
     def __str__(self):
         return f"{self.book} declined for {self.requested_by}"
-    
+    class Meta:
+        indexes = [
+            models.Index(fields=['book', 'requested_by']),
+        ]
+
 @receiver(post_save, sender=ApprovedRequest)
 def create_approved_notification(sender, instance, created, **kwargs):
     if created:

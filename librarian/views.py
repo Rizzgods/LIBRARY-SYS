@@ -19,7 +19,7 @@ from librarian.utils import delete_expired_borrow_requests
 
 @login_required
 def main(request):
-    books = Books.objects.filter(deleted_at__isnull=True)
+    books = Books.objects.all().order_by('BookTitle').filter(available=True)
     recently_deleted_books = Books.objects.filter(deleted_at__isnull=False)
     borrow_requests = BorrowRequest.objects.filter(expires_at__gt=timezone.now())
     approved_requests = ApprovedRequest.objects.all()
@@ -329,3 +329,8 @@ def my_view(request):
 def go_back(request):
     return redirect('main') 
 
+# views.py
+
+
+
+    
