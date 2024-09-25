@@ -766,7 +766,7 @@
                             </form>
                             <form id="deleteFormBook-{{ book.id }}" method="post" action="{% url 'delete_book' book.id %}" style="display: inline;">
                                 {% csrf_token %}
-                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModalBook" data-bookid="{{ book.id }}">Delete Book</button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModalBook" data-bookid="{{ book.id }}">Move to Archive</button>
                             </form>
                             <form id="editFormBook-{{ book.id }}" method="get" action="{% url 'edit_book' book.id %}" style="display: inline;">
                                 <button type="button" class="btn btn-primary" onclick="window.location.href='{% url 'edit_book' book.id %}'">Edit Book</button>
@@ -1007,7 +1007,7 @@
                                     </form>
                                     <form id="deleteFormRecentDel-{{ book.id }}" method="post" action="{% url 'delete_recently_deleted_books' book.id %}" style="display: inline;">
                                         {% csrf_token %}
-                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModalRecentDel" data-bookid="{{ book.id }}">Delete Book</button>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModalRecentDel" data-bookid="{{ book.id }}">Archive Book</button>
                                     </form> 
                                 </div>                               
                             </td>
