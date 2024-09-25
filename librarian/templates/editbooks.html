@@ -129,13 +129,10 @@
             margin-left: auto;
         }
         .main-container{
-            display: flex;
-            justify-content: center;
             background-image: url({% static '/BG2.jpg' %});
             background-repeat: no-repeat;
             background-position: center;
             background-size: cover;
-            height:100vh;
         }
         .blur {
             display: flex;
@@ -145,7 +142,7 @@
             left: 0;
             background-color: rgba(112, 112, 112, 0.349);
             width: 100%;
-            height: 100vh;
+            height: 100%;
             backdrop-filter: blur(2px);
         }
         
@@ -272,6 +269,17 @@
             </form>
             <a href="{% url 'go_back' %}" class="title">Cancel</a>
         </div>
+        {% comment %} <div class="preview-container">
+            <h1>Book Cover Preview</h1>
+            <!-- Check if there is an existing image URL and display it -->
+            {% if form.instance.BookImage %}
+                <img id="current-preview" src="{{ form.instance.BookImage.url }}" alt="Current Book Image" style="max-width: 100%; height: auto;" />
+            {% else %}
+                <p>No image available. Please upload one.</p>
+            {% endif %}
+            <!-- Placeholder for new image preview -->
+            <img id="new-preview" src="#" alt="New Image Preview" style="max-width: 100%; height: auto; display: none;" />
+        </div> {% endcomment %}
     </div>
     
     <script>
