@@ -48,6 +48,7 @@ def main(request):
     search_query = request.GET.get('search')
     status_search_query = request.GET.get('status_search')
     status_reset = request.GET.get('status_reset')
+    
 
     if year_filter:
         try:
@@ -66,7 +67,7 @@ def main(request):
     if category_filter:
         books = books.filter(Category__name=category_filter)
     if search_query:
-        books = books.filter(BookTitle__icontains=search_query)
+        books = books.filter(BookTitle__icontains=search_query) | books.filter(Author__icontains=search_query)
 
     if status_search_query:
         book_status_approved_requests = book_status_approved_requests.filter(
@@ -79,6 +80,7 @@ def main(request):
         )
     if status_reset:
         return redirect('librarian')
+    
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         books_data = []
@@ -117,6 +119,7 @@ def main(request):
     subcategories = SubCategory.objects.all()
     categories = Category.objects.all()
     subsections = SubSection.objects.all()
+    
     
     context = {
         'books': books,

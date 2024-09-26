@@ -114,6 +114,19 @@ class ApprovedRequest(models.Model):
             models.Index(fields=['book', 'requested_by']),
         ]
 
+class DeclinedRequest(models.Model):
+    book = models.ForeignKey(Books, on_delete=models.CASCADE)
+    requested_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    requested_at = models.DateTimeField()
+    declined_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.book} declined for {self.requested_by}"
+    class Meta:
+        indexes = [
+            models.Index(fields=['book', 'requested_by']),
+        ]
+
 def three_days_from_now():
     return now() + timedelta(days=3)
 
@@ -138,18 +151,7 @@ class ReturnLog(models.Model):
         return f"{self.book} status"
     
     
-class DeclinedRequest(models.Model):
-    book = models.ForeignKey(Books, on_delete=models.CASCADE)
-    requested_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    requested_at = models.DateTimeField()
-    declined_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"{self.book} declined for {self.requested_by}"
-    class Meta:
-        indexes = [
-            models.Index(fields=['book', 'requested_by']),
-        ]
 
 @receiver(post_save, sender=ApprovedRequest)
 def create_approved_notification(sender, instance, created, **kwargs):
