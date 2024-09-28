@@ -64,11 +64,14 @@
     }
     .main-container {
         display: grid;
-        grid-template-columns: 250px 1fr;
-        grid-template-rows: 1px 1fr;
+        grid-template-columns: 250px 1fr; 
+        grid-template-rows: 1px 1fr 150px;
         grid-template-areas:
         "header header"
-        "content content";
+        "content content"
+        "footer footer";
+        height: 100vh;
+        flex: 1;
     }
     
     .form-inline {
@@ -81,15 +84,30 @@
     .form-control {
         margin: 5px;
     }
-    .main-container.with-sidebar {
+    .main-container.with-sidebar{
         grid-template-areas:
             "header header"
-            "sidebar content";
-            animation: resizeContainer .2s ease;
+            "sidebar content"
+            "sidebar footer";
+        animation: resizeContainer .2s ease;
+        height: 100vh;
+        flex: 1;
     }
     
     .content {
         grid-area: content;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        max-width: 100vw;
+    }
+    .footer {
+        grid-area: footer;
+        display: flex;
+        flex-direction: column;
+        background-color: rgba(217,217,217, .5);
+        padding: 10px 20px;
+        align-self: flex-end;
     }
     
     .side-bar {
@@ -100,7 +118,7 @@
         background-color: rgb(74, 128, 210);
         position: fixed;
         width: 250px;
-        height: 100vh;
+        height: 95vh;
         padding-bottom: 10vh;
         z-index: 1;
         animation: slideOutSidebar .1s ease forwards;
@@ -352,6 +370,32 @@
     .logo-img{
         margin-left: 10px;
     }
+    .second-footer{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 50px;
+    }
+    .first-footer{
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        font-weight:bold;
+        padding-top: 20px;
+    }
+    .footer-details{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        list-style: none;
+        gap: 30px
+    }
+    .footer-details li{
+        font-weight: bold;
+    }
 
     
     
@@ -374,6 +418,9 @@
             opacity: 1;
         }
     }
+
+    
+    
 </style>
 
 {% block style %}
@@ -411,38 +458,38 @@
             {% block body %}{% endblock %}
         </div>
         <div class="footer">
-            <div class="first-footer">
+            <div class="first-footer hidden">
                 <span>Contact Us: </span>
                 <ul class="footer-details">
                     <li>
-                        <img src="{% static 'playground/email-icon.png' %}" width="30px"/>
+                        <img src="{% static 'playground/email-icon.png' %}" width="35px"/>
                         lawangbato.nhs@deped.gov.ph
                     </li>
                     <li>
-                        <img src="{% static 'playground/call-icon.png' %}" width="15px"/>
+                        <img src="{% static 'playground/call-icon.png' %}" width="20px"/>
                         Admin: (02)8983-9321
                     </li>
                     <li>
-                        <img src="{% static 'playground/email-icon.png' %}" width="30px"/>
+                        <img src="{% static 'playground/email-icon.png' %}" width="35px"/>
                         lawangbato_nationalhighschool@yahoo.com
-                   </li>
+                    </li>
                     <li>
-                        
-                        <img src="{% static 'playground/call-icon.png' %}" width="15px"/>
+                        <img src="{% static 'playground/call-icon.png' %}" width="20px"/>
                         Registrar: 09932737625
                     </li>
                 </ul>
             </div>  
-            <div class="second-footer">
+            <div class="second-footer hidden">
                 <div>
                     <a href="https://www.facebook.com/305440LBNHS" class="me-3">
-                        <img src="{% static 'playground/fb-logo.png' %}" width="25 px"/>
+                        <img src="{% static 'playground/fb-logo.png' %}" width="40px"/>
                     </a>
                     <a href="https://www.google.com/maps/place/Lawang+Bato+National+High+School/@14.7296792,120.9912317,17z/data=!3m1!4b1!4m6!3m5!1s0x3397b17f71f6fd1b:0x3442c8fb7481b19a!8m2!3d14.7296792!4d120.9938066!16s%2Fm%2F06zknph?entry=ttu&g_ep=EgoyMDI0MDkxOC4xIKXMDSoASAFQAw%3D%3D" target="_blank">
-                        <img src="{% static 'playground/map-logo.png' %}" width="25px"/>
+                        <img src="{% static 'playground/map-logo.png' %}" width="35px"/>
                     </a>
                 </div>
-                <span style="font-size: .8rem">© 2024 LBLIB | Lawang Bato National Highschool</span>
+                <span style="font-size: .8rem; font-weight: bold;">© 2024 LBLIB | Lawang Bato National Highschool</span>
+                <button id="toggleFooter" style="margin-top: 10px; border: none;"><span class="material-symbols-outlined" id="footer-btn">expand_circle_up</span></button>
             </div>
         </div>
     </div>
@@ -626,6 +673,20 @@
                 }
             });
         });
+    });
+
+    document.getElementById('toggleFooter').addEventListener('click', function() {
+        var footer = document.querySelector('.first-footer');
+        var footerBtn =  document.getElementById('footer-btn');
+
+        
+        if (footer.style.display == "flex") {
+            footer.style.display = "none";
+            footerBtn.innerHTML = "expand_circle_up";
+        } else {
+            footer.style.display = "flex";
+            footerBtn.innerHTML = "expand_circle_down";
+        }
     });
     
 </script>
