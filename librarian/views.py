@@ -28,7 +28,7 @@ def main(request):
     
     book_status_approved_requests = ApprovedRequest.objects.filter(book__research_paper=False)
     book_status_books_to_be_returned = Out.objects.filter(book__research_paper=False)
-    return_logs = ReturnLog.objects.all()
+    return_logs = ReturnLog.objects.all().order_by('-returnLogTime')
     language_choices = LANGUAGE_CHOICES
 
     years = Books.objects.annotate(year=ExtractYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
@@ -262,11 +262,10 @@ def approve_request_view(request, request_id):
             requested_by=borrow_request.requested_by,
             requested_at=borrow_request.requested_at,
         )
+        borrow_request.book.borrowed.add(borrow_request.requested_by)  # Add the requesting user to the book's borrowed field
         borrow_request.delete()
-        borrow_request.book.borrowed.add(request.user)
         return redirect('librarian')
     return redirect('librarian')
-
 @login_required
 def decline_request_view(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
@@ -288,9 +287,10 @@ def toggle_book_status(request, request_id):
 
     if not approved_request.inOut:
         # Move to Out model
-        out_entry = Out.objects.create(
+        Out.objects.create(
             book=approved_request.book,
-            returnTime=timezone.now(),  # Set appropriate return time
+            requested_by=approved_request.requested_by,  # Pass the correct user
+            returnTime=timezone.now() + timedelta(days=14),  # Set appropriate return time
             out=True
         )
         approved_request.delete()
@@ -304,17 +304,18 @@ def toggle_out_status(request, out_id):
     out_entry = get_object_or_404(Out, id=out_id)
     out_entry.out = not out_entry.out
     out_entry.save()
-    
+
     if not out_entry.out:  # When the book is marked as "In"
         ReturnLog.objects.create(
             book=out_entry.book,
-            returnLogTime=timezone.now(),  # Set appropriate return time
+            requested_by=out_entry.requested_by,  # Pass the correct user who requested the book
+            returnLogTime=timezone.now(),
             expiryLogTime=timezone.now() + timedelta(days=14)  # Example expiry time of 14 days from now
         )
         # Delete related approved request if it exists
-        ApprovedRequest.objects.filter(book=out_entry.book, requested_by=out_entry.book.borrowed.first()).delete()
+        ApprovedRequest.objects.filter(book=out_entry.book, requested_by=out_entry.requested_by).delete()
         out_entry.delete()
-    
+
     return redirect(reverse('librarian'))
 
 def book_status_view(request):
