@@ -919,12 +919,13 @@
     <br>
 
     <input type="text" id="searchRequests" onkeyup="filterRequests()" placeholder="Search Books to be Borrowed" class="form-control mb-3">
-
+    <!--Books to be borrowed-->
     <div class="tab-content" id="bookStatusTabContent">
         <div class="tab-pane fade show active" id="borrowed" role="tabpanel" aria-labelledby="borrowed-tab">
             <table class="table" id="borrowedTable">
                 <thead>
                     <tr>
+                        <th>Borrowed by</th>
                         <th>Title</th>
                         <th>Author</th>
                         <th>File Type</th>
@@ -935,6 +936,7 @@
                 <tbody>
                     {% for request in book_status_approved_requests %}
                     <tr data-title="{{ request.book.BookTitle }}" data-author="{{ request.book.Author }}">
+                        <td>{{request.requested_by}}</td>
                         <td>{{ request.book.BookTitle }}</td>
                         <td>{{ request.book.Author }}</td>
                         <td>
@@ -948,8 +950,8 @@
                         </td>
                         <td>{{ request.expireTime }}</td>
                         <td>
-                            <button type="button" class="btn {% if request.inOut %}btn-success{% else %}btn-danger{% endif %}" data-toggle="modal" data-target="#statusModal{{ request.id }}">
-                                {% if request.inOut %}In{% else %}Out{% endif %}
+                            <button type="button" class="btn {% if request.inOut %}btn-success{% else %}btn-success{% endif %}" data-toggle="modal" data-target="#statusModal{{ request.id }}">
+                                {% if request.inOut %}To claim{% else %}To return{% endif %}
                             </button>
                             <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ request.book.BookImage.url }}', '{{ request.book.BookTitle }}', '{{ request.book.Description }}')">View</button>
                         </td>
@@ -958,11 +960,12 @@
                 </tbody>
             </table>
         </div>
-
+        <!--Books to be returned-->
         <div class="tab-pane fade" id="returned" role="tabpanel" aria-labelledby="returned-tab">
             <table class="table" id="returnedTable">
                 <thead>
                     <tr>
+                        <th>Borrowed by</th>
                         <th>Title</th>
                         <th>Author</th>
                         <th>Return Time</th>
@@ -972,12 +975,13 @@
                 <tbody>
                     {% for out in book_status_books_to_be_returned %}
                     <tr data-title="{{ out.book.BookTitle }}" data-author="{{ out.book.Author }}">
+                        <td>{{out.requested_by}}</td>
                         <td>{{ out.book.BookTitle }}</td>
                         <td>{{ out.book.Author }}</td>
                         <td>{{ out.returnTime }}</td>
                         <td>
-                            <button type="button" class="btn {% if out.out %}btn-danger{% else %}btn-success{% endif %}" data-toggle="modal" data-target="#statusModal{{ out.id }}">
-                                {% if out.out %}Out{% else %}In{% endif %}
+                            <button type="button" class="btn {% if out.out %}btn-success{% else %}btn-success{% endif %}" data-toggle="modal" data-target="#statusModal{{ out.id }}">
+                                {% if out.out %}To return{% else %}To claim{% endif %}
                             </button>
                             <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ out.book.BookImage.url }}', '{{ out.book.BookTitle }}', '{{ out.book.Description }}')">View</button>
                         </td>
@@ -986,13 +990,14 @@
                 </tbody>
             </table>
         </div>
-
+        <!--Return logs-->
         <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
             <div class="return-logs">
                 {% if return_logs %}
                 <table class="table" id="logsTable">
                     <thead>
                         <tr>
+                            <th>Borrowed by</th>
                             <th>Title</th>
                             <th>Date Returned</th>
                             <th>Log Expiry</th>
@@ -1002,6 +1007,7 @@
                     <tbody>
                         {% for log in return_logs %}
                         <tr data-title="{{ log.book.BookTitle }}">
+                            <td>{{ log.requested_by }}</td>
                             <td>{{ log.book.BookTitle }}</td>
                             <td>{{ log.returnLogTime }}</td>
                             <td>{{ log.expiryLogTime }}</td>
@@ -1031,14 +1037,14 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to change the status of this book?
+                    Are you sure the book is claimed?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                     <form method="post" action="{% url 'toggle_book_status' request.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn {% if request.inOut %}btn-danger{% else %}btn-success{% endif %}">
-                            {% if request.inOut %}Out{% else %}In{% endif %}
+                        <button type="submit" class="btn {% if request.inOut %}btn-success{% else %}btn-success{% endif %}">
+                            {% if request.inOut %}Yes{% endif %}
                         </button>
                     </form>
                 </div>
@@ -1058,14 +1064,14 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to change the status of this book?
+                    Are you sure the book is returned?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                     <form method="post" action="{% url 'toggle_out_status' out.id %}">
                         {% csrf_token %}
-                        <button type="submit" class="btn {% if out.out %}btn-danger{% else %}btn-success{% endif %}">
-                            {% if out.out %}Out{% else %}In{% endif %}
+                        <button type="submit" class="btn {% if out.out %}btn-success{% else %}btn-success{% endif %}">
+                            {% if out.out %}Yes{% endif %}
                         </button>
                     </form>
                 </div>

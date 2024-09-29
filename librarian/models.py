@@ -130,8 +130,12 @@ class DeclinedRequest(models.Model):
 def three_days_from_now():
     return now() + timedelta(days=3)
 
+def get_default_user():
+    return User.objects.get(pk=1)
+
 class Out(models.Model):
     book = models.ForeignKey(Books, on_delete=models.CASCADE)
+    requested_by = models.ForeignKey(User, on_delete=models.CASCADE, default=get_default_user)
     approved_at = models.DateTimeField(auto_now_add=True)
     out = models.BooleanField(default=False)
     returnTime = models.DateTimeField(default=three_days_from_now)
@@ -144,6 +148,7 @@ def book_returnlog_expiry():
 
 class ReturnLog(models.Model):
     book = models.ForeignKey(Books, on_delete=models.CASCADE)
+    requested_by = models.ForeignKey(User, on_delete=models.CASCADE, default=get_default_user)
     returnLogTime = models.DateTimeField(auto_now_add=True)
     expiryLogTime = models.DateTimeField(default=book_returnlog_expiry)
     
