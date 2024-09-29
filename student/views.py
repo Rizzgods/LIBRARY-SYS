@@ -213,6 +213,13 @@ def fetch_notifications(request):
     data = [{'id': n.id, 'message': n.message, 'read': n.read, 'created_at': n.created_at} for n in notifications]
     return JsonResponse(data, safe=False)
 
+def mark_all_notifications_read(request):
+    if request.method == 'POST':
+        # Fetch all unread notifications for the current user and mark them as read
+        notifications = Notification.objects.filter(user=request.user, read=False)
+        notifications.update(read=True)
+        return JsonResponse({'success': True})
+    
 @login_required
 def mark_notification_read(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
