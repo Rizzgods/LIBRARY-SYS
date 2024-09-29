@@ -11,6 +11,7 @@
     <title>Librarian</title>
     <link rel="icon" href={% static "playground/school_Logo.png" %}>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -897,144 +898,304 @@
 
 
 
-
-
-
 <!-- Book Status Section -->
-<div id="book-status" class="content" style="display: none;">
-    <h2 class="table">Book to be borrowed</h2>
-    <form method="get" action="{% url 'librarian' %}">
-        <div class="form-group">
-            <input type="text" name="status_search" placeholder="Search books..." value="{{ request.GET.status_search }}">
-            <button type="submit" class="btn btn-primary">Search</button>
-            <a href="{% url 'reset_filters' %}" class="btn btn-secondary">Reset</a>
+<div id="book-status" class="content hidden">
+    <h2 class="sections">Book Status</h2>
+    <hr>
+    <!-- Tabs for Book Status Sections -->
+    <div class="border-b border-gray-200">
+        <ul class="flex" id="bookStatusTabs" role="tablist">
+            <li class="mr-2">
+                <a class="inline-block py-2 px-4 text-blue-600 border-b-2 border-blue-600 active hover:text-blue-600" id="borrowed-tab" href="#borrowed" role="tab" aria-controls="borrowed" aria-selected="true" onclick="showTab(event, 'borrowed')">Books to be Borrowed</a>
+            </li>
+            <li class="mr-2">
+                <a class="inline-block py-2 px-4 text-gray-600 border-b-2 border-transparent hover:text-blue-600" id="returned-tab" href="#returned" role="tab" aria-controls="returned" aria-selected="false" onclick="showTab(event, 'returned')">Books to be Returned</a>
+            </li>
+            <li class="mr-2">
+                <a class="inline-block py-2 px-4 text-gray-600 border-b-2 border-transparent hover:text-blue-600" id="logs-tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false" onclick="showTab(event, 'logs')">Logs</a>
+            </li>
+        </ul>
+    </div>
+    <br>
+
+    <input type="text" id="searchRequests" onkeyup="filterRequests()" placeholder="Search Books to be Borrowed" class="form-control mb-3">
+
+    <div class="tab-content" id="bookStatusTabContent">
+        <div class="tab-pane fade show active" id="borrowed" role="tabpanel" aria-labelledby="borrowed-tab">
+            <table class="table" id="borrowedTable">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>File Type</th>
+                        <th>Expires at</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in book_status_approved_requests %}
+                    <tr data-title="{{ request.book.BookTitle }}" data-author="{{ request.book.Author }}">
+                        <td>{{ request.book.BookTitle }}</td>
+                        <td>{{ request.book.Author }}</td>
+                        <td>
+                            {% if request.book.eBook %}
+                                eBook
+                            {% elif request.book.research_paper %}
+                                Research Paper
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                        <td>{{ request.expireTime }}</td>
+                        <td>
+                            <button type="button" class="btn {% if request.inOut %}btn-success{% else %}btn-danger{% endif %}" data-toggle="modal" data-target="#statusModal{{ request.id }}">
+                                {% if request.inOut %}In{% else %}Out{% endif %}
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ request.book.BookImage.url }}', '{{ request.book.BookTitle }}', '{{ request.book.Description }}')">View</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </form>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>File Type</th>
-                <th>Expires at</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in book_status_approved_requests %}
-            <tr>
-                <td><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#viewBookModal-{{ book.id }}">
-                    <i class="fas fa-eye"></i> <!-- Eye icon for viewing -->
-                </button>
-                {{ request.book.BookTitle }}
-            
-                </td>
-                <td>{{ request.book.Author }}</td>
-                <td>
-                    {% if request.book.eBook %}
-                        eBook
-                    {% elif request.book.research_paper %}
-                        Research Paper
-                    {% else %}
-                        Unknown
-                    {% endif %}
-                </td>
-                <td>{{ request.expireTime }}</td>
-                <td>
-                    <form id="toggleForm-{{ request.id }}" method="post" action="{% url 'toggle_book_status' request.id %}" style="display: inline;">
+
+        <div class="tab-pane fade" id="returned" role="tabpanel" aria-labelledby="returned-tab">
+            <table class="table" id="returnedTable">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Return Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for out in book_status_books_to_be_returned %}
+                    <tr data-title="{{ out.book.BookTitle }}" data-author="{{ out.book.Author }}">
+                        <td>{{ out.book.BookTitle }}</td>
+                        <td>{{ out.book.Author }}</td>
+                        <td>{{ out.returnTime }}</td>
+                        <td>
+                            <button type="button" class="btn {% if out.out %}btn-danger{% else %}btn-success{% endif %}" data-toggle="modal" data-target="#statusModal{{ out.id }}">
+                                {% if out.out %}Out{% else %}In{% endif %}
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ out.book.BookImage.url }}', '{{ out.book.BookTitle }}', '{{ out.book.Description }}')">View</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+            <div class="return-logs">
+                {% if return_logs %}
+                <table class="table" id="logsTable">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Date Returned</th>
+                            <th>Log Expiry</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in return_logs %}
+                        <tr data-title="{{ log.book.BookTitle }}">
+                            <td>{{ log.book.BookTitle }}</td>
+                            <td>{{ log.returnLogTime }}</td>
+                            <td>{{ log.expiryLogTime }}</td>
+                            <td>
+                                <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ log.book.BookImage.url }}', '{{ log.book.BookTitle }}', '{{ log.book.Description }}')">View</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No Recent Logs</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for Changing Status -->
+    {% for request in book_status_approved_requests %}
+    <div class="modal fade" id="statusModal{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel{{ request.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel{{ request.id }}">Change Status</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to change the status of this book?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'toggle_book_status' request.id %}">
                         {% csrf_token %}
-                        <button type="button" data-id="{{ request.id }}" data-status="{{ request.inOut }}" data-type="request" class="availabilityBtn btn {% if request.inOut %}btn-success{% else %}btn-danger{% endif %}">
-                            {% if request.inOut %}In{% else %}Out{% endif %}
+                        <button type="submit" class="btn {% if request.inOut %}btn-danger{% else %}btn-success{% endif %}">
+                            {% if request.inOut %}Out{% else %}In{% endif %}
                         </button>
                     </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    <hr>
-    <h2 class="table margin-top">Books to be Returned</h2>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Image</th>
-                <th>Author</th>
-                <th>Return Time</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for out in book_status_books_to_be_returned %}
-            <tr>
-                <td>{{ out.book.BookTitle }}</td>
-                <td><img src="{{ out.book.BookImage.url }}" alt="{{ out.book.BookTitle }}" class="lib-img"></td>
-                <td>{{ out.book.Author }}</td>
-                <td>{{ out.returnTime }}</td>
-                <td>
-                    <form id="toggleForm-{{ out.id }}" method="post" action="{% url 'toggle_out_status' out.id %}" style="display: inline;">
+    {% for out in book_status_books_to_be_returned %}
+    <div class="modal fade" id="statusModal{{ out.id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel{{ out.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel{{ out.id }}">Change Status</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to change the status of this book?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form method="post" action="{% url 'toggle_out_status' out.id %}">
                         {% csrf_token %}
-                        <button type="button" data-id="{{ out.id }}" data-status="{{ out.out }}" data-type="out" class="availabilityBtn btn {% if out.out %}btn-danger{% else %}btn-success{% endif %}">
+                        <button type="submit" class="btn {% if out.out %}btn-danger{% else %}btn-success{% endif %}">
                             {% if out.out %}Out{% else %}In{% endif %}
                         </button>
                     </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <hr>
-    <div class="return-logs">
-        {% if return_logs %}
-        <h2 class="table margin-top">Return Logs</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Image</th>
-                    <th>Date Returned</th>
-                    <th>Log Expiry</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for log in return_logs %}
-                <tr>
-                    <td>{{ log.book.BookTitle }}</td>
-                    <td><img src="{{ log.book.BookImage.url }}" alt="{{ log.book.BookTitle }}" class="mr-3 lib-img"></td>
-                    <td>{{ log.returnLogTime }}</td>
-                    <td>{{ log.expiryLogTime }}</td>
-                </tr>
-                {% endfor %}
-        </table>
-        {% else %}
-        <p>No Recent Logs</p>
-        {% endif %}
-    </div>
-</div>
-<!-- Modal Structure -->
-<div id="statusModal" class="modal modal-bg" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Change Status</h5>
-            <span class="close" onclick="closeModal()">&times;</span>
+                </div>
+            </div>
         </div>
-        <div id="modalBody"></div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Modal for Viewing Book Details -->
+<div class="modal fade" id="viewBookModal" tabindex="-1" role="dialog" aria-labelledby="viewBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewBookModalLabel">Book Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="viewBookImage" src="" alt="Book Image" class="img-fluid mb-3">
+                <h5 id="viewBookTitle"></h5>
+                <p id="viewBookDescription"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function showTab(event, tabId) {
+        event.preventDefault();
+    
+        // Hide all tab content
+        $('.tab-pane').removeClass('show active').addClass('hidden');
+    
+        // Remove active classes from all tabs
+        $('#bookStatusTabs a').removeClass('text-blue-600 border-blue-600 active')
+                              .addClass('text-gray-600 border-transparent');
+    
+        // Show the selected tab content
+        $('#' + tabId).removeClass('hidden').addClass('show active');
+    
+        // Add active class to the selected tab
+        $(event.currentTarget).addClass('border-blue-600 active')
+                              .removeClass('border-transparent');
+        
+        // Update search placeholder based on active tab
+        const tabText = $(event.currentTarget).text();
+        $('#searchRequests').attr('placeholder', 'Search ' + tabText);
+        $('#searchRequests').val(''); // Clear search input
+        filterRequests(); // Reset the filter for the current tab
+    }
+
+    function filterRequests() {
+        // Get the search input and the active tab
+        const input = $('#searchRequests').val().toLowerCase();
+        const activeTab = $('.tab-pane.show.active').attr('id');
+        let table;
+
+        // Determine which table to filter based on the active tab
+        if (activeTab === 'borrowed') {
+            table = $('#borrowedTable tr');
+        } else if (activeTab === 'returned') {
+            table = $('#returnedTable tr');
+        } else if (activeTab === 'logs') {
+            table = $('#logsTable tr');
+        }
+
+        // Filter the rows in the determined table, skipping the header row
+        table.each(function(index) {
+            if (index === 0) return; // Skip the header row
+            const row = $(this);
+            const text = row.text().toLowerCase();
+            if (text.includes(input)) {
+                row.show();
+            } else {
+                row.hide();
+            }
+        });
+    }
+
+    // Add an event listener for the search input
+    $('#searchRequests').on('keyup', filterRequests);
+
+    // Function to view book details
+    function viewBookDetails(imageUrl, title, description) {
+        $('#viewBookImage').attr('src', imageUrl);
+        $('#viewBookTitle').text(title);
+        $('#viewBookDescription').text(description);
+        $('#viewBookModal').modal('show');
+    }
+</script>
+
+<style>
+    #bookStatusTabContent .tab-pane .lib-img {
+        width: 30px !important;  /* Force width to 30px */
+        height: auto !important;  /* Maintain aspect ratio */
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .border-transparent {
+        border-color: transparent;
+    }
+
+    .active {
+        color: #1d4ed8 !important; /* Ensure the active tab text is blue */
+        border-bottom-color: #1d4ed8 !important; /* Ensure the active tab has a blue underline */
+        font-weight: bold; /* Make the active tab font bold */
+    }
+
+    #bookStatusTabs a {
+        font-weight: bold; /* Make the tab font bold */
+        font-size: 1.1em; /* Increase the font size */
+    }
+
+    #bookStatusTabs a:hover {
+        color: #1d4ed8 !important; /* Ensure the hover text is blue */
+    }
+</style>
 
 <!-- Recently Deleted -->
 
