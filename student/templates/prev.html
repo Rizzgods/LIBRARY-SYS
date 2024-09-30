@@ -474,7 +474,7 @@
             margin-top: 20px;
             width: 50vw;
             height: 80vh;
-            overflow: hidden;
+            overflow: hidden; /* Hide scrollbars but allow dragging */
             white-space: nowrap;
             background-color: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -483,8 +483,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            postion: inline;
             box-sizing: border-box;
+            position: relative; /* Ensure that the container remains relative for absolute movement */
         }
         canvas {
             display: inline-block;
@@ -670,28 +670,54 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        let pdfDoc = null;
-        let pageNum = 1;
-        let scale = 1.0;
-        let isDragging = false;
-        let startX, startY, scrollLeft, scrollTop;
-        let utterance = null;
-        let recognition = null;
-    
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        const pdfContainer = document.getElementById("pdf-container");
-        const pageCounter = document.getElementById("page-counter");
-        const pageInput = document.getElementById("page-input");
 
-        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    let pdfDoc = null;
+    let pageNum = 1;
+    let scale = 1.0;
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+    let utterance = null;
+    let recognition = null;
+    let currentX = 0, currentY = 0;
+    let xOffset = 0, yOffset = 0;
+
+    const zoomStep = 0.1; // Step size for each scroll event
+    const minScale = 0.25; // Minimum zoom scale
+    const maxScale = 4.0; // Maximum zoom scale
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const pdfContainer = document.getElementById("pdf-container");
+    const pageCounter = document.getElementById("page-counter");
+    const pageInput = document.getElementById("page-input");
     
+
+    // Function to handle zooming in and out based on scroll direction
+    function handleScrollZoom(e) {
+        e.preventDefault(); // Prevent default scroll behavior
+
+        // Check scroll direction and adjust scale
+        if (e.deltaY < 0) {
+            // Scrolled up -> zoom in
+            if (scale < maxScale) {
+                scale += zoomStep;
+            }
+        } else {
+            // Scrolled down -> zoom out
+            if (scale > minScale) {
+                scale -= zoomStep;
+            }
+        }
+
+        // Re-render the page with the updated scale
+        renderPage(pageNum, scale);
+    }
+
         // Function to speak command success message
         function speakCommandSuccess(message) {
             utterance = new SpeechSynthesisUtterance(message);
             speechSynthesis.speak(utterance);
-        }
+        }   
     
         function nextPage() {
             stopReading(); // Stop TTS before navigating
@@ -793,28 +819,55 @@
             }
         }
     
-        function startDragging(e) {
-            isDragging = true;
-            startX = e.clientX - pdfContainer.offsetLeft;
-            startY = e.clientY - pdfContainer.offsetTop;
-            scrollLeft = pdfContainer.scrollLeft;
-            scrollTop = pdfContainer.scrollTop;
-        }
-    
-        function stopDragging() {
-            isDragging = false;
-        }
-    
-        function drag(e) {
-            if (!isDragging) return;
-            e.preventDefault();
-            const x = e.clientX - pdfContainer.offsetLeft;
-            const y = e.clientY - pdfContainer.offsetTop;
-            const walkX = x - startX;
-            const walkY = y - startY;
-            pdfContainer.scrollLeft = scrollLeft - walkX;
-            pdfContainer.scrollTop = scrollTop - walkY;
-        }
+// Ensure dragging is only done on the canvas inside the pdfContainer
+function startDragging(e) {
+    if (e.target.tagName !== "CANVAS") return;  // Only allow dragging when the target is the canvas
+
+    isDragging = true;
+    pdfContainer.style.cursor = 'grabbing';
+
+    // Get the starting positions of the mouse relative to the current offset
+    startX = e.pageX - xOffset;
+    startY = e.pageY - yOffset;
+
+    e.preventDefault();  // Prevent text selection or default behavior
+    e.stopPropagation(); // Prevent event propagation to other elements
+}
+
+function stopDragging(e) {
+    if (!isDragging) return;  // Only stop if dragging is in progress
+
+    isDragging = false;
+    pdfContainer.style.cursor = 'grab';
+
+    // Update offsets based on the current position
+    xOffset = currentX;
+    yOffset = currentY;
+
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function drag(e) {
+    if (!isDragging) return;  // Do nothing if we're not dragging
+
+    // Calculate the new position based on the mouse movement
+    currentX = e.pageX - startX;
+    currentY = e.pageY - startY;
+
+    // Move the canvas by translating its position
+    canvas.style.transform = `translate(${currentX}px, ${currentY}px)`;  // Apply dragging only to the canvas
+
+    e.preventDefault();  // Prevent text selection or default behavior
+    e.stopPropagation(); // Prevent event propagation
+}
+
+// Attach event listeners to the pdfContainer for the canvas
+pdfContainer.addEventListener('mousedown', startDragging);
+pdfContainer.addEventListener('mousemove', drag);
+pdfContainer.addEventListener('mouseup', stopDragging);
+pdfContainer.addEventListener('mouseleave', stopDragging);
+
     
         function jumpToPage(e) {
             if (e.key === 'Enter') {
@@ -848,8 +901,7 @@
                 console.error('Invalid page number:', pageNumber);
             }
         }
-        
-    
+
         // Add CSS transition
         document.addEventListener('DOMContentLoaded', function() {
             const button = document.getElementById('pauseResumeButton');

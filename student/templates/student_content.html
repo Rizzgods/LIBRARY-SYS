@@ -553,7 +553,7 @@
     <div class="filter-option">
         <form method="get" id="filterForm" class="form-inline mb-1">
             <select name="year" class="form-control" id="yearFilter">
-                <option value="" >All Year</option>
+                <option value="">All Year</option>
                 {% for year in years %}
                 <option value="{{ year.year }}" {% if filter_params.year == year.year|stringformat:"s" %}selected{% endif %}>{{ year.year }}</option>
                 {% endfor %}
@@ -569,6 +569,11 @@
                 {% for code, name in language_choices %}
                 <option value="{{ code }}" {% if filter_params.language == code %}selected{% endif %}>{{ name }}</option>
                 {% endfor %}
+            </select>
+            <select name="file_type" id="fileTypeFilter" class="form-control">
+                <option value="">All Files</option>
+                <option value="ebook" {% if filter_params.file_type == 'ebook' %}selected{% endif %}>Ebooks</option>
+                <option value="research" {% if filter_params.file_type == 'research' %}selected{% endif %}>Research Papers</option>
             </select>
         </form>
     </div>
@@ -1280,6 +1285,9 @@ function copyCitation() {
         const yearFilter = document.getElementById('yearFilter');
         const categoryFilter = document.getElementById('categoryFilter');
         const languageFilter = document.getElementById('languageFilter');
+        const fileTypeFilter = document.getElementById('fileTypeFilter');
+
+        fileTypeFilter
 
         yearFilter.addEventListener('change', function() {
             filterForm.submit();
@@ -1290,6 +1298,9 @@ function copyCitation() {
         });
 
         languageFilter.addEventListener('change', function() {
+            filterForm.submit();
+        });
+        fileTypeFilter.addEventListener('change', function() {
             filterForm.submit();
         });
 

@@ -42,7 +42,8 @@ def student(request):
     filter_params = {
         'year': request.GET.get('year'),
         'category': request.GET.get('category'),
-        'language': request.GET.get('language')
+        'language': request.GET.get('language'),
+        'file_type': request.GET.get('file_type')
     }
 
     books = Books.objects.filter(available = True)
@@ -53,6 +54,11 @@ def student(request):
         books = books.filter(Category__id=filter_params['category'])
     if filter_params['language']:
         books = books.filter(Language=filter_params['language'])
+    if filter_params['file_type']:
+        if filter_params['file_type'] == 'ebook':
+            books = books.filter(eBook=True)  # Filter for ebooks
+        elif filter_params['file_type'] == 'research':
+            books = books.filter(research_paper=True)  # Filter for research papers
 
     top_viewed_books = books.order_by('-PageViews')[:7]
     categories = Category.objects.all()
