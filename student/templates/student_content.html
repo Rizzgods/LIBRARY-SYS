@@ -2,31 +2,6 @@
 
 {% block title %} Home {% endblock %}
 
-{% block notification %}
-
-<div class="notification-icon">
-    <span class="material-symbols-outlined" id="notification-bell">notifications</span>
-    <span class="notification-badge" id="notification-count">0</span>
-    <div class="dropdown" id="notification-dropdown">
-        <div class="dropdown-header">
-            <button id="mark-all-read" class="btn btn-link">Mark All as Read</button>
-        </div>
-
-        <!-- Notification list -->
-        <ul id="notification-list" class="dropdown-item-list"></ul>
-
-        <!-- See More / See Less Button -->
-        <div id="see-more-less-container" style="display: none;">
-            <button id="see-more-less-btn" class="btn btn-link">See More</button>
-        </div>
-
-        <!-- No notifications message -->
-        <span class="dropdown-item-text no-notif" id="no-notifications" style="display: none;">No notifications</span>
-    </div>
-</div>
-
-{% endblock %}
-
 {% block style %}
 
 <style>
@@ -761,7 +736,7 @@
             <div class="modal-footer modalButtons">
                 <a href="#" id="modal-borrow-link" class="btn-mdl" data-approved="{{ approved_requested }}">Borrow</a>
                 <a href="#" id="modal-preview-link" class="btn-mdl"><i class="fas fa-eye"></i></a>
-                <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="" id="AddNotifBtn">Bookmark</a>
+                <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="" id="AddNotifBtn">eg</a>
                 <button type="button" id="generate-citation" class="btn-mdl">Generate APA Citation</button>
             </div>
         </div>
@@ -957,13 +932,13 @@
                 },
                 success: function(response) {
                     if (response.bookmarked) {
-                        $('#modal-bookmark-link').text('Unbookmark');
+                        $('#modal-bookmark-link').text('uh');
                         const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
                         toastBootstrap.show();
                         
                         
                     } else {
-                        $('#modal-bookmark-link').text('Bookmark');
+                        $('#modal-bookmark-link').text('he');
                         const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
                         toastBootstrap.show();
                         
@@ -1129,151 +1104,6 @@ function copyCitation() {
     });
 
 
-
-    $(document).ready(function() {
-        var showingMore = false; // Track the current state of the "See More"/"See Less" toggle
-        var notifications = [];  // Store notification data locally
-    
-        function fetchNotifications() {
-            $.get("{% url 'fetch_notifications' %}", function(data) {
-                notifications = data; // Save the fetched data to the local variable
-                renderNotifications(); // Call the render function
-            });
-        }
-    
-        function renderNotifications() {
-            $('#notification-dropdown').empty();
-            
-            if (notifications.length > 0) {
-                $('#notification-count').text(notifications.length).show();
-                $('#no-notifications').hide();
-    
-                var markAllButton = $('<div class="dropdown-header">')
-                    .html('<button id="mark-all-read" class="btn btn-link">Mark All as Read</button>');
-                $('#notification-dropdown').append(markAllButton);
-    
-                $('#mark-all-read').click(function(event) {
-                    event.stopPropagation();
-                    markAllAsRead();
-                });
-    
-                // Determine how many notifications to display based on the "See More" state
-                var notificationsToShow = showingMore ? notifications.length : 5;
-    
-                var limitedNotifications = notifications.slice(0, notificationsToShow);
-                limitedNotifications.forEach(function(notification) {
-                    var item = $('<div class="dropdown-item">')
-                        .html(`
-                                <a href="{% url 'borrowed_books' %}" class="notif-link">
-                                    <div class="notification-icon-2">
-                                        <span class="material-symbols-outlined icon-2">notification_important</span>
-                                    </div>
-                                    <div class="notif-message">
-                                        ${notification.message}
-                                        <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
-                                    </div>
-                                </a>
-                        `)
-                        .attr('data-id', notification.id)
-                        .toggleClass('read', notification.read)  // Use the local "read" state
-                        .click(function() {
-                            markAsRead(notification.id);
-                        });
-    
-                    var deleteButton = $('<button class="btn btn-close ms-auto">')
-                        .html('')
-                        .click(function(event) {
-                            event.stopPropagation();
-                            deleteNotification(notification.id);
-                        });
-    
-                    item.append(deleteButton);
-                    $('#notification-dropdown').append(item);
-                });
-    
-                // Re-append the "Mark All as Read" button
-                $('#notification-dropdown').prepend(markAllButton);
-    
-                // Add "See More" button if there are more than 5 notifications
-                if (notifications.length > 5) {
-                    var seeMoreBtn = $('<button id="see-more-btn" class="btn btn-link">See More</button>');
-                    var seeMoreContainer = $('<div class="dropdown-footer">').append(seeMoreBtn);
-                    $('#notification-dropdown').append(seeMoreContainer);
-    
-                    // Set the text of the button based on the current state
-                    seeMoreBtn.text(showingMore ? 'See Less' : 'See More');
-    
-                    // Prevent the dropdown from closing when clicking "See More" or "See Less"
-                    seeMoreBtn.on('click', function(event) {
-                        event.stopPropagation();  // Prevent dropdown from closing
-    
-                        showingMore = !showingMore; // Toggle the state
-                        renderNotifications(); // Re-render the notifications based on the new state
-                    });
-                }
-            } else {
-                $('#notification-dropdown').html('<span class="dropdown-item-text no-notif" id="no-notifications">No notifications</span>');
-                $('#notification-count').hide();
-            }
-        }
-    
-        function markAsRead(notificationId) {
-            $.post("{% url 'mark_notification_read' 0 %}".replace('0', notificationId), {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                // Find the notification in the local array and mark it as read
-                var notification = notifications.find(function(notif) {
-                    return notif.id === notificationId;
-                });
-                if (notification) {
-                    notification.read = true; // Update the local state
-                }
-                renderNotifications(); // Re-render the notifications
-            });
-        }
-    
-        function markAllAsRead() {
-            $.post("{% url 'mark_all_notifications_read' %}", {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                // Update all notifications locally to be marked as read
-                notifications.forEach(function(notification) {
-                    notification.read = true; // Update local state
-                });
-                renderNotifications(); // Re-render the notifications
-            });
-        }
-    
-        function deleteNotification(notificationId) {
-            $.post("{% url 'delete_notification' 0 %}".replace('0', notificationId), {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                // Remove the notification from the local array
-                notifications = notifications.filter(function(notif) {
-                    return notif.id !== notificationId;
-                });
-                renderNotifications(); // Re-render the notifications
-            });
-        }
-    
-        $('#notification-bell').on('click', function() {
-            $('#notification-dropdown').toggle(); // Toggle visibility
-    
-            // Fetch and render notifications only if the dropdown is being shown
-            if ($('#notification-dropdown').is(':visible')) {
-                fetchNotifications();
-            }
-        });
-    
-        setInterval(fetchNotifications, 60000); // Fetch every 60 seconds
-        fetchNotifications();
-    
-        $(document).click(function(event) {
-            if (!$(event.target).closest('#notification-bell').length && !$(event.target).closest('#notification-dropdown').length) {
-                $('#notification-dropdown').hide(); // Hide the dropdown when clicking outside
-            }
-        });
-    });
     
     document.addEventListener('DOMContentLoaded', function() {
         const filterForm = document.getElementById('filterForm');

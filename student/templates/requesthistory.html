@@ -2,18 +2,6 @@
 
 {% block title %} Request History {% endblock %}
 
-{% block notification %}
-
-<div class="notification-icon">
-    <span class="material-symbols-outlined" id="notification-bell">notifications</span>
-    <span class="notification-badge" id="notification-count">0</span>
-    <div class="dropdown" id="notification-dropdown">
-        <span class="dropdown-item-text" id="no-notifications">No notifications</span>
-    </div>
-</div>
-
-{% endblock %}
-
 {% block style %}
 <style>
     .notification-time {
@@ -464,79 +452,6 @@
 
         
     });
-    {% comment %} notif js {% endcomment %}
-    $(document).ready(function() {
-        function fetchNotifications() {
-            $.get("{% url 'fetch_notifications' %}", function(data) {
-                $('#notification-dropdown').empty();
-                if (data.length > 0) {
-                    $('#notification-count').text(data.length).show();
-                    $('#no-notifications').hide();
-                    data.forEach(function(notification) {
-                        var item = $('<div class="dropdown-item">')
-                            .html(`
-                                <a href="{% url 'borrowed_books' %}" class="notif-link">
-                                        <div class="notification-icon-2">
-                                            <span class="material-symbols-outlined icon-2">notification_important</span>
-                                        </div>
-                                        <div class="notif-message">
-                                            ${notification.message}
-                                            <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
-                                        </div>
-                                </a>
-                            `)
-                            .attr('data-id', notification.id)
-                            .toggleClass('read', notification.read)
-                            .click(function() {
-                                markAsRead(notification.id);
-                            });
     
-                            var deleteButton = $('<button class="btn btn-close ms-auto">')
-                                .html('')
-                                .click(function(event) {
-                                    event.stopPropagation();
-                                    deleteNotification(notification.id);
-                                });
-        
-    
-                        item.append(deleteButton);
-                        $('#notification-dropdown').append(item);
-                    });
-                } else {
-                    $('#notification-dropdown').html('<span class="dropdown-item-text no-notif" id="no-notifications">No notifications</span>');
-                    $('#notification-count').hide();
-                }
-            });
-        }
-    
-        function markAsRead(notificationId) {
-            $.post("{% url 'mark_notification_read' 0 %}".replace('0', notificationId), {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                fetchNotifications();
-            });
-        }
-    
-        function deleteNotification(notificationId) {
-            $.post("{% url 'delete_notification' 0 %}".replace('0', notificationId), {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                fetchNotifications();
-            });
-        }
-    
-        $('#notification-bell').on('click', function() {
-            $('#notification-dropdown').toggle();
-        });
-    
-        setInterval(fetchNotifications, 60000); // Fetch every 60 seconds
-        fetchNotifications();
-    
-        $(document).click(function(event) {
-            if (!$(event.target).closest('#notification-bell').length) {
-                $('#notification-dropdown').hide();
-            }
-        });
-    });
 </script>
 {% endblock %}
