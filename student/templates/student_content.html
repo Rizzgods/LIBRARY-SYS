@@ -69,20 +69,75 @@
     }
     .modalButtons {
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between; /* Space buttons evenly */
         align-items: center;
+        padding: 10px 0; /* Add vertical padding */
+        border-top: 1px solid #ccc; /* Add subtle top border for separation */
     }
+    
+        .modalButtons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Create 4 equal columns */
+        gap: 10px; /* Add some space between the buttons */
+        padding: 10px 0; /* Add vertical padding */
+        border-top: 1px solid #ccc; /* Add subtle top border for separation */
+    }
+    
+    .modalButtons a, .modalButtons button {
+        text-align: center; /* Center the button text */
+        margin: 0; /* Remove the margin between buttons */
+        color: #fff; /* White text color */
+        border: none; /* Remove borders */
+        border-radius: 0; /* Keep the corners squared */
+        font-weight: bold; /* Make button text bold */
+        padding: 10px 0; /* Add padding */
+    }
+    
+    #modal-borrow-link {
+        
+        border-left: 10px solid #fff; /* 10px border on the left side, white color */
+    }
+    
+    #modal-preview-link {
+        
+    }
+    
+    #modal-bookmark-link {
+        
+    }
+    
+    #generate-citation {
+       
+        border-right: 10px solid #fff;
+    }
+    
+    /* Hover effect */
+    .modalButtons a:hover span, .modalButtons button:hover span {
+        opacity: 0.9; /* Slight opacity change on hover */
+        
+        transition: transform 0.2s ease-in-out; /* Smooth transition */
+    }
+    
     .btn-mdl {
-        background-color: rgb(74, 128, 210);
+        background-color: #007bff; /* Blue for all buttons */
         padding: 10px 20px;
         border: 1px solid white;
         border-radius: 5px;
         color: white;
         font-weight: bold;
+        overflow: hidden; /* Ensure scaling content doesn't overflow */
+        position: relative; /* For scaling effect */
     }
+    
+    .btn-mdl span {
+        display: inline-block; /* Ensure span scales properly */
+        transition: transform 0.2s ease-in-out; /* Smooth transition */
+    }
+    
     .btn-mdl:hover {
-        background-color: rgba(74, 128, 210, .8);
+        background-color: rgba(0, 123, 255, 0.8); /* Slightly darker blue on hover */
     }
+    
     .spinner-border {
         display: none;
         width: 3rem;
@@ -759,16 +814,16 @@
             </div>
             <div class="modal-footer modalButtons">
                 <a href="#" id="modal-borrow-link" class="btn-mdl" data-approved="{{ approved_requested }}">
-                    <i class="fas fa-book"></i>
+                    <span><i class="fas fa-book"></i> Borrow</span>
                 </a>
                 <a href="#" id="modal-preview-link" class="btn-mdl">
-                    <i class="fas fa-eye"></i> Preview
+                    <span><i class="fas fa-eye"></i> Preview</span>
                 </a>
                 <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="" id="AddNotifBtn">
-                    <i class="fas fa-bookmark"></i> 
+                    <span><i class="fas fa-bookmark"></i> Bookmark</span>
                 </a>
                 <button type="button" id="generate-citation" class="btn-mdl">
-                    <i class="fas fa-file-alt"></i> Generate APA Citation
+                    <span><i class="fas fa-file-alt"></i> Generate APA Citation</span>
                 </button>
             </div>
         </div>
