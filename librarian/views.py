@@ -14,6 +14,7 @@ from django.contrib import messages
 from .models import ApprovedRequest, Books, Category, LANGUAGE_CHOICES, BorrowRequest, DeclinedRequest, SubCategory, Out, ReturnLog, SubSection
 from django.db.models.functions import TruncYear, ExtractYear
 from librarian.utils import delete_expired_borrow_requests
+from student.models import Notification
 
 
 
@@ -167,17 +168,34 @@ def approve_request(request, request_id):
     borrow_request.delete()
     return redirect('librarian')
 
-@login_required
 def decline_request(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    DeclinedRequest.objects.create(
-        book=borrow_request.book,
-        requested_by=borrow_request.requested_by,
-        requested_at=borrow_request.requested_at,
-    )
-    borrow_request.delete()
-    return redirect('librarian')
+    
+    if request.method == "POST":
+        decline_reason = request.POST.get('decline_reason_input', 'No reason provided')
 
+        # Format the reason by replacing underscores with spaces
+        formatted_reason = decline_reason.replace('_', ' ')
+    
+        # Create a declined request with the selected reason
+        DeclinedRequest.objects.create(
+            book=borrow_request.book,
+            requested_by=borrow_request.requested_by,
+            requested_at=borrow_request.requested_at,
+            decline_reason=formatted_reason  # Store formatted reason
+        )
+        #WAG BURAHIN INCASE
+        """# Add a notification with the formatted decline reason
+        Notification.objects.create(
+            user=borrow_request.requested_by,
+            message=f"Your request for {borrow_request.book.BookTitle} was declined. Reason: {formatted_reason}"
+        ) """
+        
+        # Delete the original borrow request after declining it
+        borrow_request.delete()
+        messages.success(request, 'Request successfully declined.')
+        
+    return redirect('librarian')  # Redirect to your desired view
 @login_required
 def delete_approved_request(request, request_id):
     approved_request = get_object_or_404(ApprovedRequest, id=request_id)
@@ -281,42 +299,67 @@ def decline_request_view(request, request_id):
 
 
 
+@login_required
 def toggle_book_status(request, request_id):
     approved_request = get_object_or_404(ApprovedRequest, id=request_id)
     approved_request.inOut = not approved_request.inOut
 
     if not approved_request.inOut:
-        # Move to Out model
-        Out.objects.create(
-            book=approved_request.book,
-            requested_by=approved_request.requested_by,  # Pass the correct user
-            returnTime=timezone.now() + timedelta(days=14),  # Set appropriate return time
-            out=True
-        )
-        approved_request.delete()
+        # When the book is claimed, decrease the stock and move it to the 'Out' model
+        if approved_request.book.stock > 0:
+            approved_request.book.stock -= 1  # Decrease stock
+            approved_request.book.save()  # Save the stock update
+
+            # Move the book to the 'Out' model
+            Out.objects.create(
+                book=approved_request.book,
+                requested_by=approved_request.requested_by,  # Pass the correct user
+                returnTime=timezone.now() + timedelta(days=14),  # Set appropriate return time
+                out=True
+            )
+
+            approved_request.delete()  # Remove the approved request as it's been claimed
+        else:
+            messages.error(request, "Book is out of stock.")  # Optional: add a message if no stock left
+
     else:
+        # If the book is being returned, increase the stock
+        approved_request.book.stock += 1  # Increase stock when the book is returned
+        approved_request.book.save()  # Save the stock update
         approved_request.save()
 
     return redirect(reverse('librarian'))
 
 @login_required
 def toggle_out_status(request, out_id):
+    # Fetch the out record (the current borrowing entry)
     out_entry = get_object_or_404(Out, id=out_id)
+
+    # Toggle the out status (change it to "returned")
     out_entry.out = not out_entry.out
     out_entry.save()
 
-    if not out_entry.out:  # When the book is marked as "In"
+    if not out_entry.out:  # When the book is returned
+        # Create a return log
         ReturnLog.objects.create(
             book=out_entry.book,
             requested_by=out_entry.requested_by,  # Pass the correct user who requested the book
             returnLogTime=timezone.now(),
             expiryLogTime=timezone.now() + timedelta(days=14)  # Example expiry time of 14 days from now
         )
-        # Delete related approved request if it exists
+
+        # Increase the stock when the book is returned
+        out_entry.book.stock += 1  # Increase the stock
+        out_entry.book.save()  # Save the updated stock
+
+        # Optionally, you can delete any related approved request
         ApprovedRequest.objects.filter(book=out_entry.book, requested_by=out_entry.requested_by).delete()
+
+        # Clean up the Out entry after processing the return
         out_entry.delete()
 
     return redirect(reverse('librarian'))
+
 
 def book_status_view(request):
     approved_requests = ApprovedRequest.objects.select_related('book').all()
