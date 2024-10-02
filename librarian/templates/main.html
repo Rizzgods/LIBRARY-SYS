@@ -557,9 +557,14 @@
         }
           
           
+        
+        th {
+            font-weight: bold; /* Change 'normal' to the desired font weight */
+        }
 
-
-
+        tr {
+            font-weight: normal; /* Ensure tr elements have normal font weight */
+        }
     </style>
     {% block style %}{% endblock %}
 </head>
@@ -835,6 +840,10 @@
                                             <i class="fas fa-eye"></i> <!-- Eye icon for viewing -->
                                         </button>
                                         
+                                        <a href="{% url 'edit_book' book.id %}" class="btn btn-warning" target="_blank">
+                                            <i class="fas fa-edit"></i> <!-- Edit icon -->
+                                        </a>
+                                        
                                         <form id="deleteFormBook-{{ book.id }}" method="post" action="{% url 'delete_book' book.id %}" style="display: inline;">
                                             {% csrf_token %}
                                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModalBook" 
@@ -913,6 +922,7 @@
                     </div>
                 </div>
             </div>
+            
             <!-- Book Status Section -->
             <div id="book-status" class="content hidden">
                 <h2 class="sections">Book Status</h2>

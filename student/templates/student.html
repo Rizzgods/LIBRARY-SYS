@@ -14,7 +14,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
     <link rel="icon" href={% static "playground/school_Logo.png" %}>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+
+
 
 <style>
     .notification-time {
@@ -547,46 +550,7 @@
     </div>
 
     <!-- Modal Structure -->
-    <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header modalHeader">
-                    <h5 class="modal-title">Book Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="book-info">
-                        <div class="book-img">
-                            <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
-                        </div>
-                        <div class="book-data">
-                            <div class="modal-book-text">
-                                <h4 id="modal-book-title" class="book-text text1"></h4>
-                                <h5 class="book-text text2"><strong>Author: </strong><a href="#" id="modal-book-author"></a></h5>
-                                <h6 class="book-text"><strong>Description: </strong><span id="modal-book-description"></span></h6>
-                            </div>
-                            <div class="book-details">
-                                <div class="wrap row">
-                                    <p class="col-8"><strong>Date:</strong> <span id="modal-book-date"></span></p>
-                                    <p class="col-8"><strong>Category:</strong> <span id="modal-book-category"></span></p>
-                                </div>
-                                <div class="wrap row">
-                                    <p class="col-8"><strong>Language:</strong> <span id="modal-book-language"></span></p>
-                                    <p class="col-8"><strong>Views:</strong> <span id="modal-book-views"></span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer modalButtons">
-                    <a href="#" id="modal-borrow-link" class="btn-mdl">Borrow</a>
-                    <a href="#" id="modal-preview-link" class="btn-mdl">Preview</a>
-                    <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="">Bookmark</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
+   
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>

@@ -758,10 +758,18 @@
                 </div>
             </div>
             <div class="modal-footer modalButtons">
-                <a href="#" id="modal-borrow-link" class="btn-mdl" data-approved="{{ approved_requested }}">Borrow</a>
-                <a href="#" id="modal-preview-link" class="btn-mdl"><i class="fas fa-eye"></i></a>
-                <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="" id="AddNotifBtn">eg</a>
-                <button type="button" id="generate-citation" class="btn-mdl">Generate APA Citation</button>
+                <a href="#" id="modal-borrow-link" class="btn-mdl" data-approved="{{ approved_requested }}">
+                    <i class="fas fa-book"></i>
+                </a>
+                <a href="#" id="modal-preview-link" class="btn-mdl">
+                    <i class="fas fa-eye"></i> Preview
+                </a>
+                <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="" id="AddNotifBtn">
+                    <i class="fas fa-bookmark"></i> 
+                </a>
+                <button type="button" id="generate-citation" class="btn-mdl">
+                    <i class="fas fa-file-alt"></i> Generate APA Citation
+                </button>
             </div>
         </div>
     </div>
@@ -870,11 +878,7 @@
             var toast = new bootstrap.Toast(toastEl);
             toast.show();
         }
-    });
-</script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
         var bookDetailModal = document.getElementById('bookDetailModal');
     
         bookDetailModal.addEventListener('show.bs.modal', function (event) {
@@ -919,11 +923,11 @@
     
             // Update borrow button text based on book type
             if (isEbook) {
-                modalBorrowLink.textContent = 'Borrow Hard Copy';
+                modalBorrowLink.innerHTML = '<i class="fas fa-book"></i> Borrow Hard Copy';
             } else if (isResearchPaper) {
-                modalBorrowLink.textContent = 'Borrow';
+                modalBorrowLink.innerHTML = '<i class="fas fa-book"></i> Borrow';
             } else {
-                modalBorrowLink.textContent = 'Borrow';
+                modalBorrowLink.innerHTML = '<i class="fas fa-book"></i> Borrow';
             }
     
             // Check bookmark status
@@ -932,15 +936,14 @@
                 url: `{% url 'bookmark_status' 0 %}`.replace('0', bookId),
                 success: function(response) {
                     if (response.bookmarked) {
-                        modalBookmarkLink.textContent = 'Unbookmark';
+                        modalBookmarkLink.innerHTML = '<i class="fas fa-bookmark"></i> Unbookmark';
                     } else {
-                        modalBookmarkLink.textContent = 'Bookmark';
+                        modalBookmarkLink.innerHTML = '<i class="fas fa-bookmark"></i> Bookmark';
                     }
                 }
             });
         });
     
-
         // Handle bookmark toggle
         $('#modal-bookmark-link').on('click', function(event) {
             event.preventDefault();
@@ -956,22 +959,17 @@
                 },
                 success: function(response) {
                     if (response.bookmarked) {
-                        $('#modal-bookmark-link').text('Unbookmark');
+                        $('#modal-bookmark-link').html('<i class="fas fa-bookmark"></i> Unbookmark');
                         const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
                         toastBootstrap.show();
-                        
-                        
                     } else {
-                        $('#modal-bookmark-link').text('Bookmark');
+                        $('#modal-bookmark-link').html('<i class="fas fa-bookmark"></i> Bookmark');
                         const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
                         toastBootstrap.show();
-                        
                     }
                     setTimeout(function() {
                         location.reload();
                     }, delayInMilliseconds);
-                    
-                    
                 },
                 error: function(xhr, status, error) {
                     console.error('Bookmark toggle failed:', error);
@@ -979,28 +977,20 @@
                 }
             });
         });
-    document.getElementById('generate-citation').addEventListener('click', function () {
-        var title = document.getElementById('modal-book-title').textContent;
-        var author = document.getElementById('modal-book-author').textContent;
-        var date = document.getElementById('modal-book-date').textContent;
-        var publisher = document.getElementById('modal-book-category').textContent; // Assuming category as publisher for this example
 
-        var citation = `${author} (${date}). ${title}. ${publisher}.`;
-        document.getElementById('apaCitationOutput').value = citation;
+        document.getElementById('generate-citation').addEventListener('click', function () {
+            var title = document.getElementById('modal-book-title').textContent;
+            var author = document.getElementById('modal-book-author').textContent;
+            var date = document.getElementById('modal-book-date').textContent;
+            var publisher = document.getElementById('modal-book-category').textContent; // Assuming category as publisher for this example
 
-        var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
-        citationModal.show();
-    });
-});
-function copyCitation() {
-    var citationText = document.getElementById('apaCitationOutput').value;
-    navigator.clipboard.writeText(citationText).then(function () {
-        alert('Citation copied to clipboard!');
-    }, function (err) {
-        console.error('Could not copy text: ', err);
-    });
-}
-    document.addEventListener('DOMContentLoaded', function() {
+            var citation = `${author} (${date}). ${title}. ${publisher}.`;
+            document.getElementById('apaCitationOutput').value = citation;
+
+            var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
+            citationModal.show();
+        });
+
         const borrowButton = document.getElementById('modal-borrow-link');
 
         borrowButton.addEventListener('click', function(event) {
@@ -1014,16 +1004,7 @@ function copyCitation() {
                 window.location.href = this.href;
             }
         });
-    });
-</script>
 
-{% endblock %}
-
-{% block script %}
-
-
-<script>
-    $(document).ready(function() {
         $('.owl-carousel').each(function() {
             var maxHeight = 0;
             $(this).find('.owl-item').each(function() {
@@ -1052,9 +1033,7 @@ function copyCitation() {
                 }
             });
         });
-    });
 
-    document.addEventListener('DOMContentLoaded', function() {
         var offcanvasElement = document.getElementById('offcanvasScrolling');
         var sideBarElement = document.querySelector('.side-bar');
         var mainContainer = document.getElementById('main-container');
@@ -1068,10 +1047,7 @@ function copyCitation() {
             sideBarElement.classList.add('show');
             mainContainer.classList.add('with-sidebar');
         });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
+
         const modal = document.getElementById('bookDetailModal');
 
         function openBookDetailModal(book) {
@@ -1093,11 +1069,11 @@ function copyCitation() {
             // Update borrow button text based on book type
             const borrowButton = document.getElementById('modal-borrow-link');
             if (book.isEbook) {
-                borrowButton.innerText = 'Borrow Hard Copy';
+                borrowButton.innerHTML = '<i class="fas fa-book"></i> Borrow Hard Copy';
             } else if (book.isResearchPaper) {
-                borrowButton.innerText = 'Borrow';
+                borrowButton.innerHTML = '<i class="fas fa-book"></i> Borrow';
             } else {
-                borrowButton.innerText = 'Borrow';
+                borrowButton.innerHTML = '<i class="fas fa-book"></i> Borrow';
             }
 
             // Show the modal
@@ -1125,11 +1101,7 @@ function copyCitation() {
                 openBookDetailModal(book);
             });
         });
-    });
 
-
-    
-    document.addEventListener('DOMContentLoaded', function() {
         const filterForm = document.getElementById('filterForm');
         const searchButton = document.getElementById('searchButton');
         const resetButton = document.getElementById('resetButton');
@@ -1154,17 +1126,12 @@ function copyCitation() {
             // Optionally, reload the page to reset the filters
             window.location.href = window.location.pathname;
         });
-    });
 
-    
-    $(document).ready(function() {
         $(".draggable").draggable({
             handle: ".modal-header" // Specify the header as the handle for dragging
         });
-    });
 
-    // WAG BURAHIN. YAN NAGPAPAGANA SA SEARCH SA HOME
-    $(document).ready(function() {
+        // WAG BURAHIN. YAN NAGPAPAGANA SA SEARCH SA HOME
         // Search functionality
         $('#search-inputs').on('input', function() {
             var query = $(this).val();
@@ -1237,9 +1204,14 @@ function copyCitation() {
             $('#modal-preview-link').attr('href', previewUrl);
         });
     });
-    
-    
-    
-        
+
+    function copyCitation() {
+        var citationText = document.getElementById('apaCitationOutput').value;
+        navigator.clipboard.writeText(citationText).then(function () {
+            alert('Citation copied to clipboard!');
+        }, function (err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
 </script>
 {% endblock %}
