@@ -119,9 +119,11 @@ class DeclinedRequest(models.Model):
     requested_by = models.ForeignKey(User, on_delete=models.CASCADE)
     requested_at = models.DateTimeField()
     declined_at = models.DateTimeField(auto_now_add=True)
+    decline_reason = models.CharField(max_length=255, null=True, blank=True)  # New field
 
     def __str__(self):
         return f"{self.book} declined for {self.requested_by}"
+
     class Meta:
         indexes = [
             models.Index(fields=['book', 'requested_by']),
@@ -169,7 +171,11 @@ def create_approved_notification(sender, instance, created, **kwargs):
 @receiver(post_save, sender=DeclinedRequest)
 def create_declined_notification(sender, instance, created, **kwargs):
     if created:
+        # Ensure the reason is included in the message and convert to title case
+        decline_reason = instance.decline_reason.title() if instance.decline_reason else 'No Reason Provided'
+        
+        # Create the notification with the formatted reason
         Notification.objects.create(
             user=instance.requested_by,
-            message=f"Your request for {instance.book.BookTitle} has been declined."
+            message=f"Your request for {instance.book.BookTitle} has been declined. Reason: {decline_reason}"
         )

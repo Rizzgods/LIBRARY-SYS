@@ -961,7 +961,7 @@
                             <tbody>
                                 {% for request in book_status_approved_requests %}
                                 <tr data-title="{{ request.book.BookTitle }}" data-author="{{ request.book.Author }}">
-                                    <td>{{request.requested_by}}</td>
+                                    <td>{{ request.requested_by }}</td>
                                     <td>{{ request.book.BookTitle }}</td>
                                     <td>{{ request.book.Author }}</td>
                                     <td>
@@ -975,16 +975,26 @@
                                     </td>
                                     <td>{{ request.expireTime }}</td>
                                     <td>
-                                        <button type="button" class="btn {% if request.inOut %}btn-success{% else %}btn-success{% endif %}" data-toggle="modal" data-target="#statusModal{{ request.id }}">
-                                            {% if request.inOut %}To claim{% else %}To return{% endif %}
+                                        <!-- Adjusted logic to check stock properly -->
+                                        <button type="button" 
+                                                class="btn {% if request.book.stock > 0 %}btn-success{% else %}btn-secondary{% endif %}" 
+                                                {% if request.book.stock == 0 %}disabled{% endif %} 
+                                                data-toggle="modal" data-target="#statusModal{{ request.id }}">
+                                            {% if request.inOut %}TO RETURN{% else %}TO CLAIM{% endif %}
                                         </button>
-                                        <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ request.book.BookImage.url }}', '{{ request.book.BookTitle }}', '{{ request.book.Description }}')">View</button>
+
+                                        <button type="button" 
+                                                class="btn btn-info" 
+                                                onclick="viewBookDetails('{{ request.book.BookImage.url }}', '{{ request.book.BookTitle }}', '{{ request.book.Description }}')">
+                                            View
+                                        </button>
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
+
                     <!--Books to be returned-->
                     <div class="tab-pane fade" id="returned" role="tabpanel" aria-labelledby="returned-tab">
                         <table class="table" id="returnedTable">
@@ -1005,8 +1015,8 @@
                                     <td>{{ out.book.Author }}</td>
                                     <td>{{ out.returnTime }}</td>
                                     <td>
-                                        <button type="button" class="btn {% if out.out %}btn-success{% else %}btn-success{% endif %}" data-toggle="modal" data-target="#statusModal{{ out.id }}">
-                                            {% if out.out %}To return{% else %}To claim{% endif %}
+                                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#statusModal{{ out.id }}">
+                                            To return
                                         </button>
                                         <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ out.book.BookImage.url }}', '{{ out.book.BookTitle }}', '{{ out.book.Description }}')">View</button>
                                     </td>
@@ -1364,30 +1374,51 @@
                                         </div>
                                         <!-- End Approve Modal -->
 
-                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#declineModal{{ request.id }}">Decline</button>
-                                        <!-- Decline Modal -->
-                                        <div class="modal fade" id="declineModal{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="declineModalLabel{{ request.id }}" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="declineModalLabel{{ request.id }}">Decline Request</h5>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Are you sure you want to decline this request?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                                        <form method="post" action="{% url 'decline_request' request.id %}">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-danger">Decline</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+<!-- Decline Button -->
+<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#declineModal{{ request.id }}">Decline</button>
+
+<!-- Decline Modal -->
+<div class="modal fade" id="declineModal{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="declineModalLabel{{ request.id }}" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="declineModalLabel{{ request.id }}">Decline Request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to decline this request?</p>
+                
+                <!-- Dropdown for selecting the reason for declining -->
+                <div class="form-group">
+                    <label for="declineReason{{ request.id }}">Select a reason for declining:</label>
+                    <select class="form-control" id="declineReason{{ request.id }}" name="decline_reason" required>
+                        <option value="" disabled selected>Select a reason</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                        <option value="book_not_available">Book Not Available</option>
+                        <option value="invalid_request">Invalid Request</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+
+                <!-- Form to submit the decline request with the selected reason -->
+                <form method="post" action="{% url 'decline_request' request.id %}">
+                    {% csrf_token %}
+                    <input type="hidden" id="declineReasonInput{{ request.id }}" name="decline_reason_input">
+                    <button type="submit" class="btn btn-danger" 
+                            onclick="document.getElementById('declineReasonInput{{ request.id }}').value = document.getElementById('declineReason{{ request.id }}').value;">
+                        Decline
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
                                         <!-- End Decline Modal -->
                                     </td>
                                 </tr>
