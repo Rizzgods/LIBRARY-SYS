@@ -530,19 +530,25 @@
             <select name="year" class="form-control" id="yearFilter">
                 <option value="">All Year</option>
                 {% for year in years %}
-                <option value="{{ year.year }}" {% if filter_params.year == year.year|stringformat:"s" %}selected{% endif %}>{{ year.year }}</option>
+                <option value="{{ year.year }}" {% if filter_params.year == year.year|stringformat:"s" %}selected{% endif %}>
+                    {{ year.year }}
+                </option>
                 {% endfor %}
             </select>
             <select name="category" class="form-control" id="categoryFilter">
                 <option value="">All Category</option>
                 {% for category in categories %}
-                <option value="{{ category.id }}" {% if filter_params.category == category.id|stringformat:"s" %}selected{% endif %}>{{ category.name }}</option>
+                <option value="{{ category.id }}" {% if filter_params.category == category.id|stringformat:"s" %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
                 {% endfor %}
             </select>
             <select name="language" id="languageFilter" class="form-control">
                 <option value="">All Language</option>
                 {% for code, name in language_choices %}
-                <option value="{{ code }}" {% if filter_params.language == code %}selected{% endif %}>{{ name }}</option>
+                <option value="{{ code }}" {% if filter_params.language == code %}selected{% endif %}>
+                    {{ name }}
+                </option>
                 {% endfor %}
             </select>
             <select name="file_type" id="fileTypeFilter" class="form-control">
@@ -550,11 +556,16 @@
                 <option value="ebook" {% if filter_params.file_type == 'ebook' %}selected{% endif %}>Ebooks</option>
                 <option value="research" {% if filter_params.file_type == 'research' %}selected{% endif %}>Research Papers</option>
             </select>
+    
+            <!-- Add Search and Reset buttons -->
+            <button type="button" id="searchButton" class="btn btn-primary">Search</button>
+            <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
         </form>
     </div>
 </div>
 
 <!-- Top Viewed Books Section -->
+{% if top_viewed_books %}
 <div class="container-xl">
     <hr>
     <div class="top-bar">
@@ -591,8 +602,9 @@
     </div>
     <hr>
 </div>
-
-<!-- Research Papers Section -->
+{% endif %}
+<!--Research Papers Section-->
+{% if research_papers %}
 <div class="container-xl">
     <div class="top-bar">
         <h4 class="booklabels"><b>Research Papers</b></h4>
@@ -628,8 +640,10 @@
     </div>
     <hr>
 </div>
+{% endif %}
 
-<!-- eBooks Section -->
+<!--Ebook Section-->
+{% if ebooks %}
 <div class="container-xl">
     <div class="top-bar">
         <h4 class="booklabels"><b>eBooks</b></h4>
@@ -665,43 +679,48 @@
     </div>
     <hr>
 </div>
+{% endif %}
 
+<!--Categories Section-->
 {% for category, books in books_per_category.items %}
-    <div class="container-xl">
-        <div class="top-bar">
-            <h4 class="booklabels"><b>{{ category }}</b></h4>
-        </div>
-        <div class="owl-carousel owl-theme" id="book-carousel-{{ forloop.counter }}">
-            {% for item in books %}
-            <span class="special" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
-                  data-title="{{ item.BookTitle }}"
-                  data-author="{{ item.Author }}"
-                  data-description="{{ item.Description }}"
-                  data-date="{{ item.Date }}"
-                  data-category="{{ item.Category.all|join:', ' }}"
-                  data-language="{{ item.Language }}"
-                  data-image="{{ item.BookImage.url }}"
-                  data-views="{{ item.PageViews }}"
-                  data-id="{{ item.id }}"
-                  data-borrow-link="{% url 'borrow_request' item.id %}"
-                  data-preview-link="{% url 'prev_file' item.id %}"
-                  data-is-ebook="{{ item.eBook|yesno:'true,false' }}"
-                  data-is-research-paper="{{ item.research_paper|yesno:'true,false' }}">
-                <div class="item">
-                    <a class="card-link">
-                        <div class="card">
-                            <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
-                            <div class="card-body preview-title">
-                                <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </span>
-            {% endfor %}
-        </div>
+{% if books %}
+<div class="container-xl">
+    <div class="top-bar">
+        <h4 class="booklabels"><b>{{ category }}</b></h4>
     </div>
+    <div class="owl-carousel owl-theme" id="book-carousel-{{ forloop.counter }}">
+        {% for item in books %}
+        <span class="special" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
+              data-title="{{ item.BookTitle }}"
+              data-author="{{ item.Author }}"
+              data-description="{{ item.Description }}"
+              data-date="{{ item.Date }}"
+              data-category="{{ item.Category.all|join:', ' }}"
+              data-language="{{ item.Language }}"
+              data-image="{{ item.BookImage.url }}"
+              data-views="{{ item.PageViews }}"
+              data-id="{{ item.id }}"
+              data-borrow-link="{% url 'borrow_request' item.id %}"
+              data-preview-link="{% url 'prev_file' item.id %}"
+              data-is-ebook="{{ item.eBook|yesno:'true,false' }}"
+              data-is-research-paper="{{ item.research_paper|yesno:'true,false' }}">
+            <div class="item">
+                <a class="card-link">
+                    <div class="card">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <div class="card-body preview-title">
+                            <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endfor %}
+
 
 <!-- Book Info Modal -->
 <div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
@@ -937,13 +956,13 @@
                 },
                 success: function(response) {
                     if (response.bookmarked) {
-                        $('#modal-bookmark-link').text('uh');
+                        $('#modal-bookmark-link').text('Unbookmark');
                         const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
                         toastBootstrap.show();
                         
                         
                     } else {
-                        $('#modal-bookmark-link').text('he');
+                        $('#modal-bookmark-link').text('Bookmark');
                         const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
                         toastBootstrap.show();
                         
@@ -1112,29 +1131,29 @@ function copyCitation() {
     
     document.addEventListener('DOMContentLoaded', function() {
         const filterForm = document.getElementById('filterForm');
+        const searchButton = document.getElementById('searchButton');
+        const resetButton = document.getElementById('resetButton');
         const yearFilter = document.getElementById('yearFilter');
         const categoryFilter = document.getElementById('categoryFilter');
         const languageFilter = document.getElementById('languageFilter');
         const fileTypeFilter = document.getElementById('fileTypeFilter');
-
-        fileTypeFilter
-
-        yearFilter.addEventListener('change', function() {
-            filterForm.submit();
+    
+        // Handle Search button click
+        searchButton.addEventListener('click', function() {
+            filterForm.submit(); // Manually submit the form when the search button is clicked
         });
-
-        categoryFilter.addEventListener('change', function() {
-            filterForm.submit();
+    
+        // Handle Reset button click
+        resetButton.addEventListener('click', function() {
+            // Clear all filter inputs
+            yearFilter.value = '';
+            categoryFilter.value = '';
+            languageFilter.value = '';
+            fileTypeFilter.value = '';
+    
+            // Optionally, reload the page to reset the filters
+            window.location.href = window.location.pathname;
         });
-
-        languageFilter.addEventListener('change', function() {
-            filterForm.submit();
-        });
-        fileTypeFilter.addEventListener('change', function() {
-            filterForm.submit();
-        });
-
-        categoryFilter.style.textTransform = 'capitalize';
     });
 
     
@@ -1144,6 +1163,7 @@ function copyCitation() {
         });
     });
 
+    // WAG BURAHIN. YAN NAGPAPAGANA SA SEARCH SA HOME
     $(document).ready(function() {
         // Search functionality
         $('#search-inputs').on('input', function() {
@@ -1162,25 +1182,62 @@ function copyCitation() {
                             .attr('data-image', book.image_url)
                             .attr('data-views', book.views)
                             .attr('data-id', book.id)
-                            .attr('data-available', book.available)
                             .append($('<img>').attr('src', book.image_url))
                             .append($('<span>').text(book.title + ' by ' + book.author));
                         $('#suggestions').append(suggestion);
                     });
                     $('#suggestions').show();
+                }).fail(function() {
+                    console.error('Error fetching suggestions.');
+                    $('#suggestions').hide();
                 });
             } else {
                 $('#suggestions').hide();
             }
         });
-
+    
         $(document).click(function(event) {
-            if (!$(event.target).closest('#search-input').length) {
+            if (!$(event.target).closest('#search-inputs').length) {
                 $('#suggestions').hide();
             }
         });
+    
+        $(document).on('click', '.suggestion-item', function() {
+            var bookId = $(this).attr('data-id');
+            var bookTitle = $(this).attr('data-title');
+            var bookAuthor = $(this).attr('data-author');
+            var bookDescription = $(this).attr('data-description');
+            var bookDate = $(this).attr('data-date');
+            var bookCategory = $(this).attr('data-category');
+            var bookLanguage = $(this).attr('data-language');
+            var bookImage = $(this).attr('data-image');
+            var bookViews = $(this).attr('data-views');
+        
+            if (!bookId) {
+                console.error('Book ID is missing.');
+                return;
+            }
+        
+            // Set modal content
+            $('#modal-book-image').attr('src', bookImage);
+            $('#modal-book-title').text(bookTitle);
+            $('#modal-book-author').text(bookAuthor);
+            $('#modal-book-description').text(bookDescription);
+            $('#modal-book-date').text(bookDate);
+            $('#modal-book-category').text(bookCategory);
+            $('#modal-book-language').text(bookLanguage);
+            $('#modal-book-views').text(bookViews);
+        
+            // Construct URLs dynamically using the book ID
+            var borrowUrl = "{% url 'borrow_request' 0 %}".replace('0', bookId);
+            var previewUrl = "{% url 'prev_file' 0 %}".replace('0', bookId);
+        
+            // Set the href attributes for the borrow and preview links
+            $('#modal-borrow-link').attr('href', borrowUrl);
+            $('#modal-preview-link').attr('href', previewUrl);
+        });
     });
-
+    
     
     
         
