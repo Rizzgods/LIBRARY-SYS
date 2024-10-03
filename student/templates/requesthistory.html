@@ -344,91 +344,152 @@
 {% endblock %}
 
 {% block body %}
-<div class="container d-flex justify-content-center mt-5">
-    <div class="card">
-        <div class="card-header text-center">
-            <h2>Request History</h2>
+<div class="container mt-4">
+    <h1>Request History</h1>
+    <div class="row mb-3 align-items-end">
+        <div class="col-md-3">
+            <div class="form-group">
+                
+                <select class="form-select" id="requestTypeSelect" onchange="toggleRequestTable()">
+                    <option value="pending">Pending Requests</option>
+                    <option value="approved">Approved Requests</option>
+                    <option value="declined">Declined Requests</option>
+                </select>
+            </div>
         </div>
-        <div class="card-body">
-            <h3 class="sections">Pending Requests</h3>
-            <hr>
-            {% if pending_requests %}
-            <table class="table table-striped table-hover">
-                <thead>
+        <div class="col-md-9">
+            <div class="form-group">
+                
+                <input type="text" class="form-control" id="searchInput" onkeyup="searchTable()" placeholder="Search for requests...">
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Pending Requests Table -->
+    <div id="pendingRequestsTable" class="request-table">
+        {% if pending_requests %}
+            <table class="table table-striped">
+                <thead class="thead-light">
                     <tr>
-                        <th>Book Title</th>
-                        <th>Status</th>
+                        <th>Book</th>
                         <th>Requested At</th>
-                        <th>Expires At</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for request in pending_requests %}
-                    <tr class="{% if request.is_expired %}table-danger{% endif %}">
-                        <td class="book-title">{{ request.book.BookTitle }}</td>
-                        <td>{{ request.status }}</td>
-                        <td>{{ request.requested_at }}</td>
-                        <td>{{ request.expires_at }}</td>
-                    </tr>
+                        <tr>
+                            <td>{{ request.book }}</td>
+                            <td>{{ request.requested_at }}</td>
+                            <td>{{ request.status }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            {% else %}
-            <p class="text-center">Nothing to see here.</p>
-            {% endif %}
-            <hr>
-            <h3 class="sections sec-mar">Approved Requests</h3>
-            <hr>
-            {% if approved_requests %}
-            <table class="table table-striped table-hover">
-                <thead>
+        {% else %}
+            <div class="alert alert-warning">No pending requests found.</div>
+        {% endif %}
+    </div>
+
+    <!-- Approved Requests Table -->
+    <div id="approvedRequestsTable" class="request-table" style="display: none;">
+        {% if approved_requests %}
+            <table class="table table-striped">
+                <thead class="thead-light">
                     <tr>
-                        <th>Book Title</th>
+                        <th>Book</th>
                         <th>Requested At</th>
                         <th>Approved At</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for request in approved_requests %}
-                    <tr>
-                        <td class="book-title">{{ request.book.BookTitle }}</td>
-                        <td>{{ request.requested_at }}</td>
-                        <td>{{ request.approved_at }}</td>
-                    </tr>
+                        <tr>
+                            <td>{{ request.book }}</td>
+                            <td>{{ request.requested_at }}</td>
+                            <td>{{ request.approved_at }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            {% else %}
-            <p class="text-center">Nothing to see here.</p>
-            {% endif %}
-            <hr>
-            <h3 class="sections sec-mar">Declined Requests</h3>
-            <hr>
-            {% if declined_requests %}
-            <table class="table table-striped table-hover">
-                <thead>
+        {% else %}
+            <div class="alert alert-warning">No approved requests found.</div>
+        {% endif %}
+    </div>
+
+    <!-- Declined Requests Table -->
+    <div id="declinedRequestsTable" class="request-table" style="display: none;">
+        {% if declined_requests %}
+            <table class="table table-striped">
+                <thead class="thead-light">
                     <tr>
-                        <th>Book Title</th>
+                        <th>Book</th>
                         <th>Requested At</th>
                         <th>Declined At</th>
+                        <th>Reason</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for request in declined_requests %}
-                    <tr>
-                        <td class="book-title">{{ request.book.BookTitle }}</td>
-                        <td>{{ request.requested_at }}</td>
-                        <td>{{ request.declined_at }}</td>
-                    </tr>
+                        <tr>
+                            <td>{{ request.book }}</td>
+                            <td>{{ request.requested_at }}</td>
+                            <td>{{ request.declined_at }}</td>
+                            <td>{{ request.decline_reason }}</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            {% else %}
-            <p class="text-center">Nothing to see here.</p>
-            {% endif %}
-        </div>
+        {% else %}
+            <div class="alert alert-warning">No declined requests found.</div>
+        {% endif %}
     </div>
 </div>
+
+<script>
+    function toggleRequestTable() {
+        const requestType = document.getElementById('requestTypeSelect').value;
+        const pendingTable = document.getElementById('pendingRequestsTable');
+        const approvedTable = document.getElementById('approvedRequestsTable');
+        const declinedTable = document.getElementById('declinedRequestsTable');
+
+        pendingTable.style.display = 'none';
+        approvedTable.style.display = 'none';
+        declinedTable.style.display = 'none';
+
+        if (requestType === 'pending') {
+            pendingTable.style.display = 'block';
+        } else if (requestType === 'approved') {
+            approvedTable.style.display = 'block';
+        } else if (requestType === 'declined') {
+            declinedTable.style.display = 'block';
+        }
+    }
+
+    function searchTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const requestType = document.getElementById('requestTypeSelect').value;
+        const table = document.getElementById(requestType + 'RequestsTable');
+        const tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
+            const tdArray = tr[i].getElementsByTagName('td');
+            let found = false;
+            for (let j = 0; j < tdArray.length; j++) {
+                if (tdArray[j]) {
+                    const txtValue = tdArray[j].textContent || tdArray[j].innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            tr[i].style.display = found ? '' : 'none';
+        }
+    }
+</script>
 {% endblock %}
 
 {% block script %}
