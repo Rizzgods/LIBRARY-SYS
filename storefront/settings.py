@@ -64,6 +64,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'librarian.middleware.InactivityLogoutMiddleware',
+    'librarian.middleware.UserRedirect',
 ]
 
 INTERNAL_IPS = [
@@ -72,6 +74,9 @@ INTERNAL_IPS = [
     # ...
 ]
 
+# Session settings
+SESSION_COOKIE_AGE = 20  # 30 minutes
+SESSION_SAVE_EVERY_REQUEST = True
 
 ROOT_URLCONF = 'storefront.urls'
 
