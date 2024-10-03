@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from librarian.models import Books, BorrowRequest, ApprovedRequest, DeclinedRequest, LANGUAGE_CHOICES, Category
 from django.urls import reverse
-from django.db.models import Count, F
+from django.db.models import Count, F, Q
 import logging
 from .models import Notification
 from django.http import HttpResponseForbidden, HttpResponseNotFound
@@ -46,7 +46,7 @@ def student(request):
         'file_type': request.GET.get('file_type')
     }
 
-    books = Books.objects.filter(available = True)
+    books = Books.objects.filter(available = True, deleted_at__isnull=True)
 
     if filter_params['year']:
         books = books.filter(Date__year=filter_params['year'])
@@ -179,7 +179,10 @@ def prev_file(request, book_id):
 def search_suggestions(request):
     query = request.GET.get('q', '')
     if len(query) >= 3:
-        books = Books.objects.filter(BookTitle__icontains=query) | Books.objects.filter(Author__icontains=query)
+        books = Books.objects.filter(
+            (Q(BookTitle__icontains=query) | Q(Author__icontains=query)),
+            deleted_at__isnull=True  # Exclude archived books
+        )        
         suggestions = [
             {
                 'id': book.id,
