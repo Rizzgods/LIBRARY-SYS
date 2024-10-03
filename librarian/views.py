@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+import time
 from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
@@ -120,6 +121,7 @@ def main(request):
     subcategories = SubCategory.objects.all()
     categories = Category.objects.all()
     subsections = SubSection.objects.all()
+    
     
     
     context = {
@@ -376,6 +378,14 @@ def my_view(request):
 def go_back(request):
     return redirect('main') 
 
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def keep_session_alive(request):
+    request.session['last_activity'] = time.time()
+    return JsonResponse({'status': 'success'})
 # views.py
 
 

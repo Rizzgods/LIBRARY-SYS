@@ -3,6 +3,8 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static 
 
+
+
 urlpatterns = [
     path('librarian/', views.main, name='librarian'),
     path('librarian/delete_book/<int:book_id>/', views.delete_book, name='delete_book'),
@@ -22,7 +24,7 @@ urlpatterns = [
     path('toggle_out_status/<int:out_id>/', views.toggle_out_status, name='toggle_out_status'),
     path('edit_book/<int:book_id>/', views.edit_book, name='edit_book'),
     path('reset_filters/', views.reset_filters, name='reset_filters'),
- 
+    path('keep-session-alive/', views.keep_session_alive, name='keep_session_alive'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -1,6 +1,8 @@
 {% load custom_tags2 %}
 
 {% if user.is_authenticated and user|is_librarian %}
+
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -1139,7 +1141,7 @@
                 </div>
             </div>
 
-            <!-- Recently Deleted -->
+            <!-- Archive -->
 
             <div id="recent-delete" class="content book-section" style="display: none;">
                 <div class="header-lib">
@@ -1395,51 +1397,50 @@
                                         </div>
                                         <!-- End Approve Modal -->
 
-<!-- Decline Button -->
-<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#declineModal{{ request.id }}">Decline</button>
+                                        <!-- Decline Button -->
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#declineModal{{ request.id }}">Decline</button>
 
-<!-- Decline Modal -->
-<div class="modal fade" id="declineModal{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="declineModalLabel{{ request.id }}" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="declineModalLabel{{ request.id }}"><b>Decline Request?</b></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>This action cannot be reversed</p>
-                <hr>
-                <!-- Dropdown for selecting the reason for declining -->
-                <div class="form-group">
-                    <label for="declineReason{{ request.id }}">Select a reason for declining:</label>
-                    <select class="form-control" id="declineReason{{ request.id }}" name="decline_reason" required>
-                        <option value="" disabled selected>Select a reason</option>
-                        <option value="out_of_stock">Out of Stock</option>
-                        <option value="book_not_available">Book Not Available</option>
-                        <option value="invalid_request">Invalid Request</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <!-- Decline Modal -->
+                                        <div class="modal fade" id="declineModal{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="declineModalLabel{{ request.id }}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="declineModalLabel{{ request.id }}"><b>Decline Request?</b></h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>This action cannot be reversed</p>
+                                                        <hr>
+                                                        <!-- Dropdown for selecting the reason for declining -->
+                                                        <div class="form-group">
+                                                            <label for="declineReason{{ request.id }}">Select a reason for declining:</label>
+                                                            <select class="form-control" id="declineReason{{ request.id }}" name="decline_reason" required>
+                                                                <option value="" disabled selected>Select a reason</option>
+                                                                <option value="out_of_stock">Out of Stock</option>
+                                                                <option value="book_not_available">Book Not Available</option>
+                                                                <option value="invalid_request">Invalid Request</option>
+                                                                <option value="other">Other</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
 
-                <!-- Form to submit the decline request with the selected reason -->
-                <form method="post" action="{% url 'decline_request' request.id %}">
-                    {% csrf_token %}
-                    <input type="hidden" id="declineReasonInput{{ request.id }}" name="decline_reason_input">
-                    <button type="submit" class="btn btn-danger" 
-                            onclick="document.getElementById('declineReasonInput{{ request.id }}').value = document.getElementById('declineReason{{ request.id }}').value;">
-                        Decline
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
+                                                        <!-- Form to submit the decline request with the selected reason -->
+                                                        <form method="post" action="{% url 'decline_request' request.id %}">
+                                                            {% csrf_token %}
+                                                            <input type="hidden" id="declineReasonInput{{ request.id }}" name="decline_reason_input">
+                                                            <button type="submit" class="btn btn-danger" 
+                                                                    onclick="document.getElementById('declineReasonInput{{ request.id }}').value = document.getElementById('declineReason{{ request.id }}').value;">
+                                                                Decline
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <!-- End Decline Modal -->
                                     </td>
                                 </tr>
@@ -2053,6 +2054,30 @@
         }
     };
 
+</script>
+
+<script>
+    // Function to send an AJAX request to keep the session alive
+    function keepSessionAlive() {
+        fetch("{% url 'keep_session_alive' %}", {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(response => response.json())
+          .then(data => {
+              console.log('Session kept alive:', data);
+          }).catch(error => {
+              console.error('Error keeping session alive:', error);
+          });
+    }
+
+    // Event listener to keep the session alive on every mouse click
+    document.addEventListener('click', keepSessionAlive);
+    document.addEventListener('keypress', keepSessionAlive);
+
+    // Optionally, you can still send an AJAX request periodically
+    setInterval(keepSessionAlive, 300000);
 </script>
 </body>
 </html>
