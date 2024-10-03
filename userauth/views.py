@@ -33,10 +33,15 @@ def login_user(request):
             if user is not None:
                 login(request, user)
                 # Redirect based on user's group
-                if user_is_student(user):
-                    return redirect('student_success')
-                elif user_is_librarian(user):
-                    return redirect('librarian_success')
+                try:
+                    if user_is_student(user):
+                        return redirect('student_success')
+                    elif user_is_librarian(user):
+                        return redirect('librarian_success')
+                except Exception as e:
+                    # If reverse for 'user-login' not found, redirect to login_user
+                    messages.error(request, "Error in redirection. Please try again.")
+                    return redirect('login_user')
             else:
                 # Return an 'invalid login' error message.
                 messages.error(request, "Invalid username or password. Please try again.")
@@ -47,5 +52,4 @@ def login_user(request):
             return redirect('login_user')
     else:
         return render(request, 'authenticate/login.html', {})
-
 

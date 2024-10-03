@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'librarian',
     'student',
     'adminside',
-    
     'import_export',
 ]
 
@@ -65,8 +64,14 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'librarian.middleware.InactivityLogoutMiddleware',
-    'librarian.middleware.UserRedirect',
+    'librarian.middleware.HandleNoReverseMatchMiddleware',
+   
+    
 ]
+
+SESSION_COOKIE_AGE = 30 * 60  # 30 minutes
+SESSION_SAVE_EVERY_REQUEST = True
+
 
 INTERNAL_IPS = [
     # ...
@@ -75,8 +80,7 @@ INTERNAL_IPS = [
 ]
 
 # Session settings
-SESSION_COOKIE_AGE = 20  # 30 minutes
-SESSION_SAVE_EVERY_REQUEST = True
+
 
 ROOT_URLCONF = 'storefront.urls'
 
@@ -91,6 +95,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
             ],
         },
     },
@@ -171,3 +176,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'user-login'
 
 VIEW_COUNT_SESSION_KEY = 'book_view_count'
+
+# settings.py
+

@@ -20,12 +20,15 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static 
 
+
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('student/',include('student.urls') ),
     path('librarian/',include('librarian.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
-    path('userauth/',include('userauth.urls')),
+    path('userauth/', include('userauth.urls')),
     path('adminside/',include('adminside.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

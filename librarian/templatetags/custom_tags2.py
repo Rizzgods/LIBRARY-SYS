@@ -8,3 +8,5 @@ register = template.Library()
 @register.filter(name='is_librarian')
 def is_librarian(user):
     return user.groups.filter(name='Librarian').exists()
+
+
