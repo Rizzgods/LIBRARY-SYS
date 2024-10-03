@@ -906,13 +906,13 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="deleteModalLabel">Archive Book</h5>
+                                <h5 class="modal-title" id="deleteModalLabel"><b>Archive Book?</b></h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to archive this book?
+                                This action cannot be reversed
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -980,7 +980,7 @@
                                                 class="btn {% if request.book.stock > 0 %}btn-success{% else %}btn-secondary{% endif %}" 
                                                 {% if request.book.stock == 0 %}disabled{% endif %} 
                                                 data-toggle="modal" data-target="#statusModal{{ request.id }}">
-                                            {% if request.inOut %}TO RETURN{% else %}TO CLAIM{% endif %}
+                                            {% if request.inOut %}TO CLAIM{% else %}TO RETURN{% endif %}
                                         </button>
 
                                         <button type="button" 
@@ -1016,7 +1016,7 @@
                                     <td>{{ out.returnTime }}</td>
                                     <td>
                                         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#statusModal{{ out.id }}">
-                                            To return
+                                            TO RETURN
                                         </button>
                                         <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ out.book.BookImage.url }}', '{{ out.book.BookTitle }}', '{{ out.book.Description }}')">View</button>
                                     </td>
@@ -1066,13 +1066,13 @@
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="statusModalLabel{{ request.id }}">Change Status</h5>
+                                    <h5 class="modal-title" id="statusModalLabel{{ request.id }}">Book claimed?</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    Are you sure the book is claimed? <b>(This action is irreversible)</b>
+                                    Are you sure the book is claimed?<b>This action cannot be reversed</b>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
@@ -1093,13 +1093,13 @@
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="statusModalLabel{{ out.id }}">Change Status</h5>
+                                    <h5 class="modal-title" id="statusModalLabel{{ out.id }}">Book Returned?</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    Are you sure the book is returned? <b>(This action is irreversible)</b>
+                                    Are you sure the book is returned?<b>This action cannot be reversed</b>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
@@ -1354,7 +1354,7 @@
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="approveModalLabel{{ request.id }}">Approve Request</h5>
+                                                        <h5 class="modal-title" id="approveModalLabel{{ request.id }}"><b>Approve Request?</b></h5>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
@@ -1382,14 +1382,14 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="declineModalLabel{{ request.id }}">Decline Request</h5>
+                <h5 class="modal-title" id="declineModalLabel{{ request.id }}"><b>Decline Request?</b></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to decline this request?</p>
-                
+                <p>This action cannot be reversed</p>
+                <hr>
                 <!-- Dropdown for selecting the reason for declining -->
                 <div class="form-group">
                     <label for="declineReason{{ request.id }}">Select a reason for declining:</label>
@@ -1460,13 +1460,13 @@
                                             <div class="modal-dialog" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="deleteApprovedModalLabel{{ request.id }}">Delete Approved Request</h5>
+                                                        <h5 class="modal-title" id="deleteApprovedModalLabel{{ request.id }}">Delete Approved Request?</h5>
                                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                             <span aria-hidden="true">&times;</span>
                                                         </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        Are you sure you want to delete this approved request?
+                                                        This action cannot be reversed
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
