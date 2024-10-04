@@ -276,30 +276,48 @@ def logout_user(request):
 @login_required
 def approve_request_view(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    if request.method == 'POST':
-        ApprovedRequest.objects.create(
-            book=borrow_request.book,
-            requested_by=borrow_request.requested_by,
-            requested_at=borrow_request.requested_at,
-        )
-        borrow_request.book.borrowed.add(borrow_request.requested_by)  # Add the requesting user to the book's borrowed field
-        borrow_request.delete()
-        return redirect('librarian')
+    ApprovedRequest.objects.create(
+        book=borrow_request.book,
+        requested_by=borrow_request.requested_by,
+        requested_at=borrow_request.requested_at,
+    )
+    
+    # Create a notification for the approved request
+    Notification.objects.create(
+        user=borrow_request.requested_by,
+        message=f"Your request for {borrow_request.book.BookTitle} has been approved.",
+        notification_type='approved'  # Set notification type
+    )
+    
+    borrow_request.delete()
     return redirect('librarian')
+
+
 @login_required
 def decline_request_view(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    if request.method == 'POST':
+    
+    if request.method == "POST":
+        decline_reason = request.POST.get('decline_reason_input', 'No reason provided')
+        
         DeclinedRequest.objects.create(
             book=borrow_request.book,
             requested_by=borrow_request.requested_by,
             requested_at=borrow_request.requested_at,
+            decline_reason=decline_reason
         )
+        
+        # Create a notification for the declined request
+        Notification.objects.create(
+            user=borrow_request.requested_by,
+            message=f"Your request for {borrow_request.book.BookTitle} was declined. Reason: {decline_reason}",
+            notification_type='declined'  # Set notification type
+        )
+        
         borrow_request.delete()
-        return redirect('librarian')
+        messages.success(request, 'Request successfully declined.')
+        
     return redirect('librarian')
-
-
 
 @login_required
 def toggle_book_status(request, request_id):
