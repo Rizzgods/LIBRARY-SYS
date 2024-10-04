@@ -712,7 +712,29 @@
     });
     
 </script>
+<script>
+    // Function to send an AJAX request to keep the session alive
+    function keepSessionAlive() {
+        fetch("{% url 'keep_session_alive' %}", {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(response => response.json())
+          .then(data => {
+              console.log('Session kept alive:', data);
+          }).catch(error => {
+              console.error('Error keeping session alive:', error);
+          });
+    }
 
+    // Event listener to keep the session alive on every mouse click
+    document.addEventListener('click', keepSessionAlive);
+    document.addEventListener('keypress', keepSessionAlive);
+
+    // Optionally, you can still send an AJAX request periodically
+    setInterval(keepSessionAlive, 300000);
+</script>
     {% block script %}{% endblock %}
 </body>
 </html>

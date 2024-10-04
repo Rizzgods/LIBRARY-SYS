@@ -152,6 +152,11 @@ def your_view(request):
 from django.db.models import Max, Count
 from django.utils import timezone
 
+
+def user_is_schoolAdmin(user):
+    return user.groups.filter(name='SchoolAdmin').exists()
+
+
 def book_page_views(request):
     # Retrieve all books and sort them by page views in descending order
     books = Books.objects.all().order_by('-PageViews')[:10]
@@ -198,6 +203,10 @@ def book_page_views(request):
     user_logs = UserActivity.objects.all()
     user_total = Student_total + lib_total
     users = User.objects.all()
+
+    if not request.user.is_authenticated:
+        return redirect('login_user')
+    
     # Render the template with the necessary data
     return render(request, 'book_page_views.html', {
     'book_titles': book_titles, 
