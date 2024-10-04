@@ -165,7 +165,8 @@ def create_approved_notification(sender, instance, created, **kwargs):
     if created:
         Notification.objects.create(
             user=instance.requested_by,
-            message=f"Your request for {instance.book.BookTitle} has been approved."
+            message=f"Your request for {instance.book.BookTitle} has been approved.",
+            notification_type='approved'  # Set notification type
         )
 
 @receiver(post_save, sender=DeclinedRequest)
@@ -174,8 +175,9 @@ def create_declined_notification(sender, instance, created, **kwargs):
         # Ensure the reason is included in the message and convert to title case
         decline_reason = instance.decline_reason.title() if instance.decline_reason else 'No Reason Provided'
         
-        # Create the notification with the formatted reason
+        # Create the notification with the formatted reason and notification_type set to 'declined'
         Notification.objects.create(
             user=instance.requested_by,
-            message=f"Your request for {instance.book.BookTitle} has been declined. Reason: {decline_reason}"
+            message=f"Your request for {instance.book.BookTitle} has been declined. Reason: {decline_reason}",
+            notification_type='declined'  # Set notification type
         )

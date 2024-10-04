@@ -574,30 +574,30 @@
             });
         }
     
+
         function renderNotifications() {
             $('#notification-dropdown').empty();
             
             if (notifications.length > 0) {
                 $('#notification-count').text(notifications.length).show();
                 $('#no-notifications').hide();
-    
+        
                 var markAllButton = $('<div class="dropdown-header">')
                     .html('<button id="mark-all-read" class="btn btn-link notif-btn">Mark All as Read</button>');
                 $('#notification-dropdown').append(markAllButton);
-    
+        
                 $('#mark-all-read').click(function(event) {
                     event.stopPropagation();
                     markAllAsRead();
                 });
-    
-                // Determine how many notifications to display based on the "See More" state
+        
                 var notificationsToShow = showingMore ? notifications.length : 5;
-    
                 var limitedNotifications = notifications.slice(0, notificationsToShow);
+        
                 limitedNotifications.forEach(function(notification) {
                     var item = $('<div class="dropdown-item">')
                         .html(`
-                                <a href="{% url 'borrowed_books' %}" class="notif-link">
+                                <a href="javascript:void(0)" class="notif-link">
                                     <div class="notification-icon-2">
                                         <span class="material-symbols-outlined icon-2">notification_important</span>
                                     </div>
@@ -608,40 +608,31 @@
                                 </a>
                         `)
                         .attr('data-id', notification.id)
-                        .toggleClass('read', notification.read)  // Use the local "read" state
+                        .toggleClass('read', notification.read)
                         .click(function() {
-                            markAsRead(notification.id);
+                            markAsReadAndRedirect(notification.id, notification.type);
                         });
-    
-                    var deleteButton = $('<button class="btn btn-close ms-auto">')
-                        .html('')
-                        .click(function(event) {
-                            event.stopPropagation();
-                            deleteNotification(notification.id);
-                        });
-    
+        
+                    var deleteButton = $('<button class="btn btn-close ms-auto">').html('').click(function(event) {
+                        event.stopPropagation();
+                        deleteNotification(notification.id);
+                    });
+        
                     item.append(deleteButton);
                     $('#notification-dropdown').append(item);
                 });
-    
-                // Re-append the "Mark All as Read" button
-                $('#notification-dropdown').prepend(markAllButton);
-    
-                // Add "See More" button if there are more than 5 notifications
+        
                 if (notifications.length > 5) {
                     var seeMoreBtn = $('<button id="see-more-btn" class="btn btn-link notif-btn">See More</button>');
                     var seeMoreContainer = $('<div class="dropdown-footer">').append(seeMoreBtn);
                     $('#notification-dropdown').append(seeMoreContainer);
-    
-                    // Set the text of the button based on the current state
+        
                     seeMoreBtn.text(showingMore ? 'See Less' : 'See More');
-    
-                    // Prevent the dropdown from closing when clicking "See More" or "See Less"
+        
                     seeMoreBtn.on('click', function(event) {
-                        event.stopPropagation();  // Prevent dropdown from closing
-    
-                        showingMore = !showingMore; // Toggle the state
-                        renderNotifications(); // Re-render the notifications based on the new state
+                        event.stopPropagation();
+                        showingMore = !showingMore;
+                        renderNotifications();
                     });
                 }
             } else {
@@ -650,21 +641,19 @@
             }
         }
     
-        function markAsRead(notificationId) {
+        function markAsReadAndRedirect(notificationId, notificationType) {
             $.post("{% url 'mark_notification_read' 0 %}".replace('0', notificationId), {
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function() {
-                // Find the notification in the local array and mark it as read
-                var notification = notifications.find(function(notif) {
-                    return notif.id === notificationId;
-                });
-                if (notification) {
-                    notification.read = true; // Update the local state
+                let requestType = 'pending';  // Default to pending
+                if (notificationType === 'approved') {
+                    requestType = 'approved';
+                } else if (notificationType === 'declined') {
+                    requestType = 'declined';
                 }
-                renderNotifications(); // Re-render the notifications
+                window.location.href = "{% url 'request_history' %}?requestType=" + requestType;
             });
         }
-    
         function markAllAsRead() {
             $.post("{% url 'mark_all_notifications_read' %}", {
                 csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -707,7 +696,7 @@
             }
         });
     });
-
+    
     document.getElementById('toggleFooter').addEventListener('click', function() {
         var footer = document.querySelector('.first-footer');
         var footerBtn =  document.getElementById('footer-btn');

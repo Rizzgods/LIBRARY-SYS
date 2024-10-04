@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from librarian.models import Books, BorrowRequest, ApprovedRequest, DeclinedRequest, LANGUAGE_CHOICES, Category
 from django.urls import reverse
-from django.db.models import Count, F
+from django.db.models import Count, F, Q
 import logging
 from .models import Notification
 from django.http import HttpResponseForbidden, HttpResponseNotFound
@@ -46,7 +46,7 @@ def student(request):
         'file_type': request.GET.get('file_type')
     }
 
-    books = Books.objects.filter(available = True)
+    books = Books.objects.filter(available = True, deleted_at__isnull=True)
 
     if filter_params['year']:
         books = books.filter(Date__year=filter_params['year'])
@@ -179,7 +179,10 @@ def prev_file(request, book_id):
 def search_suggestions(request):
     query = request.GET.get('q', '')
     if len(query) >= 3:
-        books = Books.objects.filter(BookTitle__icontains=query) | Books.objects.filter(Author__icontains=query)
+        books = Books.objects.filter(
+            (Q(BookTitle__icontains=query) | Q(Author__icontains=query)),
+            deleted_at__isnull=True  # Exclude archived books
+        )        
         suggestions = [
             {
                 'id': book.id,
@@ -212,11 +215,22 @@ def fetch_notifications(request):
         req.save()
         Notification.objects.create(
             user=req.requested_by,
-            message=f"Your borrow request for {req.book.BookTitle} has expired."
+            message=f"Your borrow request for {req.book.BookTitle} has expired.",
+            notification_type='expired'  # You can also handle expired separately if needed
         )
     
+    # Fetch notifications with their types
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-    data = [{'id': n.id, 'message': n.message, 'read': n.read, 'created_at': n.created_at} for n in notifications]
+    data = [
+        {
+            'id': n.id,
+            'message': n.message,
+            'read': n.read,
+            'created_at': n.created_at,
+            'type': n.notification_type  # Include the notification type in the response
+        }
+        for n in notifications
+    ]    
     return JsonResponse(data, safe=False)
 
 def mark_all_notifications_read(request):
@@ -231,7 +245,14 @@ def mark_notification_read(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
     notification.read = True
     notification.save()
-    return JsonResponse({'success': True})
+
+    # Determine the redirection based on the notification type
+    if notification.notification_type == 'approved':
+        return redirect(f"{reverse('request_history')}?requestType=approved")
+    elif notification.notification_type == 'declined':
+        return redirect(f"{reverse('request_history')}?requestType=declined")
+    else:
+        return redirect(f"{reverse('request_history')}?requestType=pending")
 
 @login_required
 def delete_notification(request, notification_id):
@@ -299,14 +320,20 @@ def borrow_request(request, book_id):
 
 @login_required
 def request_history_view(request):
-    pending_requests = BorrowRequest.objects.filter(requested_by=request.user)
+    # Fetch pending requests, ordered by the 'requested_at' field in descending order
+    pending_requests = BorrowRequest.objects.filter(requested_by=request.user).order_by('-requested_at')
+    
+    # Fetch approved requests, ordered by the 'approved_at' field in descending order
+    approved_requests = ApprovedRequest.objects.filter(requested_by=request.user).order_by('-approved_at')
+    
+    # Fetch declined requests, ordered by the 'declined_at' field in descending order
+    declined_requests = DeclinedRequest.objects.filter(requested_by=request.user).order_by('-declined_at')
+
+    # Handle expired requests in pending requests
     for request_obj in pending_requests:
         if request_obj.is_expired() and request_obj.status != 'Expired':
             request_obj.status = 'Expired'
             request_obj.save()
-
-    approved_requests = ApprovedRequest.objects.filter(requested_by=request.user)
-    declined_requests = DeclinedRequest.objects.filter(requested_by=request.user)
 
     context = {
         'pending_requests': pending_requests,
@@ -315,7 +342,6 @@ def request_history_view(request):
     }
 
     return render(request, 'requesthistory.html', context)
-
 @login_required
 def borrowed_books_view(request):
     borrowed_books = ApprovedRequest.objects.filter(requested_by=request.user)

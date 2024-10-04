@@ -4,6 +4,13 @@
 
 {% block style %}
 <style>
+    .no-results {
+        text-align: center;
+        padding: 20px;
+        font-size: 1.2rem;
+        color: red;
+        display: none;  /* Initially hidden */
+    }
     .notification-time {
         font-size: 0.8rem;
         color: grey;
@@ -349,7 +356,6 @@
     <div class="row mb-3 align-items-end">
         <div class="col-md-3">
             <div class="form-group">
-                
                 <select class="form-select" id="requestTypeSelect" onchange="toggleRequestTable()">
                     <option value="pending">Pending Requests</option>
                     <option value="approved">Approved Requests</option>
@@ -359,12 +365,13 @@
         </div>
         <div class="col-md-9">
             <div class="form-group">
-                
                 <input type="text" class="form-control" id="searchInput" onkeyup="searchTable()" placeholder="Search for requests...">
             </div>
         </div>
     </div>
-    
+
+    <!-- No results message -->
+    <div id="noResults" class="no-results">No such request found.</div>
 
     <!-- Pending Requests Table -->
     <div id="pendingRequestsTable" class="request-table">
@@ -446,18 +453,25 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
 
+{% block script %}
 <script>
+    // Toggle the table visibility based on the selected request type
     function toggleRequestTable() {
         const requestType = document.getElementById('requestTypeSelect').value;
         const pendingTable = document.getElementById('pendingRequestsTable');
         const approvedTable = document.getElementById('approvedRequestsTable');
         const declinedTable = document.getElementById('declinedRequestsTable');
-
+        const noResults = document.getElementById('noResults');
+    
+        // Hide all tables and no results message initially
         pendingTable.style.display = 'none';
         approvedTable.style.display = 'none';
         declinedTable.style.display = 'none';
-
+        noResults.style.display = 'none';
+    
+        // Show the selected table
         if (requestType === 'pending') {
             pendingTable.style.display = 'block';
         } else if (requestType === 'approved') {
@@ -467,52 +481,49 @@
         }
     }
 
+    // Search functionality for filtering rows and toggling headers
     function searchTable() {
-        const input = document.getElementById('searchInput');
-        const filter = input.value.toLowerCase();
+        const input = document.getElementById('searchInput').value.toLowerCase();
         const requestType = document.getElementById('requestTypeSelect').value;
-        const table = document.getElementById(requestType + 'RequestsTable');
-        const tr = table.getElementsByTagName('tr');
+        const tableId = requestType + 'RequestsTable';  // Get the current active table
+        const table = document.querySelector(`#${tableId} tbody`); // Select the tbody within the current table
+        const rows = table.getElementsByTagName('tr');
+        const noResults = document.getElementById('noResults');
+        const tableHeader = document.querySelector(`#${tableId} thead`);
+        let noMatchFound = true;
 
-        for (let i = 1; i < tr.length; i++) { // Start from 1 to skip the header row
-            const tdArray = tr[i].getElementsByTagName('td');
+        // Loop through all table rows, and hide those that don't match the search query
+        for (let i = 0; i < rows.length; i++) {
+            const tds = rows[i].getElementsByTagName('td');
             let found = false;
-            for (let j = 0; j < tdArray.length; j++) {
-                if (tdArray[j]) {
-                    const txtValue = tdArray[j].textContent || tdArray[j].innerText;
-                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                        found = true;
-                        break;
-                    }
+            for (let j = 0; j < tds.length; j++) {
+                if (tds[j].textContent.toLowerCase().includes(input)) {
+                    found = true;
+                    break;
                 }
             }
-            tr[i].style.display = found ? '' : 'none';
+            rows[i].style.display = found ? '' : 'none';  // Toggle the visibility based on the search match
+            if (found) {
+                noMatchFound = false;
+            }
+        }
+
+        // Show or hide the "No such request found" message and the table header
+        if (noMatchFound) {
+            noResults.style.display = 'block';  // Show the no results message
+            tableHeader.style.display = 'none';  // Hide the table header
+        } else {
+            noResults.style.display = 'none';  // Hide the no results message
+            tableHeader.style.display = 'table-header-group';  // Show the table header
         }
     }
-</script>
-{% endblock %}
 
-{% block script %}
-<script>
+    // Automatically select the correct table based on URL parameter
     document.addEventListener('DOMContentLoaded', function() {
-        var offcanvasElement = document.getElementById('offcanvasScrolling');
-        var sideBarElement = document.querySelector('.side-bar');
-        var mainContainer = document.getElementById('main-container'); // Select the main container
-        
-        // Add event listener to the offcanvas element
-        offcanvasElement.addEventListener('hidden.bs.offcanvas', function() {
-            sideBarElement.classList.remove('show');
-            mainContainer.classList.remove('with-sidebar');
-        });
-        
-        // Add event listener to the offcanvas element
-        offcanvasElement.addEventListener('show.bs.offcanvas', function() {
-            sideBarElement.classList.add('show');
-            mainContainer.classList.add('with-sidebar');
-        });
-
-        
+        const urlParams = new URLSearchParams(window.location.search);
+        const requestType = urlParams.get('requestType') || 'pending'; // Default to 'pending' if not specified
+        document.getElementById('requestTypeSelect').value = requestType;
+        toggleRequestTable();  // Ensure the correct table is shown based on the URL parameter
     });
-    
 </script>
 {% endblock %}
