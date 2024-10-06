@@ -1,0 +1,8 @@
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 05, 2024 - 13:53:03
+Django version 5.0.3, using settings 'storefront.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+

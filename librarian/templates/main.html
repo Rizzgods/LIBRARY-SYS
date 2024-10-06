@@ -625,20 +625,23 @@
             <!-- Upload Section-->
             <div id="upload" class="content" style="display: none;">
                 {% if messages %}
-                    {% for message in messages %}
-                        {% if message.tags == 'success' %}
-                            <div class="alert alert-success">
-                                {{ message }}
-                            </div>
-                        {% elif message.tags == 'error' %}
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    <li>{{ message }}</li>
-                                </ul>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% elif message.tags == 'error' %}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                <li>{{ message }}</li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
                 <h1 class="mt-4">Upload</h1>
                 <hr>
                 <form method="post" enctype="multipart/form-data" action="{% url 'librarian' %}">
@@ -1322,6 +1325,24 @@
 
             <div id="borrow-req" class="content" style="display: none;">
                 <h2 class="sections">Borrow Requests</h2>
+                {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% elif message.tags == 'error' %}
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
+                                <li>{{ message }}</li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
                 <!-- Dropdown and Search Field in the Same Row -->
                 <div class="d-flex align-items-center mb-3">
                     <!-- Dropdown for Borrow Requests -->
@@ -1862,17 +1883,22 @@
 
     window.onload = function() {
         var activeContent = localStorage.getItem('activeContent') || 'home';
+        
+        // Check if there's a URL hash to load the correct tab
+        if (window.location.hash) {
+            activeContent = window.location.hash.substring(1); // Get hash without '#'
+        }
+    
         showContent(activeContent);
-
-        // Hide all sections
+    
+        // Hide all sections (optional, if you have other content management logic)
         document.querySelectorAll('.content-section').forEach(function(section) {
             section.style.display = 'none';
         });
-
+    
         // Show the selected section
-        document.getElementById(section).style.display = 'block';
+        document.getElementById(activeContent).style.display = 'block';
     };
-
     function setDeleteUrl(bookId) {
         var bookRow = document.getElementById('bookRow-' + bookId);
         bookRow.style.display = 'none';

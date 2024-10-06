@@ -175,8 +175,6 @@ def decline_request(request, request_id):
     
     if request.method == "POST":
         decline_reason = request.POST.get('decline_reason_input', 'No reason provided')
-
-        # Format the reason by replacing underscores with spaces
         formatted_reason = decline_reason.replace('_', ' ')
     
         # Create a declined request with the selected reason
@@ -184,20 +182,16 @@ def decline_request(request, request_id):
             book=borrow_request.book,
             requested_by=borrow_request.requested_by,
             requested_at=borrow_request.requested_at,
-            decline_reason=formatted_reason  # Store formatted reason
+            decline_reason=formatted_reason
         )
-        #WAG BURAHIN INCASE
-        """# Add a notification with the formatted decline reason
-        Notification.objects.create(
-            user=borrow_request.requested_by,
-            message=f"Your request for {borrow_request.book.BookTitle} was declined. Reason: {formatted_reason}"
-        ) """
-        
-        # Delete the original borrow request after declining it
+
+        # Delete the original borrow request
         borrow_request.delete()
+
         messages.success(request, 'Request successfully declined.')
         
-    return redirect('librarian')  # Redirect to your desired view
+    # Redirect to the borrow requests section (borrow-req tab)
+    return redirect(reverse('librarian') + '#borrow-req')
 @login_required
 def delete_approved_request(request, request_id):
     approved_request = get_object_or_404(ApprovedRequest, id=request_id)
