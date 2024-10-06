@@ -75,7 +75,7 @@
         border-top: 1px solid #ccc; /* Add subtle top border for separation */
     }
     
-        .modalButtons {
+    .modalButtons {
         display: grid;
         grid-template-columns: repeat(4, 1fr); /* Create 4 equal columns */
         gap: 10px; /* Add some space between the buttons */
@@ -97,15 +97,6 @@
         
         border-left: 10px solid #fff; /* 10px border on the left side, white color */
     }
-    
-    #modal-preview-link {
-        
-    }
-    
-    #modal-bookmark-link {
-        
-    }
-    
     #generate-citation {
        
         border-right: 10px solid #fff;
@@ -438,7 +429,9 @@
             flex: 1;
         }
        
-
+        .offcanvas{
+            z-index: 2;
+        }
         /* Sidebar stays fixed and overlays the content on small screens */
         .side-bar {
             width: auto;

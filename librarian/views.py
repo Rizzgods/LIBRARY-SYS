@@ -391,6 +391,34 @@ def go_back(request):
     return redirect('main') 
 
 
+@login_required
+def borrow_request_view(request):
+    # Fetch pending requests, ordered by the 'requested_at' field in descending order
+    pending_requests = BorrowRequest.objects.filter(requested_by=request.user).order_by('-requested_at')
+    
+    # Fetch approved requests, ordered by the 'approved_at' field in descending order
+    approved_requests = ApprovedRequest.objects.filter(requested_by=request.user).order_by('-approved_at')
+    
+    # Fetch declined requests, ordered by the 'declined_at' field in descending order
+    declined_requests = DeclinedRequest.objects.filter(requested_by=request.user).order_by('-declined_at')
+
+    # Handle expired requests in pending requests
+    for pending_request in pending_requests:
+        if pending_request.is_expired() and pending_request.status != 'Expired':
+            pending_request.status = 'Expired'
+            pending_request.save()
+
+    context = {
+        'pending_requests': pending_requests,
+        'approved_requests': approved_requests,
+        'declined_requests': declined_requests,
+    }
+
+    return render(request, 'borrow_request_table.html', context)
+
+
+
+
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
