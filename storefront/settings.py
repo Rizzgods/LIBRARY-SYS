@@ -65,6 +65,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'librarian.middleware.InactivityLogoutMiddleware',
     'librarian.middleware.HandleNoReverseMatchMiddleware',
+    'student.middleware.InactivityLogoutMiddleware',
+    'student.middleware.HandleNoReverseMatchMiddleware',
    
     
 ]

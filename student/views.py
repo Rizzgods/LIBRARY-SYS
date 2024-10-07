@@ -13,9 +13,10 @@ from django.utils import timezone
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash, logout
 from django.shortcuts import render, redirect
 from django.contrib import messages
+
 
 @login_required
 def change_password(request):
@@ -83,6 +84,8 @@ def student(request):
                 books_per_category[category] = []
             books_per_category[category].append(book)
 
+    if not request.user.is_authenticated:
+        return redirect('login_user')
     return render(request, 'student_content.html', {
         'books': books,
         'top_viewed_books': top_viewed_books,
@@ -165,7 +168,7 @@ def prev_file(request, book_id):
     
     # Check if the user is authenticated
     if not request.user.is_authenticated:
-        return HttpResponseForbidden("You need to be logged in to access this book.")
+        return redirect('login_user')
     
     # Check if there exists an approved request for the book and user
     if ApprovedRequest.objects.filter(book=book, requested_by=request.user).exists():

@@ -186,8 +186,6 @@ def decline_request(request, request_id):
     
     if request.method == "POST":
         decline_reason = request.POST.get('decline_reason_input', 'No reason provided')
-
-        # Format the reason by replacing underscores with spaces
         formatted_reason = decline_reason.replace('_', ' ')
     
         # Create a declined request with the selected reason
@@ -195,20 +193,16 @@ def decline_request(request, request_id):
             book=borrow_request.book,
             requested_by=borrow_request.requested_by,
             requested_at=borrow_request.requested_at,
-            decline_reason=formatted_reason  # Store formatted reason
+            decline_reason=formatted_reason
         )
-        #WAG BURAHIN INCASE
-        """# Add a notification with the formatted decline reason
-        Notification.objects.create(
-            user=borrow_request.requested_by,
-            message=f"Your request for {borrow_request.book.BookTitle} was declined. Reason: {formatted_reason}"
-        ) """
-        
-        # Delete the original borrow request after declining it
+
+        # Delete the original borrow request
         borrow_request.delete()
+
         messages.success(request, 'Request successfully declined.')
         
-    return redirect('librarian')  # Redirect to your desired view
+    # Redirect to the borrow requests section (borrow-req tab)
+    return redirect(reverse('librarian') + '#borrow-req')
 @login_required
 def delete_approved_request(request, request_id):
     approved_request = get_object_or_404(ApprovedRequest, id=request_id)
@@ -406,6 +400,34 @@ def my_view(request):
     
 def go_back(request):
     return redirect('main') 
+
+
+@login_required
+def borrow_request_view(request):
+    # Fetch pending requests, ordered by the 'requested_at' field in descending order
+    pending_requests = BorrowRequest.objects.filter(requested_by=request.user).order_by('-requested_at')
+    
+    # Fetch approved requests, ordered by the 'approved_at' field in descending order
+    approved_requests = ApprovedRequest.objects.filter(requested_by=request.user).order_by('-approved_at')
+    
+    # Fetch declined requests, ordered by the 'declined_at' field in descending order
+    declined_requests = DeclinedRequest.objects.filter(requested_by=request.user).order_by('-declined_at')
+
+    # Handle expired requests in pending requests
+    for pending_request in pending_requests:
+        if pending_request.is_expired() and pending_request.status != 'Expired':
+            pending_request.status = 'Expired'
+            pending_request.save()
+
+    context = {
+        'pending_requests': pending_requests,
+        'approved_requests': approved_requests,
+        'declined_requests': declined_requests,
+    }
+
+    return render(request, 'borrow_request_table.html', context)
+
+
 
 
 from django.http import JsonResponse
