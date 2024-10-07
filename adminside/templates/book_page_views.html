@@ -1,3 +1,6 @@
+{%load customtags3%}
+{% if user.is_authenticated and user|is_schoolAdmin %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -82,10 +85,7 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Logout</a>
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                         </li>
                     </ul>
                 </div>
@@ -94,12 +94,12 @@
         <br>
         <!-- Overview Section -->
         <div id="overview-section">
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-md-3">
                     <div class="card text-white bg-success">
                         <div class="card-body">
                             <h5 class="card-title">Total Users</h5>
-                            <p class="card-text">{{ user_total }}</p>
+                            <p class="card-text display-4">{{ user_total }}</p>
                         </div>
                     </div>
                 </div>
@@ -107,41 +107,45 @@
                     <div class="card text-white bg-warning">
                         <div class="card-body">
                             <h5 class="card-title">Users This Month</h5>
-                            <p class="card-text">{{ distinct_users_count_this_month }}</p>
+                            <p class="card-text display-4">{{ distinct_users_count_this_month }}</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Most Viewed Material</h5>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Most Viewed Material</h5>
-                            <div class="chart-container" >
+                            <div class="chart-container" style="height: 400px;">
                                 <canvas id="pageViewsChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-
-
                 <div class="col-md-6">
                     <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Top E-Books Borrowed</h5>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Top E-Books Borrowed</h5>
-                            <div class="chart-container" >
+                            <div class="chart-container" style="height: 400px;">
                                 <canvas id="topBooksChart"></canvas>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                
-                <div class="col-md-6">
+            </div>
+            <div class="row mb-4">
+                <div class="col-md-12">
                     <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Active Users</h5>
+                        </div>
                         <div class="card-body">
-                            <h5 class="card-title">Active Users</h5>
-                            <table class="table">
+                            <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>User</th>
@@ -156,7 +160,7 @@
                                     </tr>
                                     {% empty %}
                                     <tr>
-                                        <td colspan="3">No user activities</td>
+                                        <td colspan="2">No user activities</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
@@ -169,11 +173,14 @@
 
         <!-- Placeholder for other sections -->
         <div id="active-section" style="display: none;">
-            <h2>USER ACTIVITY LOGS</h2>
+            <h2 class="mb-4">User Activity Logs</h2>
         
+            <!-- Filters Row -->
+            <div class="row mb-3">
             <!-- Dropdown filter for selecting the month -->
-            <label for="month-filter">Filter by Month:</label>
-            <select id="month-filter" onchange="filterTableByMonth()">
+            <div class="col-md-2">
+                <label for="month-filter" class="form-label">Filter by Month:</label>
+                <select id="month-filter" class="form-select" onchange="filterTableByMonth()">
                 <option value="">All Months</option>
                 <option value="01">January</option>
                 <option value="02">February</option>
@@ -187,30 +194,40 @@
                 <option value="10">October</option>
                 <option value="11">November</option>
                 <option value="12">December</option>
-            </select>
+                </select>
+            </div>
+
+            <!-- Search input for filtering by username -->
+            <div class="col-md-10">
+                <label for="search-input" class="form-label">Search by Username:</label>
+                <input type="text" id="search-input" class="form-control" onkeyup="searchTableByUsernameActivity()" placeholder="Search for usernames..">
+            </div>
+            </div>
         
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Login Time</th>
-                        <th>Logout Time</th>
-                    </tr>
+            <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                <tr>
+                    <th>User</th>
+                    <th>Login Time</th>
+                    <th>Logout Time</th>
+                </tr>
                 </thead>
                 <tbody id="activity-log-tbody">
-                    {% for user_logs in user_logs %}
-                    <tr>
-                        <td>{{ user_logs.user.username }}</td>
-                        <td>{{ user_logs.login_time }}</td>
-                        <td>{{ user_logs.logout_time }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3">No user activities</td>
-                    </tr>
-                    {% endfor %}
+                {% for user_logs in user_logs %}
+                <tr>
+                    <td>{{ user_logs.user.username }}</td>
+                    <td>{{ user_logs.login_time }}</td>
+                    <td>{{ user_logs.logout_time }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center">No user activities</td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
+            </div>
         </div>
         
         <script>
@@ -219,206 +236,377 @@
             var table = document.getElementById("activity-log-tbody");
             var rows = table.getElementsByTagName("tr");
             var monthMapping = {
-                "Jan.": "01", "Feb.": "02", "March": "03", "April": "04", 
-                "May": "05", "June": "06", "July": "07", "Aug.": "08", 
-                "Sept.": "09", "Oct.": "10", "Nov.": "11", "Dec.": "12"
+            "Jan.": "01", "Feb.": "02", "March": "03", "April": "04", 
+            "May": "05", "June": "06", "July": "07", "Aug.": "08", 
+            "Sept.": "09", "Oct.": "10", "Nov.": "11", "Dec.": "12"
             };
         
             for (var i = 0; i < rows.length; i++) {
-                var loginTime = rows[i].getElementsByTagName("td")[1]; // Assuming login time is in the second column
-                if (loginTime) {
-                    var dateParts = loginTime.innerHTML.split(' ');
-                    var shortMonth = dateParts[0];
-                    var monthIndex = monthMapping[shortMonth];
-                    if (filterValue === "" || monthIndex === filterValue) {
-                        rows[i].style.display = "";
-                    } else {
-                        rows[i].style.display = "none";
-                    }
+            var loginTime = rows[i].getElementsByTagName("td")[1]; // Assuming login time is in the second column
+            if (loginTime) {
+                var dateParts = loginTime.innerHTML.split(' ');
+                var shortMonth = dateParts[0];
+                var monthIndex = monthMapping[shortMonth];
+                if (filterValue === "" || monthIndex === filterValue) {
+                rows[i].style.display = "";
+                } else {
+                rows[i].style.display = "none";
                 }
+            }
+            }
+        }
+
+        function searchTableByUsernameActivity() {
+            var input = document.getElementById("search-input");
+            var filter = input.value.toLowerCase();
+            var table = document.getElementById("activity-log-tbody");
+            var rows = table.getElementsByTagName("tr");
+
+            for (var i = 0; i < rows.length; i++) {
+            var usernameCell = rows[i].getElementsByTagName("td")[0]; // Assuming username is in the first column
+            if (usernameCell) {
+                var username = usernameCell.textContent || usernameCell.innerText;
+                if (username.toLowerCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+                } else {
+                rows[i].style.display = "none";
+                }
+            }
             }
         }
         </script>
         
         
 <!-- Template: book_page_views.html -->
-        <div id="analytics-section">
-            <h2>User List</h2>
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Name</th>
-                            <th>Active</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                        <tr id="user-row-{{ user.id }}">
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.first_name }}, {{ user.last_name }}</td>
-                            <td id="user-status-{{ user.id }}">{{ user.is_active }}</td>
-                            <td>
-                                <button 
-                                    class="btn {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}" 
-                                    data-bs-toggle="modal" 
-                                    data-bs-target="#confirmDisableModal" 
-                                    data-user-id="{{ user.id }}" 
-                                    data-user-status="{{ user.is_active }}">
-                                    {% if user.is_active %}Disable{% else %}Activate{% endif %}
-                                </button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    
-                </table>
-            </div>
-        </div>
+            <div id="analytics-section">
+                <h2>User List</h2>
+                <!-- Filters Row -->
+                <div class="row mb-3">
+                    <!-- Dropdown filter for selecting the role -->
+                    <div class="col-md-2">
+                        <label for="role-filter" class="form-label">Filter by Role:</label>
+                        <select id="role-filter" class="form-select" onchange="filterTableByRole()">
+                            <option value="">All Roles</option>
+                            <option value="Student">Student</option>
+                            <option value="Librarian">Librarian</option>
+                        </select>
+                    </div>
 
-        <!-- Modal -->
-        <div class="modal fade" id="confirmDisableModal" tabindex="-1" aria-labelledby="confirmDisableModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="confirmDisableModalLabel">Confirm Action</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <!-- Search input for filtering by username -->
+                    <div class="col-md-10">
+                        <label for="search-input1" class="form-label">Search by Username:</label>
+                        <input type="text" id="search-input1" class="form-control" onkeyup="searchTableByUsernameAndDetails()" placeholder="Search for usernames..">
                     </div>
-                    <div class="modal-body">
-                        Are you sure you want to <span id="action-text">disable</span> this account?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                        <button type="button" class="btn btn-primary" id="confirmAction">Yes</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Role</th>   
+                                <th>Active</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list-tbody">
+                            {% for user in users %}
+                            <tr id="user-row-{{ user.id }}">
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.first_name }}, {{ user.last_name }}</td>
+                                <td>
+                                    {% for group in user.groups.all %}
+                                        {{ group.name }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td id="user-status-{{ user.id }}">{{ user.is_active }}</td>
+                                <td>
+                                    <button 
+                                        class="btn {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#confirmDisableModal" 
+                                        data-user-id="{{ user.id }}" 
+                                        data-user-status="{{ user.is_active }}">
+                                        {% if user.is_active %}Disable{% else %}Activate{% endif %}
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="confirmDisableModal" tabindex="-1" aria-labelledby="confirmDisableModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmDisableModalLabel">Confirm Action</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to <span id="action-text">disable</span> this account?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                            <button type="button" class="btn btn-primary" id="confirmAction">Yes</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Include jQuery and Bootstrap JS for handling the modal -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <!-- Include Bootstrap Bundle (includes Bootstrap JS and Popper.js) -->
+            <!-- Include jQuery and Bootstrap JS for handling the modal -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <!-- Include Bootstrap Bundle (includes Bootstrap JS and Popper.js) -->
 
-        <script>
-            $(document).ready(function(){
-                var userId, userStatus;
-            
-                $('#confirmDisableModal').on('show.bs.modal', function (event) {
-                    var button = $(event.relatedTarget);
-                    userId = button.data('user-id');
-                    userStatus = button.data('user-status');
-                    var actionText = userStatus ? 'disable' : 'activate';
-                    $('#action-text').text(actionText);
-                });
-            
-                $('#confirmAction').click(function(){
-                    $.ajax({
-                        url: '{% url "toggle_user_status" %}',
-                        method: 'POST',
-                        data: {
-                            'user_id': userId,
-                            'csrfmiddlewaretoken': '{{ csrf_token }}'
-                        },
-                        success: function(response){
-                            if(response.status == 'success'){
-                                var newStatus = response.new_status;
-                                $('#user-status-' + userId).text(newStatus);
-                                var newButtonText = newStatus ? 'Disable' : 'Activate';
-                                var newButtonClass = newStatus ? 'btn btn-danger' : 'btn btn-success';
-                                $('button[data-user-id="' + userId + '"]').text(newButtonText).removeClass('btn-success btn-danger').addClass(newButtonClass);
-                                $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
-                                $('#confirmDisableModal').modal('hide');    
+            <script>
+                $(document).ready(function() {
+                    var userId, userStatus;
+                
+                    $('#confirmDisableModal').on('show.bs.modal', function(event) {
+                        var button = $(event.relatedTarget);
+                        userId = button.data('user-id');
+                        userStatus = button.data('user-status');
+                        var actionText = userStatus ? 'disable' : 'activate';
+                        $('#action-text').text(actionText);
+                    });
+                
+                    $('#confirmAction').click(function() {
+                        $.ajax({
+                            url: '{% url "toggle_user_status" %}',
+                            method: 'POST',
+                            data: {
+                                'user_id': userId,
+                                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                            },
+                            success: function(response) {
+                                if (response.status == 'success') {
+                                    var newStatus = response.new_status;
+                                    $('#user-status-' + userId).text(newStatus);
+                                    var newButtonText = newStatus ? 'Disable' : 'Activate';
+                                    var newButtonClass = newStatus ? 'btn btn-danger' : 'btn btn-success';
+                                    $('button[data-user-id="' + userId + '"]').text(newButtonText).removeClass('btn-success btn-danger').addClass(newButtonClass);
+                                    $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
+                                    $('#confirmDisableModal').modal('hide');
+                                    localStorage.setItem('activeSection', 'analytics-section'); // Store the active section
+                                    setTimeout(function() {
+                                        alert('Successfully ' + (newStatus ? 'activated' : 'disabled'));
+                                        location.reload(); // Refresh the page
+                                    }, 500);
+                                }
+                            }
+                        });
+                    });
+                
+                    // Check local storage for active section and display it
+                    var activeSection = localStorage.getItem('activeSection');
+                    if (activeSection) {
+                        document.getElementById('overview-section').style.display = 'none';
+                        document.getElementById('active-section').style.display = 'none';
+                        document.getElementById('analytics-section').style.display = 'none';
+                        document.getElementById('Create-section').style.display = 'none';
+                        document.getElementById('csv-section').style.display = 'none';
+                        document.getElementById(activeSection).style.display = 'block';
+                    }
+                    localStorage.removeItem('activeSection'); // Clear the stored section after activation
+                
+                    function filterTableByRole() {
+                        var filterValue = document.getElementById("role-filter").value.toLowerCase();
+                        var table = document.getElementById("user-list-tbody");
+                        var rows = table.getElementsByTagName("tr");
+                
+                        for (var i = 0; i < rows.length; i++) {
+                            var roleCell = rows[i].getElementsByTagName("td")[3]; // Assuming role is in the fourth column
+                            if (roleCell) {
+                                var role = roleCell.textContent || roleCell.innerText;
+                                if (filterValue === "" || role.toLowerCase().indexOf(filterValue) > -1) {
+                                    rows[i].style.display = "";
+                                } else {
+                                    rows[i].style.display = "none";
+                                }
                             }
                         }
-                    });
+                    }
+                
+                    function searchTableByUsernameAndDetails() {
+                        var input = document.getElementById('search-input1');
+                        var filter = input.value.toLowerCase();
+                        var table = document.getElementById('user-list-tbody');
+                        var rows = table.getElementsByTagName("tr");
+                
+                        for (var i = 0; i < rows.length; i++) {
+                            // Skip hidden rows
+                            if (rows[i].style.display === "none") continue;
+                
+                            var usernameCell = rows[i].getElementsByTagName("td")[0];
+                            var emailCell = rows[i].getElementsByTagName("td")[1];
+                            var nameCell = rows[i].getElementsByTagName("td")[2];
+                            var roleCell = rows[i].getElementsByTagName("td")[3];
+                
+                            // Extract text content
+                            var username = usernameCell ? usernameCell.textContent.toLowerCase() : "";
+                            var email = emailCell ? emailCell.textContent.toLowerCase() : "";
+                            var name = nameCell ? nameCell.textContent.toLowerCase() : "";
+                            var role = roleCell ? roleCell.textContent.toLowerCase() : "";
+                
+                            // Check if any of the fields match the search filter
+                            if (username.indexOf(filter) > -1 || email.indexOf(filter) > -1 || name.indexOf(filter) > -1 || role.indexOf(filter) > -1) {
+                                rows[i].style.display = ""; // Show row
+                            } else {
+                                rows[i].style.display = "none"; // Hide row
+                            }
+                        }
+                    }
+                
+                    // Attach event listeners
+                    document.getElementById("role-filter").addEventListener("change", filterTableByRole);
+                    document.getElementById("search-input1").addEventListener("keyup", searchTableByUsernameAndDetails);
                 });
-            });
             </script>
 
         <div id="Create-section">
-            <div class="container">
-                <div class="row justify-content-center mt-5">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h2>Account Creation</h2>
-                                
-                                <select class="form-select" id="role" name="role" onchange="toggleForm()">
-                                    <option value="Student">Student</option>
-                                    <option value="Librarian">Librarian</option>
-                                </select>
-                            </div>
-                            <div class="card-body">
-                                <!-- Student Form -->
-                                <form id="student-form" method="post" action="{% url 'create_account' %}">
-                                    {% csrf_token %}
-                                    <div class="mb-3">
+        <div class="container">
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="mb-0">Account Creation</h2>
+                            <select class="form-select mt-3" id="role" name="role" onchange="toggleForm()">
+                                <option value="Student">Student</option>
+                                <option value="Librarian">Librarian</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <!-- Student Form -->
+                            <form id="student-form" method="post" action="{% url 'create_account' %}" class="d-none">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
                                         <label for="lrn" class="form-label">LRN</label>
-                                        <input type="text" class="form-control" id="lrn" name="lrn">
+                                        <input type="text" class="form-control" id="lrn" name="lrn" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid LRN.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="fname" class="form-label">First Name</label>
-                                        <input type="text" class="form-control" id="fname" name="fname">
+                                        <input type="text" class="form-control" id="fname" name="fname" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a first name.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="lname" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" id="lname" name="lname">
+                                        <input type="text" class="form-control" id="lname" name="lname" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a last name.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="address" class="form-label">Address</label>
-                                        <input type="text" class="form-control" id="address" name="address">
+                                        <input type="text" class="form-control" id="address" name="address" required>
+                                        <div class="invalid-feedback">
+                                            Please provide an address.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="birthday" class="form-label">Birthday</label>
-                                        <input type="date" class="form-control" id="birthday" name="birthday">
+                                        <input type="date" class="form-control" id="birthday" name="birthday" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a birthday.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="age" class="form-label">Age</label>
-                                        <input type="number" class="form-control" id="age" name="age">
+                                        <input type="number" class="form-control" id="age" name="age" required>
+                                        <div class="invalid-feedback">
+                                            Please provide an age.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-12 mb-3">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email">
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid email address.
+                                        </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-block">Create Account</button>
-                                </form>
-            
-                                <!-- Librarian Form -->
-                                <form id="librarian-form" method="post" action="{% url 'create_librarian' %}">
-                                    {% csrf_token %}
-                                    <!-- Your Librarian form fields here -->
-                                    <div class="mb-3">
-                                        <label for="Username" class="form-label">Username</label>
-                                        <input type="text" class="form-control" id="username" name="Username">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Create Account</button>
+                            </form>
+    
+                            <!-- Librarian Form -->
+                            <form id="librarian-form" method="post" action="{% url 'create_librarian' %}" class="d-none">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="username" name="Username" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a username.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="fname" class="form-label">First Name</label>
-                                        <input type="text" class="form-control" id="fname" name="fname">
+                                        <input type="text" class="form-control" id="fname" name="fname" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a first name.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="lname" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" id="lname" name="lname">
+                                        <input type="text" class="form-control" id="lname" name="lname" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a last name.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
+                                    <div class="col-md-6 mb-3">
                                         <label for="email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="email" name="email">
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid email address.
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="Bday" class="form-label">Birthday</label>
-                                        <input type="date" class="form-control" id="bday" name="Bday">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="bday" class="form-label">Birthday</label>
+                                        <input type="date" class="form-control" id="bday" name="Bday" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a birthday.
+                                        </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary btn-block">Create Librarian</button>
-                                </form>
-                            </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">Create Librarian</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+    
+    <script>
+        function toggleForm() {
+            var role = document.getElementById('role').value;
+            var studentForm = document.getElementById('student-form');
+            var librarianForm = document.getElementById('librarian-form');
+    
+            if (role === 'Student') {
+                studentForm.classList.remove('d-none');
+                librarianForm.classList.add('d-none');
+            } else if (role === 'Librarian') {
+                studentForm.classList.add('d-none');
+                librarianForm.classList.remove('d-none');
+            }
+        }
+    
+        // Initialize form visibility based on the selected role
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleForm();
+        });
+    </script>
     <!-- /Page Content -->
     <div id="csv-section">
         <form method="post" enctype="multipart/form-data" action="{% url 'import_csv' %}">
@@ -540,24 +728,7 @@
             }
         });
 
-        function toggleForm() {
-            var role = document.getElementById('role').value;
-            var studentForm = document.getElementById('student-form');
-            var librarianForm = document.getElementById('librarian-form');
-
-            if (role === 'Student') {
-                studentForm.style.display = 'block';
-                librarianForm.style.display = 'none';
-            } else if (role === 'Librarian') {
-                studentForm.style.display = 'none';
-                librarianForm.style.display = 'block';
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            toggleForm(); // Call once to set the initial state
-        });
-
+      
 
         const ebook_titles = {{ ebook_titles|safe }};
         const times_borrowed = {{ borrow|safe }};
@@ -594,3 +765,4 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+{%endif%}
