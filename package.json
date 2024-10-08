@@ -1,0 +1,5 @@
+{
+    "scripts": {
+      "vercel-build": "pip install django-import-export"
+    }
+  }
