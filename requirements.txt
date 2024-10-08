@@ -33,4 +33,3 @@ tzdata==2024.1
 urllib3==2.2.3
 vercel==0.2.1
 virtualenv==20.25.1
-django-import-export==4.1.1
