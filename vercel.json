@@ -13,5 +13,13 @@
       "dest": "storefront/wsgi.py"
     }
   ],
-  
+  "build": {
+    "env": {
+      "PIP_NO_CACHE_DIR": "false"
+    },
+    "commands": [
+      "pip install -r requirements.txt",
+      "pip list"
+    ]
+  }
 }
