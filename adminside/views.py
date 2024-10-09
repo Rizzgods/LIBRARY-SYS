@@ -382,6 +382,10 @@ def user_logged_out_handler(sender, request, user, **kwargs):
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import logout
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse
 
 @csrf_exempt
 def toggle_user_status(request):
@@ -394,3 +398,8 @@ def toggle_user_status(request):
     return JsonResponse({'status': 'error'}, status=400)
 
 
+def logout_user(request):
+    logout(request)
+    messages.success(request, ("You were Logged Out!"))
+    url = reverse('login_user')
+    return redirect(url)
