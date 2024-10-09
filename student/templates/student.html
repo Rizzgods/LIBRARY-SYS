@@ -436,7 +436,9 @@
     .dropdown{
         z-index: 2;
     }
-
+    a:hover{
+        color: black;
+    }
     
     
     @keyframes slideInSidebar {
@@ -656,7 +658,7 @@
                 } else if (notificationType === 'declined') {
                     requestType = 'declined';
                 }
-                window.location.href = "{% url 'request_history' %}?requestType=" + requestType;
+                window.location.href = "{% url 'borrowed_books' %}?requestType=" + requestType;
             });
         }
     

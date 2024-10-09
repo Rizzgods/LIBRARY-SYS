@@ -55,6 +55,9 @@
     }
     .card-text {
         color: #555;
+        padding: 0px 5px;
+        margin: 0px;
+        font-size: .8rem;
     }
     .card-footer {
         display: flex;
@@ -393,7 +396,7 @@
         }
         .card{
             max-width: 200px;
-            max-height: 430px;
+            max-height: 520px;
         }
         .modal-dialog{
             max-width: 80vw;
@@ -407,6 +410,9 @@
         }
         .footer-details li{
             font-weight: normal;
+        }
+        #li-dropdown{
+            max-width: 218px;
         }
      
     }
@@ -471,184 +477,37 @@
 
 {% block body %}
 {% load static %}
-<div class="container d-flex justify-content-center mt-5">
-    <h3 class="sections sec-mar">Borrowed Books</h3>
-    <div class="card">
-        {% if borrowed_books %}
-        <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ request.book.id }}">
-            {% for request in borrowed_books %}
-            <div class="col-sm-3 mb-4">
-                <div class="card">
-                    <a href="{% url 'prev_file' request.book.id  %}">
-                        <img class="borrowed-book-img" src="{{ request.book.BookImage.url }}" alt="{{ request.book.BookTitle }}">
-                    </a>
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{% url 'prev_file' request.book.id  %}">{{ request.book.BookTitle }}</a>
-                        </h5>
-                        <p class="card-text"><strong>Requested At:</strong> {{ request.requested_at }}</p>
-                        <p class="card-text"><strong>Approved At:</strong> {{ request.approved_at }}</p>
+<div class="d-flex justify-content-center">
+    <h3 class="fs-2 mb-4">Borrowed Books</h3>
+</div>
+    
+<div class="bookmark-content row">
+    {% if borrowed_books %}
+    {% for request in borrowed_books %}
+    <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ request.book.id }}">
+        <div class="card d-flex justify-content-center align-items-center">
+            <a href="{% url 'prev_file' request.book.id  %}">
+                <img class="card-img-top" src="{{ request.book.BookImage.url }}" alt="{{ request.book.BookTitle }}">
+            </a>
+            <div class="card-body">
+                <a href="{% url 'prev_file' request.book.id  %}">
+                    <h5 class="card-title p-0 m-0">
+                        {{ request.book.BookTitle }}
+                    </h5>
+                    <div class="d-flex flex-row justify-content-center align-items-center ">
+                    <p class="card-text"><strong>Requested At:</strong> <br/>{{ request.requested_at }}</p>
+                    <p class="card-text"><strong>Approved At:</strong> <br/>{{ request.approved_at }}</p>
                     </div>
-                </div>
+                </a>           
             </div>
-            {% endfor %}
         </div>
-        {% else %}
+    </div>
+    {% endfor %}
+</div> 
+    {% else %}
         <p class="text-center">Nothing to see here.</p>
-        {% endif %}
-    </div>
-</div>
+    {% endif %}
 
-
-
-<div class="bookmark-content row">
-    {% for book in all_books %}
-    <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ book.id }}">
-        <div class="card">
-            <span class="special" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
-                  data-title="{{ book.BookTitle }}"
-                  data-author="{{ book.Author }}"
-                  data-description="{{ book.Description }}"
-                  data-date="{{ book.Date }}"
-                  data-category="{{ book.Category.all|join:', ' }}"
-                  data-language="{{ book.Language }}"
-                  data-image="{{ book.BookImage.url }}"
-                  data-views="{{ book.PageViews }}"
-                  data-id="{{ book.id }}"
-                  data-available="{{ book.available|yesno:"true,false" }}">
-                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
-            </span>
-            <div class="card-body">
-                <h5 class="card-title">{{ book.BookTitle }}</h5>
-                <a class="bookmark-link" id="RemoveNotifBtn" data-book-id="{{ book.id }}"><span class="material-symbols-outlined bookmark-remove" >bookmark_remove</span></a>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<!-- Bookmark Section -->
-<div class="bookmark-head rpw">
-    <button id="unbookmark-all" class="btn-mdl Unbook-All-Btn col-1"><span class="material-symbols-outlined Unbook-Icon">delete</span></button>
-    <h1 class="bookmark-title col">Bookmarks</h1>
-    <div class="search-bar col-3">
-        <input type="text" id="bookmarkSearch" placeholder="Search bookmarked books..." class="form-control">
-    </div>    
-</div>
-
-<div class="bookmark-content row">
-    {% for book in all_books %}
-    <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ book.id }}">
-        <div class="card">
-            <span class="special" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
-                  data-title="{{ book.BookTitle }}"
-                  data-author="{{ book.Author }}"
-                  data-description="{{ book.Description }}"
-                  data-date="{{ book.Date }}"
-                  data-category="{{ book.Category.all|join:', ' }}"
-                  data-language="{{ book.Language }}"
-                  data-image="{{ book.BookImage.url }}"
-                  data-views="{{ book.PageViews }}"
-                  data-id="{{ book.id }}"
-                  data-available="{{ book.available|yesno:"true,false" }}">
-                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
-            </span>
-            <div class="card-body">
-                <h5 class="card-title">{{ book.BookTitle }}</h5>
-                <a class="bookmark-link" id="RemoveNotifBtn" data-book-id="{{ book.id }}"><span class="material-symbols-outlined bookmark-remove">bookmark_remove</span></a>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
-
-<!--Bookmark Removed Notification-->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="RemoveNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        <strong class="me-auto">Bookmark Removed</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        <p>Bookmark has been successfully removed.</p>
-      </div>
-    </div>
-</div>
-
-<!-- Remove All Bookmark Modal -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmation</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to unbookmark all books?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmUnbookmark">Unbookmark All</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="RemoveAll" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="toast-header">
-        <strong class="me-auto">Removed All Bookmarks</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-      <div class="toast-body">
-        <p>All bookmarks have been successfully removed.</p>
-      </div>
-    </div>
-</div>
-
-<!-- Modal Structure -->
-<div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header modalHeader">
-                <h5 class="modal-title">Book Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="book-info">
-                    <div class="book-img">
-                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
-                    </div>
-                    <div class="book-data">
-                        <div class="modal-book-text">
-                            <h4 id="modal-book-title" class="book-text text1"></h4>
-                            <h5 class="book-text text2"><strong>Author: </strong><a href="#" id="modal-book-author"></a></h5>
-                            <h6 class="book-text"><strong>Description: </strong><span id="modal-book-description"></span></h6>
-                        </div>
-                        <div class="book-details">
-                            <div class="wrap row">
-                                <p class="col-8"><strong>Date:</strong> <span id="modal-book-date"></span></p>
-                                <p class="col-8"><strong>Category:</strong> <span id="modal-book-category"></span></p>
-                            </div>
-                            <div class="wrap row">
-                                <p class="col-8"><strong>Language:</strong> <span id="modal-book-language"></span></p>
-                                <p class="col-8"><strong>Views:</strong> <span id="modal-book-views"></span></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer modalButtons">
-                <a href="#" id="modal-borrow-link" class="btn-mdl" data-approved="{{ approved_requested }}">
-                    <i class="fas fa-book"></i> Borrow
-                </a>
-                <a href="#" id="modal-preview-link" class="btn-mdl">
-                    <i class="fas fa-eye"></i> Preview
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block script %}
@@ -668,108 +527,6 @@
         offcanvasElement.addEventListener('show.bs.offcanvas', function() {
             sideBarElement.classList.add('show');
             mainContainer.classList.add('with-sidebar');
-        });
-
-        document.getElementById('bookmarkSearch').addEventListener('input', function () {
-            const searchQuery = this.value.toLowerCase();
-            const bookCards = document.querySelectorAll('.bookmark-content .col-sm-3.mb-4');
-
-            bookCards.forEach(function (card) {
-                const bookTitle = card.querySelector('.card-title').textContent.toLowerCase();
-
-                if (bookTitle.includes(searchQuery)) {
-                    card.style.display = '';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var bookDetailModal = document.getElementById('bookDetailModal');
-            var loadingSpinner = document.getElementById('loading-spinner');
-
-            bookDetailModal.addEventListener('show.bs.modal', function(event) {
-                var button = event.relatedTarget;
-                var title = button.getAttribute('data-title');
-                var author = button.getAttribute('data-author');
-                var description = button.getAttribute('data-description');
-                var date = button.getAttribute('data-date');
-                var category = button.getAttribute('data-category');
-                var language = button.getAttribute('data-language');
-                var image = button.getAttribute('data-image');
-                var views = button.getAttribute('data-views');
-                var id = button.getAttribute('data-id');
-
-                // Get the available status
-                var available = button.getAttribute('data-available');
-
-                // Update the modal's content
-                var modalTitle = bookDetailModal.querySelector('#modal-book-title');
-                var modalAuthor = bookDetailModal.querySelector('#modal-book-author');
-                var modalDescription = bookDetailModal.querySelector('#modal-book-description');
-                var modalDate = bookDetailModal.querySelector('#modal-book-date');
-                var modalCategory = bookDetailModal.querySelector('#modal-book-category');
-                var modalLanguage = bookDetailModal.querySelector('#modal-book-language');
-                var modalViews = bookDetailModal.querySelector('#modal-book-views');
-                var modalImage = bookDetailModal.querySelector('#modal-book-image');
-                var modalBorrowLink = bookDetailModal.querySelector('#modal-borrow-link');
-
-                modalTitle.textContent = title;
-                modalAuthor.textContent = author;
-                modalDescription.textContent = description;
-                modalDate.textContent = date;
-                modalCategory.textContent = category;
-                modalLanguage.textContent = language;
-                modalViews.textContent = views;
-                modalImage.src = image;
-
-                // Set the borrow link
-               
-                modalBorrowLink.setAttribute('data-approved', available);
-            });
-
-            // Unbookmark a book
-            const removeBookmarkButtons = document.querySelectorAll('.bookmark-remove');
-
-            removeBookmarkButtons.forEach(button => {
-                button.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const bookId = this.getAttribute('data-book-id');
-
-                    // Remove the card from the DOM
-                    const bookCard = document.getElementById(`book-card-${bookId}`);
-                    bookCard.remove();
-
-                    // Show the notification
-                    const toast = document.getElementById('RemoveNotif');
-                    const bsToast = new bootstrap.Toast(toast);
-                    bsToast.show();
-                });
-            });
-
-            // Unbookmark all books
-            document.getElementById('unbookmark-all').addEventListener('click', function () {
-                // Show confirmation modal
-                var confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
-                confirmModal.show();
-            });
-
-            // Handle confirmation to unbookmark all
-            document.getElementById('confirmUnbookmark').addEventListener('click', function () {
-                const allBookCards = document.querySelectorAll('.bookmark-content .bookmark-card');
-
-                allBookCards.forEach(card => {
-                    card.remove();
-                });
-
-                const toast = document.getElementById('RemoveAll');
-                const bsToast = new bootstrap.Toast(toast);
-                bsToast.show();
-
-                var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-                confirmModal.hide();
-            });
         });
     });
 </script>
