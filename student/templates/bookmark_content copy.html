@@ -328,16 +328,6 @@
         flex-grow: 1;
         margin-right: 10px;
       }
-      .dropdown-menu.show {
-        transform: scaleY(0);
-        opacity: 1;
-        transform: translate(0px, 0px);
-        width: 218px;
-        background-color: transparent;
-        border: none;
-        position: relative;
-        padding: 0;
-      }
       
       @media (max-width: 1200px) {
         .main-container {
@@ -455,14 +445,14 @@
 
 {% block nav %}
 <a href="{% url 'view' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
-<a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
+<a href="{% url 'bookmark' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
 <a href="{% url 'change-password' %}" target="_blank" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>Change Password</li></a>
 <li id="li-dropdown"><div>
     <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
         <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
     </button>
-    <ul class="dropdown-menu animate-dropdown show">
-        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li class="active"><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
+    <ul class="dropdown-menu animate-dropdown">
+        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
         <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
     </ul>
   </div>
@@ -472,59 +462,34 @@
 {% block body %}
 {% load static %}
 <div class="container d-flex justify-content-center mt-5">
-    <h3 class="sections sec-mar">Borrowed Books</h3>
     <div class="card">
+        <h3 class="sections sec-mar">Borrowed Books</h3>
+        <hr>
         {% if borrowed_books %}
-        <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ request.book.id }}">
-            {% for request in borrowed_books %}
-            <div class="col-sm-3 mb-4">
-                <div class="card">
-                    <a href="{% url 'prev_file' request.book.id  %}">
-                        <img class="borrowed-book-img" src="{{ request.book.BookImage.url }}" alt="{{ request.book.BookTitle }}">
-                    </a>
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="{% url 'prev_file' request.book.id  %}">{{ request.book.BookTitle }}</a>
-                        </h5>
-                        <p class="card-text"><strong>Requested At:</strong> {{ request.requested_at }}</p>
-                        <p class="card-text"><strong>Approved At:</strong> {{ request.approved_at }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Book Cover</th>
+                    <th>Book Title</th>
+                    <th>Requested At</th>
+                    <th>Approved At</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in borrowed_books %}
+                <tr>
+                    <td class="img-table"><a href="{% url 'prev_file' request.book.id  %}"><img class="borrowed-book-img" src="{{ request.book.BookImage.url }}"></a></td>
+                    <td class="borrowed-book-title"><a href="{% url 'prev_file' request.book.id  %}">{{ request.book.BookTitle }}</a></td>
+                    <td>{{ request.requested_at }}</td>
+                    <td>{{ request.approved_at }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% else %}
         <p class="text-center">Nothing to see here.</p>
         {% endif %}
     </div>
-</div>
-
-
-
-<div class="bookmark-content row">
-    {% for book in all_books %}
-    <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ book.id }}">
-        <div class="card">
-            <span class="special" data-bs-toggle="modal" data-bs-target="#bookDetailModal"
-                  data-title="{{ book.BookTitle }}"
-                  data-author="{{ book.Author }}"
-                  data-description="{{ book.Description }}"
-                  data-date="{{ book.Date }}"
-                  data-category="{{ book.Category.all|join:', ' }}"
-                  data-language="{{ book.Language }}"
-                  data-image="{{ book.BookImage.url }}"
-                  data-views="{{ book.PageViews }}"
-                  data-id="{{ book.id }}"
-                  data-available="{{ book.available|yesno:"true,false" }}">
-                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
-            </span>
-            <div class="card-body">
-                <h5 class="card-title">{{ book.BookTitle }}</h5>
-                <a class="bookmark-link" id="RemoveNotifBtn" data-book-id="{{ book.id }}"><span class="material-symbols-outlined bookmark-remove" >bookmark_remove</span></a>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
 </div>
 
 <!-- Bookmark Section -->
@@ -725,7 +690,7 @@
                 modalImage.src = image;
 
                 // Set the borrow link
-               
+                modalBorrowLink.href = "{% url 'borrow' 0 %}".replace('0', id);
                 modalBorrowLink.setAttribute('data-approved', available);
             });
 
@@ -773,5 +738,4 @@
         });
     });
 </script>
-
 {% endblock %}
