@@ -2225,7 +2225,11 @@
                     $(targetModal).on('shown.bs.modal', function() {
                         hideSpinner();
                     });
-                } else {
+                    // Hide spinner on modal close
+                    $(targetModal).on('hidden.bs.modal', function() {
+                        hideSpinner();
+                    });
+                } else if (!this.classList.contains('view-btn')) {
                     // Otherwise, show the spinner and hide it after form submission or AJAX completion
                     showSpinner();
                 }
