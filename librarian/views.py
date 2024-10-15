@@ -28,11 +28,18 @@ def main(request):
     declined_requests = DeclinedRequest.objects.all()
     books_to_be_returned = Out.objects.all()
     
+    #homepagestatistics
+    total_books = books.count()
+    pending_borrow_requests = BorrowRequest.objects.filter(expires_at__gt=timezone.now()).count()
+    current_date = timezone.now()
+    start_of_month = current_date.replace(day=1)
+    books_added_this_month = Books.objects.filter(Date__gte=start_of_month).count()
+    recently_deleted_books_count = Books.objects.filter(deleted_at__isnull=False).count()
+
     book_status_approved_requests = ApprovedRequest.objects.filter(book__research_paper=False)
     book_status_books_to_be_returned = Out.objects.filter(book__research_paper=False)
     return_logs = ReturnLog.objects.all().order_by('-returnLogTime')
     language_choices = LANGUAGE_CHOICES
-
     years = Books.objects.annotate(year=ExtractYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
 
     if request.method == 'POST':
@@ -140,6 +147,10 @@ def main(request):
         'book_status_books_to_be_returned': book_status_books_to_be_returned,
         'return_logs': return_logs,
         'subsections': subsections,
+        'total_books': total_books,
+        'pending_borrow_requests': pending_borrow_requests,
+        'books_added_this_month': books_added_this_month,
+        'recently_deleted_books_count': recently_deleted_books_count,
     }
     return render(request, 'main.html', context)
 
@@ -389,6 +400,34 @@ def my_view(request):
     
 def go_back(request):
     return redirect('main') 
+
+
+@login_required
+def borrow_request_view(request):
+    # Fetch pending requests, ordered by the 'requested_at' field in descending order
+    pending_requests = BorrowRequest.objects.filter(requested_by=request.user).order_by('-requested_at')
+    
+    # Fetch approved requests, ordered by the 'approved_at' field in descending order
+    approved_requests = ApprovedRequest.objects.filter(requested_by=request.user).order_by('-approved_at')
+    
+    # Fetch declined requests, ordered by the 'declined_at' field in descending order
+    declined_requests = DeclinedRequest.objects.filter(requested_by=request.user).order_by('-declined_at')
+
+    # Handle expired requests in pending requests
+    for pending_request in pending_requests:
+        if pending_request.is_expired() and pending_request.status != 'Expired':
+            pending_request.status = 'Expired'
+            pending_request.save()
+
+    context = {
+        'pending_requests': pending_requests,
+        'approved_requests': approved_requests,
+        'declined_requests': declined_requests,
+    }
+
+    return render(request, 'borrow_request_table.html', context)
+
+
 
 
 from django.http import JsonResponse

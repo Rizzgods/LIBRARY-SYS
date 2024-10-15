@@ -143,13 +143,13 @@
         display: flex;
         flex-direction: column;
         justify-content: start;
-        align-item: center;
+        align-items: center;
         background-color: rgb(74, 128, 210);
         position: fixed;
         width: 250px;
         height: 95vh;
         padding-bottom: 10vh;
-        z-index: 1;
+        z-index: -1;
         animation: slideOutSidebar .1s ease forwards;
     }
     .side-bar.show {
@@ -325,13 +325,10 @@
         cursor: pointer
     }
     a{
-        text-decoration: none;
+        text-decoration: none !important;
         color: black;
         transition: color .2s
     }
-    {% comment %} a:hover{
-        color: lightgray;
-    } {% endcomment %}
     .top-bar{
         display: flex;
         justify-content: space-between;
@@ -393,6 +390,9 @@
     .item:hover{
         transform: translateY(-10px);
     }
+    .offcanvas{
+        z-index: 1;
+    }
     .offcanvas-start{
         height: 0%;
     }
@@ -427,7 +427,7 @@
     }
     .notif-btn{
         color: rgb(73, 110, 232);
-        text-decoration: none;
+        text-decoration: none !important; 
         font-weight: bold
       }
       .notif-btn:hover{
@@ -436,7 +436,9 @@
     .dropdown{
         z-index: 2;
     }
-
+    a:hover{
+        color: black;
+    }
     
     
     @keyframes slideInSidebar {
@@ -656,7 +658,7 @@
                 } else if (notificationType === 'declined') {
                     requestType = 'declined';
                 }
-                window.location.href = "{% url 'request_history' %}?requestType=" + requestType;
+                window.location.href = "{% url 'borrowed_books' %}?requestType=" + requestType;
             });
         }
     
