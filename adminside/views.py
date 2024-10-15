@@ -24,6 +24,9 @@ from io import TextIOWrapper  # Add this import
 from librarian.models import Books, Category, SubCategory
 
 def batch_upload_view(request):
+    if not request.user.is_authenticated or not user_is_schoolAdmin(request.user):
+        return redirect('login_user')
+
     if request.method == 'POST':
         csv_file = request.FILES.get('csvFile')
         files = request.FILES.getlist('fileFolder')
@@ -158,6 +161,74 @@ def user_is_schoolAdmin(user):
 
 
 def book_page_views(request):
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return redirect('login_user')
+
+    # Retrieve all books and sort them by page views in descending order
+    books = Books.objects.all().order_by('-PageViews')[:10]
+    
+    # Retrieve top eBooks sorted by times borrowed in descending order
+    top_books = Books.objects.filter(eBook=True).order_by('-TimesBorrow')[:4]
+    
+    # Retrieve all eBooks
+    ebook = Books.objects.filter(eBook=True)
+
+    # Extract necessary data (book titles and times borrowed)
+    ebook_titles = [book.BookTitle for book in ebook]
+    times_borrowed = [book.TimesBorrow for book in top_books]
+
+    # Get the most recent user activity for each user
+    latest_user_activities = UserActivity.objects.filter(
+        active=True
+    ).values('user').annotate(
+        latest_activity=Max('login_time')
+    )
+    
+    # Retrieve the user activities corresponding to the most recent login time
+    user_activities = UserActivity.objects.filter(
+        active=True,
+        login_time__in=[activity['latest_activity'] for activity in latest_user_activities]
+    )
+    
+    # Calculate the count of distinct users who logged in this month
+    current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    next_month_start = (current_month_start + timezone.timedelta(days=31)).replace(day=1)
+    distinct_users_count_this_month = UserActivity.objects.filter(
+        login_time__gte=current_month_start,
+        login_time__lt=next_month_start
+    ).values('user').distinct().count()
+
+    # Extract book titles and page views
+    book_titles = [book.BookTitle for book in books]
+    page_views = [book.PageViews for book in books]
+
+    # Extract top eBook titles and times borrowed
+    ebook_titles = [book.BookTitle for book in top_books]
+    borrow = [book.TimesBorrow for book in top_books]
+
+    # Calculate total number of students and librarians
+    student_total = Account.objects.distinct().count()
+    lib_total = Librarian.objects.distinct().count()
+    user_total = student_total + lib_total
+
+    # Retrieve all user logs and users
+    user_logs = UserActivity.objects.all()
+    users = User.objects.all()
+
+    # Render the template with the necessary data
+    return render(request, 'book_page_views.html', {
+        'book_titles': book_titles, 
+        'page_views': page_views, 
+        'user_activities': user_activities, 
+        'distinct_users_count_this_month': distinct_users_count_this_month,
+        'user_total': user_total,
+        'user_logs': user_logs,
+        'users': users,
+        'times_borrowed': times_borrowed,
+        'ebook_titles': ebook_titles,
+        'borrow': borrow,
+    })
     # Retrieve all books and sort them by page views in descending order
     books = Books.objects.all().order_by('-PageViews')[:10]
     
@@ -311,6 +382,10 @@ def user_logged_out_handler(sender, request, user, **kwargs):
 from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import logout
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse
 
 @csrf_exempt
 def toggle_user_status(request):
@@ -323,3 +398,8 @@ def toggle_user_status(request):
     return JsonResponse({'status': 'error'}, status=400)
 
 
+def logout_user(request):
+    logout(request)
+    messages.success(request, ("You were Logged Out!"))
+    url = reverse('login_user')
+    return redirect(url)
