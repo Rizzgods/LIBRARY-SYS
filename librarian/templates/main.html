@@ -866,7 +866,7 @@
                             <th>Author</th>
                             <th>Date</th>
                             <th>Category</th>
-                            <th>Sub-Category</th>
+                            <th>Dewey Decimal</th>
                             <th>Language</th>
                             <th>File Type</th>
                             <th>Stock</th>
@@ -886,8 +886,8 @@
                                         {% endfor %}
                                     </td>
                                     <td>
-                                        {% for subcategory in book.SubCategory.all %}
-                                            {{ subcategory.name }}{% if not forloop.last %}, {% endif %}
+                                        {% for subsection in book.SubSection.all %}
+                                            {{ subsection.code }}{% if not forloop.last %}, {% endif %}
                                         {% endfor %}
                                     </td>
                                     <td>{{ book.Language }}</td>
