@@ -68,7 +68,6 @@ MIDDLEWARE = [
     'librarian.middleware.HandleNoReverseMatchMiddleware',
     'student.middleware.InactivityLogoutMiddleware',
     'student.middleware.HandleNoReverseMatchMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
    
     
