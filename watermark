@@ -1,0 +1,4 @@
+<div class="watermark">PROPERTY OF LAWANG BATO NATIONAL HIGHSCHOOL</div>
+                    <div class="watermark">
+                        <img src="{% static '/LOGO.png' %}" alt="Watermark Logo" style="opacity: 0.1; width: 500px; height: auto;">
+                    </div>

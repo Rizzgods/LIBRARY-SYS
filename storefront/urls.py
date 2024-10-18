@@ -30,6 +30,7 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path('userauth/', include('userauth.urls')),
     path('adminside/',include('adminside.urls')),
+    path('StudentMobile/',include('StudentMobile.urls')),
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
