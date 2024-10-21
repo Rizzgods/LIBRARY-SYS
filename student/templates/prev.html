@@ -571,6 +571,12 @@
             margin-right: 50px;
         }
 
+        @media(max-width: 800px){
+            #speaker-control{
+                width: 120%;
+            }
+        }
+
 
     </style>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -640,18 +646,17 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-7">
-                        <span id="page-counter" aria-live="polite"></span>
-                        <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
-                    </div>
+                    
                 </div>
-            </div>
-            <div>
             </div>
             <div class="static-div">
                 <button onclick="nextPage()" class="nav-arrow"><span class="material-symbols-outlined">arrow_forward_ios</span></button>
+            </div>
         </div>
-    </div>
+        <div class="d-flex f-direction-row">
+            <span id="page-counter" aria-live="polite"></span>
+            <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
+        </div>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>

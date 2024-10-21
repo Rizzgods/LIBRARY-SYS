@@ -45,6 +45,7 @@
     }
     .card:hover {
         transform: translateY(-10px);
+        z-index: 1;
     }
     .card-img-top {
         border-top-left-radius: 10px;
@@ -328,6 +329,14 @@
         flex-grow: 1;
         margin-right: 10px;
       }
+      .book-img{
+        display:flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+
       
       @media (max-width: 1200px) {
         .main-container {
@@ -363,7 +372,6 @@
             position: fixed;
             left: 0;
             top: 0;
-            z-index: 1; /* Ensure it overlays on top of the content */
             transform: translateX(-100%); /* Initially off-screen */
             transition: transform 0.3s ease; /* Smooth transition */
         }
@@ -381,10 +389,10 @@
             flex:1;
             max-width: 100vw;
         }
-        .card{
-            max-width: 200px;
-            max-height: 430px;
+        .card-img-top{
+            width:100%;
         }
+      
         .modal-dialog{
             max-width: 80vw;
         }
@@ -397,6 +405,22 @@
         }
         .footer-details li{
             font-weight: normal;
+        }
+        .modal-content{
+            width: 100%;
+        }
+        .book-info{
+            flex-direction: column;
+        }
+        .text1{
+            margin: 0;
+        }
+        .btn-mdl{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            gap: 10px;
         }
      
     }
@@ -420,7 +444,6 @@
             position: fixed;
             left: 0;
             top: 0;
-            z-index: 1; /* Ensure it overlays on top of the content */
             transform: translateX(-100%); /* Initially off-screen */
             transition: transform 0.3s ease; /* Smooth transition */
         }
@@ -437,6 +460,51 @@
             display: flex;
             flex:1;
             max-width: 100vw;
+        }
+        
+    }
+    @media(max-width: 570px){
+        .modal-content{
+            width: 117%;
+        }
+        .book-info{
+            flex-direction: column;
+        }
+        .text1{
+            margin: 0;
+        }
+        .modalButtons{
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            grid-template-areas:
+            "borrow preview"
+            "bookmark generate-citation";
+        }
+        #modal-borrow-link{
+            grid-area: borrow;
+        }
+        #modal-preview-link{
+            grid-area: preview;
+            margin-right: 10px;
+        }
+        #modal-bookmark-link{
+            grid-area: bookmark;
+            margin-left: 10px;
+        }
+        #generate-citaion{
+            grid-area: generate-citation;
+        }
+        .form-control{
+            width: 100px;
+        }
+        .card-img-top{
+            width:100%;
+        }
+        .card{
+            max-width: inherit;
+        }
+        .notification-icon {
+            margin-right: 20px;
         }
     }
     
