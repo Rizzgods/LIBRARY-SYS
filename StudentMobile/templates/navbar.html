@@ -12,23 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="{% static 'mobile/home.css' %}">
-    <style>
-        #info_content .card-img-top {
-            width: 100%;
-            height: auto;
-            object-fit: contain;
-        }
-        .navbar.fixed-bottom {
-            padding: 10px 0;
-        }
-        .navbar .nav-link {
-            padding: 15px;
-            font-size: 1.5rem;
-        }
-        .navbar .nav-link i {
-            font-size: 2rem;
-        }
-    </style>
 </head>
 <body class="bg-light">
     <header class="header">
@@ -44,10 +27,10 @@
             {% include 'bookmark_data.html' %}
         </div>
         <div id="history_content" class="content-section hidden">
-            history
+            {% include 'history.html' %}
         </div>
         <div id="settings_content" class="content-section hidden">
-            settings
+            {%include 'settings.html'%}
         </div>
         <div id="info_content" class="content-section hidden">
             <div class="container mt-4">

@@ -1,13 +1,20 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-from librarian.models import Books
+from librarian.models import ApprovedRequest, Books
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from student.forms import PasswordChangeForm
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.contrib.auth import update_session_auth_hash
+
 
 def home(request):
     all_books = Books.objects.all()
     ebooks = Books.objects.filter(eBook=True)
     research_papers = Books.objects.filter(research_paper=True)
     bookmarked_books = Books.objects.filter(bookmarked_by=request.user)
+    borrowed_books = ApprovedRequest.objects.filter(requested_by=request.user)
     
     categories = {
         'Generalities': Books.objects.filter(Category__name='Generalities'),
@@ -28,6 +35,7 @@ def home(request):
         'research_papers': research_papers,
         'categories': categories,
         'bookmarked_books': bookmarked_books,
+        'borrowed_books': borrowed_books,
     }
     return render(request, 'navbar.html', context)
 
@@ -63,3 +71,23 @@ def toggle_bookmark(request, book_id):
             'isBookmarked': is_bookmarked,
         }
         return JsonResponse({'book': book_data})
+    
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important to keep the user logged in
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('home')  # Redirect to home or any other page
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'settings.html', {
+        'form': form,
+        'user': request.user
+    })
