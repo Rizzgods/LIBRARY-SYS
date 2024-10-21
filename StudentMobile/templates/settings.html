@@ -1,0 +1,43 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" action="{% url 'change_password' %}">
+                        {% csrf_token %}
+                        <div class="mb-3 d-flex align-items-center">
+                            <h5 class="me-2 mb-0">Username:</h5>
+                            <h1 class="mb-0 fs-4">{{ user.username }}</h1>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_old_password" class="form-label">Old Password</label>
+                            <input type="password" class="form-control" id="id_old_password" name="old_password" required>
+                            {% if form.old_password.errors %}
+                                <div class="text-danger">{{ form.old_password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_new_password1" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="id_new_password1" name="new_password1" required>
+                            {% if form.new_password1.errors %}
+                                <div class="text-danger">{{ form.new_password1.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_new_password2" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="id_new_password2" name="new_password2" required>
+                            {% if form.new_password2.errors %}
+                                <div class="text-danger">{{ form.new_password2.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn w-100" style="background-color: rgb(74, 128, 210); color: white;">Change Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

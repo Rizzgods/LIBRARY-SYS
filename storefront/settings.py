@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'student',
     'adminside',
     'import_export',
+    'StudentMobile',
 ]
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
@@ -67,9 +68,12 @@ MIDDLEWARE = [
     'librarian.middleware.HandleNoReverseMatchMiddleware',
     'student.middleware.InactivityLogoutMiddleware',
     'student.middleware.HandleNoReverseMatchMiddleware',
+    'django.middleware.common.CommonMiddleware',
    
     
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 SESSION_COOKIE_AGE = 30 * 60  # 30 minutes
 SESSION_SAVE_EVERY_REQUEST = True
@@ -180,5 +184,10 @@ LOGIN_URL = 'user-login'
 
 VIEW_COUNT_SESSION_KEY = 'book_view_count'
 
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = 'user-login'
+VIEW_COUNT_SESSION_KEY = 'book_view_count'
 # settings.py
 

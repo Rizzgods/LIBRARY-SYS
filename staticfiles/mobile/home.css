@@ -1,0 +1,45 @@
+.header {
+    background-color: rgb(74, 128, 210);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.header .logo {
+    height: 50px;
+}
+.navbar.fixed-bottom {
+    padding: 5px 0;
+}
+
+.navbar .nav-link {
+    padding: 10px;
+    font-size: 1.5rem;
+}
+
+.navbar .nav-link i {
+    font-size: 1.5rem;
+}
+.card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.card-body {
+    position: relative;
+    overflow: hidden;
+}
+.card-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    padding: 0 10px; /* Add padding to the title */
+}
+.container {
+    padding-bottom: 80px; /* Add padding to the bottom to avoid overlap with the navbar */
+}
+.hidden {
+    display: none;
+}
+        

@@ -1,0 +1,19 @@
+{% load static %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Bookmarks</h1>
+    <div class="row mt-3">
+        {% for book in bookmarked_books %}
+        <div class="col-6 col-md-4 col-lg-3 mb-3">
+            <div class="card h-100" data-book-id="{{ book.id }}">
+                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
+                <div class="card-body">
+                    <h6 class="card-title">{{ book.BookTitle }}</h6>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-center">No bookmarked books available.</p>
+        {% endfor %}
+    </div>
+</div>

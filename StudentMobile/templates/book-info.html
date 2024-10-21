@@ -1,0 +1,21 @@
+{% extends 'navbar.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
+        <div class="card-body">
+            <div class="d-flex justify-content-around mb-3">
+                <button class="btn btn-primary">Bookmark</button>
+                <button class="btn btn-secondary">View</button>
+            </div>
+            <h5 class="title">{{ book.BookTitle }}</h5>
+            <p class="card-text"><strong>Author:</strong> {{ book.Author }}</p>
+            <p class="card-text"><strong>Date:</strong> {{ book.Date }}</p>
+            <p class="card-text"><strong>Description:</strong> {{ book.Description }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
