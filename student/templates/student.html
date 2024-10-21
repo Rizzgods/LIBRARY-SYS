@@ -424,9 +424,7 @@
         list-style: none;
         gap: 30px
     }
-    .footer-details li{
-        font-weight: bold;
-    }
+   
     .notif-btn{
         color: rgb(73, 110, 232);
         text-decoration: none !important; 
@@ -490,30 +488,39 @@
         width: 35px;
     }
 
+    @media (max-width: 1500px) {
+        .first-footer-text{
+            font-weight: 400;
+            font-size: .8rem;
+        }
+    }
 
     @media (max-width: 768px) {
-        .second-footer {
-            flex-direction: column;
-            gap: 10px;
+        .content{
+            margin-bottom: 60px !important;
         }
         .second-footer .fb-logo, .second-footer .loc-logo {
             width: 30px;
         }
         .second-footer .footer-text {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-align: center;
         }
-    }
-
-    @media (max-width: 480px) {
-        .second-footer .fb-logo, .second-footer .loc-logo {
-            width: 25px;
+        .footer-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Adjust the number of columns as needed */
+            gap: 10px;
         }
-        .second-footer .footer-text {
-            font-size: 0.8rem;
+        .dropdown-item-list{
+            padding-left: 10px;
+        }
+        .dropdown{
+            width: 500px;
+        }
+        .dropdown-item{
+            text-wrap: wrap;
         }
     }
-    
     @media (max-width: 530px) {
         .fb-logo{
             width: 35px;
@@ -524,8 +531,16 @@
         .notification-icon {
             margin-right: 20px;
         }
+        .dropdown-item-list{
+            padding-left: 10px;
+        }
+        .dropdown{
+            width: 400px;
+        }
+        .dropdown-item{
+            text-wrap: wrap;
+        }
     }
-
 </style>
 
 {% block style %}
@@ -583,19 +598,19 @@
                 <ul class="footer-details">
                     <li>
                         <img src="{% static 'playground/email-icon.png' %}" width="35px"/>
-                        lawangbato.nhs@deped.gov.ph
+                        <span class="first-footer-text">lawangbato.nhs@deped.gov.ph</span>
                     </li>
                     <li>
                         <img src="{% static 'playground/call-icon.png' %}" width="20px"/>
-                        Admin: (02)8983-9321
+                        <span class="first-footer-text">Admin: (02)8983-9321</span>
                     </li>
                     <li>
-                        <img src="{% static 'playground/email-icon.png' %}" width="35px"/>
-                        lawangbato_nationalhighschool@yahoo.com
+                        <img src="{% static 'playground/email-icon.png' %}" width="35px"/>                        
+                        <span class="first-footer-text">lawangbato_nationalhighschool@yahoo.com</span>
                     </li>
                     <li>
-                        <img src="{% static 'playground/call-icon.png' %}" width="20px"/>
-                        Registrar: 09932737625
+                        <img src="{% static 'playground/call-icon.png' %}" width="20px"/>                        
+                        <span class="first-footer-text">Registrar: 09932737625</span>
                     </li>
                 </ul>
             </div>  
@@ -609,6 +624,7 @@
                     </a>
                 </div>
                 <span class="footer-text">© 2024 LBLIB | Lawang Bato National Highschool</span>
+                <button id="readMoreBtn" class="btn btn-link" style="display:none;">Read More</button>
                 <button id="toggleFooter" style="margin-top: 10px; border: none;"><span class="material-symbols-outlined" id="footer-btn">expand_circle_up</span></button>
             </div>
         </div>

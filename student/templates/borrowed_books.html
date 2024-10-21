@@ -21,7 +21,15 @@
         flex-direction: row;
     }
     .bookmark-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
         padding: 20px 50px;
+    }
+
+    .bookmark-card {
+        flex: 1 1 calc(25% - 20px); /* Adjust the percentage as needed */
+        box-sizing: border-box;
     }
     .container {
         padding: 20px;
@@ -341,6 +349,11 @@
         position: relative;
         padding: 0;
       }
+      .card:hover {
+        transform: translateY(-10px);
+        z-index: 1;
+    }
+    
       
       @media (max-width: 1200px) {
         .main-container {
@@ -407,11 +420,11 @@
             gap: 0px;
             padding-top: 0px;
         }
-        .footer-details li{
-            font-weight: normal;
-        }
         #li-dropdown{
             max-width: 218px;
+        }
+        .bookmark-card {
+            flex: 1 1 calc(33.33% - 20px); /* 3 cards per row */
         }
      
     }
@@ -426,8 +439,11 @@
         .bookmark-content{
             padding: 0px;
         }
+        .bookmark-card {
+            flex: 1 1 calc(50% - 20px); /* 2 cards per row */
+        }
     }
-    @media (max-width: 580px) {
+    @media (max-width: 600px) {
         .card-img-top{
             width:100%;
         }
@@ -436,6 +452,12 @@
         }
         .notification-icon {
             margin-right: 20px;
+        }
+        .bookmark-card {
+            flex: 1 1 calc(100% - 20px); /* 1 card per row */
+        }
+        .card:hover {
+            z-index: 0;
         }
     }
 
