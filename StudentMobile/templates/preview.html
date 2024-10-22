@@ -1,0 +1,123 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ book.BookTitle }} </title>
+
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'mobile/home.css' %}">
+
+    <style>
+        .zoom-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .zoom-controls button {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .zoom-controls button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <img src="{% static 'playground/Logo.png' %}" alt="Library Logo" class="logo">
+    </header>
+    <div class="container mt-4">
+        <!-- Page Header with Book Info -->
+        <div class="pdf-header">
+            <h3 class="display-4">{{ book.BookTitle }}</h3>
+            <p class="lead">{{ book.Author }} - {{ book.Date }}</p>
+        </div>
+
+        <!-- PDF Pages Displayed as Images -->
+        <div class="row" id="pdf-container">
+            {% for image_url in image_urls %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-body pdf-page">
+                            <img src="/{{ image_url }}" alt="PDF page {{ forloop.counter }}" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div class="zoom-controls">
+        <button id="zoom-in">Zoom In</button>
+        <button id="zoom-out">Zoom Out</button>
+    </div>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="{% static 'mobile/preview.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pdfContainer = document.getElementById('pdf-container');
+            let scale = 1;
+
+            // Zoom In and Zoom Out buttons
+            document.getElementById('zoom-in').addEventListener('click', function() {
+                scale += 0.1;
+                pdfContainer.style.transform = `scale(${scale})`;
+            });
+
+            document.getElementById('zoom-out').addEventListener('click', function() {
+                if (scale > 0.1) {
+                    scale -= 0.1;
+                    pdfContainer.style.transform = `scale(${scale})`;
+                }
+            });
+
+            // Finger zooming (pinch-to-zoom)
+            let initialDistance = null;
+
+            pdfContainer.addEventListener('touchstart', function(e) {
+                if (e.touches.length === 2) {
+                    initialDistance = getDistance(e.touches[0], e.touches[1]);
+                }
+            });
+
+            pdfContainer.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 2 && initialDistance) {
+                    const currentDistance = getDistance(e.touches[0], e.touches[1]);
+                    const scaleChange = currentDistance / initialDistance;
+                    scale *= scaleChange;
+                    pdfContainer.style.transform = `scale(${scale})`;
+                    initialDistance = currentDistance;
+                }
+            });
+
+            pdfContainer.addEventListener('touchend', function(e) {
+                if (e.touches.length < 2) {
+                    initialDistance = null;
+                }
+            });
+
+            function getDistance(touch1, touch2) {
+                const dx = touch2.clientX - touch1.clientX;
+                const dy = touch2.clientY - touch1.clientY;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+        });
+    </script>
+</body>
+</html>

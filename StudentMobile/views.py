@@ -91,3 +91,33 @@ def change_password(request):
         'form': form,
         'user': request.user
     })
+
+from pdf2image import convert_from_path
+import os
+
+def preview(request, book_id):
+    book = get_object_or_404(Books, id=book_id)
+
+    # Check if the book has a PDF file
+    if book.BookFile:
+        # Define a path to store the images (or you could use a temporary location)
+        output_folder = os.path.join('media', 'book_previews', f'book_{book_id}')
+        os.makedirs(output_folder, exist_ok=True)
+
+        # Convert PDF pages to images
+        pdf_path = book.BookFile.path
+        images = convert_from_path(pdf_path)
+
+        # Save each image and get the URLs
+        image_urls = []
+        for i, image in enumerate(images):
+            image_path = os.path.join(output_folder, f'page_{i + 1}.jpg')
+            image.save(image_path, 'JPEG')
+            image_urls.append(image_path)
+
+    context = {
+        'book': book,
+        'image_urls': image_urls
+    }
+
+    return render(request, 'preview.html', context)
