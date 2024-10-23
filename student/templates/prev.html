@@ -63,9 +63,9 @@
         }
         
         .content {
-            margin-top: 80px;
+            margin-top: 50px;
             grid-area: content;
-            postion: relative;
+            position: relative;
             display: flex;
             flex-direction: row;
             justify-content: center;
@@ -571,9 +571,9 @@
             margin-right: 50px;
         }
 
-        @media(max-width: 800px){
-            #speaker-control{
-                width: 120%;
+        @media(max-width: 1500px){
+            .content{
+                min-width: 1000px;
             }
         }
 
@@ -627,8 +627,8 @@
                         <button onclick="zoomOut()" class="button-design"><span class="material-symbols-outlined icons">zoom_out</span></button>
                     </div>
                 </div>
-                <div class="static-div page-count row">
-                    <div class="col">
+                <div class="static-div page-count row mt-2">
+                    <div class="col" style="max-width: 45%;">
                         <div id="speaker-controls">
                             <button onclick="readPage()" class="button-design" data-bs-toggle="tooltip" data-bs-placement="top"
                                 data-bs-custom-class="custom-tooltip"
@@ -646,17 +646,17 @@
                             </div>
                         </div>
                     </div>
-                    
+                    <div class="d-flex f-direction-row align-items-center col">
+                        <span id="page-counter" aria-live="polite" style="font-size: 1.8rem; vertical-align: text-bottom;"></span>
+                        <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)" style="font-size: 1.5rem; margin: 10px 0px 10px 10px ">
+                    </div>
                 </div>
             </div>
             <div class="static-div">
                 <button onclick="nextPage()" class="nav-arrow"><span class="material-symbols-outlined">arrow_forward_ios</span></button>
             </div>
         </div>
-        <div class="d-flex f-direction-row">
-            <span id="page-counter" aria-live="polite"></span>
-            <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
-        </div>
+       
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
