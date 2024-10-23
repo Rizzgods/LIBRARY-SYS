@@ -74,3 +74,49 @@
         max-width: 100%;
     }
 }
+
+/* Mobile-friendly styles for book-info page */
+.book-details-card {
+    margin-bottom: 20px;
+}
+
+.book-details-card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.book-body {
+    padding: 10px;
+}
+
+.book-body .btn-group {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.book-body .btn {
+    flex: 1;
+    margin: 0 5px;
+}
+
+.book-body h5 {
+    font-size: 1.25rem;
+    margin-top: 10px;
+}
+
+.book-body p {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+/* Ensure the navbar is locked in place */
+.navbar.fixed-bottom {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fff;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}

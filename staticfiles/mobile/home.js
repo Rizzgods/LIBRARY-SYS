@@ -9,10 +9,10 @@ $(document).ready(function(){
         ],
         responsive: {
             0: {
-                items: 2
+                items: 2.5
             },
             600: {
-                items: 2
+                items: 2.5
             },
             1000: {
                 items: 5
@@ -82,6 +82,13 @@ $(document).ready(function(){
         document.querySelector('#info_content .author').textContent = `Author: ${bookInfo.Author}`;
         document.querySelector('#info_content .date').textContent = `Date: ${bookInfo.Date}`;
         document.querySelector('#info_content .description').textContent = `Description: ${bookInfo.Description}`;
+        
+
+        const viewButton = document.querySelector('#info_content .view-button');
+        viewButton.setAttribute('data-book-id', bookInfo.id);
+        viewButton.addEventListener('click', function() {
+            redirectToPreview(this);
+        });
 
         const bookmarkButton = document.querySelector('#info_content .bookmark-button');
         if (bookInfo.isBookmarked) {
@@ -95,6 +102,14 @@ $(document).ready(function(){
         bookmarkButton.addEventListener('click', function() {
             toggleBookmark(bookInfo.id);
         });
+    }
+
+    function redirectToPreview(button) {
+        // Retrieve the book ID from the data attribute of the button
+        const bookId = button.getAttribute('data-book-id');
+
+        // Redirect to the preview URL
+        window.location.href = `/StudentMobile/preview/${bookId}/`;
     }
 
     function toggleBookmark(bookId) {
@@ -151,50 +166,4 @@ $(document).ready(function(){
 
     // Handle browser back/forward buttons
     window.addEventListener('popstate', showContentBasedOnHash);
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const oldPasswordInput = document.getElementById('id_old_password');
-    const newPassword1Input = document.getElementById('id_new_password1');
-    const newPassword2Input = document.getElementById('id_new_password2');
-
-    const oldPasswordError = document.createElement('div');
-    oldPasswordError.classList.add('text-danger');
-    oldPasswordInput.parentNode.appendChild(oldPasswordError);
-
-    const newPassword1Error = document.createElement('div');
-    newPassword1Error.classList.add('text-danger');
-    newPassword1Input.parentNode.appendChild(newPassword1Error);
-
-    const newPassword2Error = document.createElement('div');
-    newPassword2Error.classList.add('text-danger');
-    newPassword2Input.parentNode.appendChild(newPassword2Error);
-
-    function validateOldPassword() {
-        if (oldPasswordInput.value.length < 8) {
-            oldPasswordError.textContent = 'Old password must be at least 8 characters long.';
-        } else {
-            oldPasswordError.textContent = '';
-        }
-    }
-
-    function validateNewPassword1() {
-        if (newPassword1Input.value.length < 8) {
-            newPassword1Error.textContent = 'New password must be at least 8 characters long.';
-        } else {
-            newPassword1Error.textContent = '';
-        }
-    }
-
-    function validateNewPassword2() {
-        if (newPassword2Input.value !== newPassword1Input.value) {
-            newPassword2Error.textContent = 'Passwords do not match.';
-        } else {
-            newPassword2Error.textContent = '';
-        }
-    }
-
-    oldPasswordInput.addEventListener('input', validateOldPassword);
-    newPassword1Input.addEventListener('input', validateNewPassword1);
-    newPassword2Input.addEventListener('input', validateNewPassword2);
 });

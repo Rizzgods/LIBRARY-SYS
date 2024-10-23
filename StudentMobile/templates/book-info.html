@@ -1,20 +1,33 @@
-
 {% load static %}
 
-{% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
-        <div class="card-body">
-            <div class="d-flex justify-content-around mb-3">
-                <button class="btn btn-primary">Bookmark</button>
-                <a href="{% url 'preview' book.id %}" class="btn btn-secondary">View</a>
+<style>
+
+</style>
+
+<div class="mobile-only">
+    <div class="container mt-4">
+        <div class="book-details-card" data-book-id="{{ book.id }}">
+            <img src="{{ book.BookImage.url }}" class="book-img-top" alt="{{ book.BookTitle }}">
+            <br>
+            <div class="book-body">
+                <div id="button-group" class="d-flex justify-content-around mb-3">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button class="btn btn-primary bookmark-button">
+                            <i class="fas fa-bookmark"></i> Bookmark
+                        </button>
+                        <button class="btn btn-secondary view-button" data-book-id="" onclick="redirectToPreview(this)">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="btn btn-success">
+                            <i class="fas fa-book"></i> Borrow
+                        </button>
+                    </div>
+                </div>
+                <h5 class="title">{{ book.BookTitle }}</h5>
+                <p class="book-text author"><strong>Author:</strong> {{ book.Author }}</p>
+                <p class="book-text date"><strong>Date:</strong> {{ book.Date }}</p>
+                <p class="book-text description"><strong>Description:</strong> {{ book.Description }}</p>
             </div>
-            <h5 class="title">{{ book.BookTitle }}</h5>
-            <p class="card-text"><strong>Author:</strong> {{ book.Author }}</p>
-            <p class="card-text"><strong>Date:</strong> {{ book.Date }}</p>
-            <p class="card-text"><strong>Description:</strong> {{ book.Description }}</p>
         </div>
     </div>
 </div>
-{% endblock %}

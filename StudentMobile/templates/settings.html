@@ -9,6 +9,8 @@
                             <h5 class="me-2 mb-0">Username:</h5>
                             <h1 class="mb-0 fs-4">{{ user.username }}</h1>
                         </div>
+
+                        
                         
                         <div class="mb-3">
                             <label for="id_old_password" class="form-label">Old Password</label>
@@ -21,6 +23,7 @@
                         <div class="mb-3">
                             <label for="id_new_password1" class="form-label">New Password</label>
                             <input type="password" class="form-control" id="id_new_password1" name="new_password1" required>
+                            <div id="password-strength" class="mt-2"></div>
                             {% if form.new_password1.errors %}
                                 <div class="text-danger">{{ form.new_password1.errors }}</div>
                             {% endif %}
@@ -29,6 +32,7 @@
                         <div class="mb-3">
                             <label for="id_new_password2" class="form-label">Confirm New Password</label>
                             <input type="password" class="form-control" id="id_new_password2" name="new_password2" required>
+                            <div id="password-match" class="mt-2"></div>
                             {% if form.new_password2.errors %}
                                 <div class="text-danger">{{ form.new_password2.errors }}</div>
                             {% endif %}
@@ -41,3 +45,73 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('id_new_password1');
+    const confirmPasswordInput = document.getElementById('id_new_password2');
+    const passwordStrength = document.getElementById('password-strength');
+    const passwordMatch = document.getElementById('password-match');
+
+    passwordInput.addEventListener('input', function() {
+        const strength = getPasswordStrength(passwordInput.value);
+        passwordStrength.textContent = `Password strength: ${strength}`;
+        passwordStrength.className = `strength-${strength.toLowerCase()}`;
+        checkPasswordMatch();
+    });
+
+    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+
+    function getPasswordStrength(password) {
+        let strength = 'Weak';
+        const regexes = [
+            /[a-z]/, // lowercase
+            /[A-Z]/, // uppercase
+            /[0-9]/, // digits
+            /[^A-Za-z0-9]/ // special characters
+        ];
+
+        let passedTests = regexes.reduce((acc, regex) => acc + regex.test(password), 0);
+
+        if (password.length >= 8 && passedTests >= 3) {
+            strength = 'Strong';
+        } else if (password.length >= 6 && passedTests >= 2) {
+            strength = 'Medium';
+        }
+
+        return strength;
+    }
+
+    function checkPasswordMatch() {
+        if (passwordInput.value === confirmPasswordInput.value) {
+            passwordMatch.textContent = 'Passwords match';
+            passwordMatch.className = 'text-success';
+        } else {
+            passwordMatch.textContent = 'Passwords do not match';
+            passwordMatch.className = 'text-danger';
+        }
+    }
+});
+</script>
+
+<style>
+.strength-weak {
+    color: red;
+}
+
+.strength-medium {
+    color: orange;
+}
+
+.strength-strong {
+    color: green;
+}
+
+.text-success {
+    color: green;
+}
+
+.text-danger {
+    color: red;
+}
+</style>
