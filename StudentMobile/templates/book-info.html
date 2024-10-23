@@ -1,4 +1,4 @@
-{% extends 'navbar.html' %}
+
 {% load static %}
 
 {% block content %}
@@ -8,7 +8,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-around mb-3">
                 <button class="btn btn-primary">Bookmark</button>
-                <button class="btn btn-secondary">View</button>
+                <a href="{% url 'preview' book.id %}" class="btn btn-secondary">View</a>
             </div>
             <h5 class="title">{{ book.BookTitle }}</h5>
             <p class="card-text"><strong>Author:</strong> {{ book.Author }}</p>
@@ -17,5 +17,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

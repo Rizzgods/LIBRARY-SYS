@@ -43,3 +43,34 @@
     display: none;
 }
         
+.pdf-page {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.pdf-page img {
+    width: 100%;
+    max-width: 600px;  /* Adjust this size as needed */
+    height: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom header styling */
+.pdf-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.pdf-header h1 {
+    font-size: 2rem;
+}
+
+.pdf-header p {
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .pdf-page img {
+        max-width: 100%;
+    }
+}
