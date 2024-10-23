@@ -63,7 +63,7 @@
         }
         
         .content {
-            margin-top: 50px;
+            margin-top: 95px;
             grid-area: content;
             position: relative;
             display: flex;
@@ -627,7 +627,7 @@
                         <button onclick="zoomOut()" class="button-design"><span class="material-symbols-outlined icons">zoom_out</span></button>
                     </div>
                 </div>
-                <div class="static-div page-count row mt-2">
+                <div class="static-div page-count row">
                     <div class="col" style="max-width: 45%;">
                         <div id="speaker-controls">
                             <button onclick="readPage()" class="button-design" data-bs-toggle="tooltip" data-bs-placement="top"
@@ -647,8 +647,8 @@
                         </div>
                     </div>
                     <div class="d-flex f-direction-row align-items-center col">
-                        <span id="page-counter" aria-live="polite" style="font-size: 1.8rem; vertical-align: text-bottom;"></span>
-                        <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)" style="font-size: 1.5rem; margin: 10px 0px 10px 10px ">
+                        <span id="page-counter" aria-live="polite" style="font-size: 1rem; vertical-align: text-bottom;"></span>
+                        <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)" style="font-size: 1rem; margin: 10px 0px 10px 10px ">
                     </div>
                 </div>
             </div>
