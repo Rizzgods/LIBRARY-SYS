@@ -30,33 +30,10 @@
             {% include 'history.html' %}
         </div>
         <div id="settings_content" class="content-section hidden">
-            {%include 'settings.html'%}
+            {% include 'settings.html' %}
         </div>
         <div id="info_content" class="content-section hidden">
-            <div class="container mt-4">
-                <div class="card">
-                    <img src="" class="card-img-top" alt="Book Image">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-around mb-3">
-                            <div class="btn-group" role="group" aria-label="Basic example">
-                                <button class="btn btn-primary bookmark-button">
-                                    <i class="fas fa-bookmark"></i> Bookmark
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                                <button class="btn btn-success">
-                                    <i class="fas fa-book"></i> Borrow
-                                </button>
-                            </div>
-                        </div>
-                        <h5 class="title"></h5>
-                        <p class="card-text author"><strong>Author:</strong></p>
-                        <p class="card-text date"><strong>Date:</strong></p>
-                        <p class="card-text description"><strong>Description:</strong></p>
-                    </div>
-                </div>
-            </div>
+            {% include 'book-info.html' %}
         </div>
         {% endblock %}
     </div>

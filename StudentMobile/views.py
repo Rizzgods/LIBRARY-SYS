@@ -7,7 +7,8 @@ from student.forms import PasswordChangeForm
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.contrib.auth import update_session_auth_hash
-
+from pdf2image import convert_from_path
+import os
 
 def home(request):
     all_books = Books.objects.all()
@@ -92,9 +93,6 @@ def change_password(request):
         'user': request.user
     })
 
-from pdf2image import convert_from_path
-import os
-
 def preview(request, book_id):
     book = get_object_or_404(Books, id=book_id)
 
@@ -121,3 +119,20 @@ def preview(request, book_id):
     }
 
     return render(request, 'preview.html', context)
+
+from django.shortcuts import render, get_object_or_404
+
+
+def book_info(request, book_id):
+    book = get_object_or_404(Books, id=book_id)
+    is_bookmarked = request.user in book.bookmarked_by.all()
+    book_data = {
+        'id': book.id,  # Include the book ID
+        'BookImage': {'url': book.BookImage.url},
+        'BookTitle': book.BookTitle,
+        'Author': book.Author,
+        'Date': book.Date,
+        'Description': book.Description,
+        'isBookmarked': is_bookmarked,
+    }
+    return JsonResponse({'book': book_data})
