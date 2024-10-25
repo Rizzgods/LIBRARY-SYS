@@ -430,9 +430,7 @@
     }
 
       @media (max-width: 768px) {
-        .card-img-top{
-            width:100%;
-        }
+       
         .card{
             max-width: 200px;
         }
@@ -444,9 +442,6 @@
         }
     }
     @media (max-width: 600px) {
-        .card-img-top{
-            width:100%;
-        }
         .card{
             max-width: inherit;
         }
@@ -458,6 +453,20 @@
         }
         .card:hover {
             z-index: 0;
+        }
+    }
+    @media (max-width: 420px) {
+        .dropdown-item-list{
+            padding-left: 10px;
+        }
+        .dropdown{
+            width:325px;
+        }
+        .dropdown-item{
+            text-wrap: wrap;
+        }
+        .notif-link{
+            font-size: 15px;
         }
     }
 
@@ -482,37 +491,37 @@
 {% endblock %}
 
 {% block body %}
-{% load static %}
-<div class="d-flex justify-content-center">
-    <h3 class="fs-2 mb-4">Borrowed Books</h3>
-</div>
-    
-<div class="bookmark-content row">
-    {% if borrowed_books %}
-    {% for request in borrowed_books %}
-    <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ request.book.id }}">
-        <div class="card d-flex justify-content-center align-items-center">
-            <a href="{% url 'prev_file' request.book.id  %}">
-                <img class="card-img-top" src="{{ request.book.BookImage.url }}" alt="{{ request.book.BookTitle }}">
-            </a>
-            <div class="card-body">
+    {% load static %}
+    <div class="d-flex justify-content-center">
+        <h3 class="fs-2 mb-4">Borrowed Books</h3>
+    </div>
+        
+    <div class="bookmark-content row">
+        {% if borrowed_books %}
+        {% for request in borrowed_books %}
+        <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ request.book.id }}">
+            <div class="card d-flex justify-content-center align-items-center">
                 <a href="{% url 'prev_file' request.book.id  %}">
-                    <h5 class="card-title p-0 m-0">
-                        {{ request.book.BookTitle }}
-                    </h5>
-                    <div class="d-flex flex-row justify-content-center align-items-center ">
-                    <p class="card-text"><strong>Requested At:</strong> <br/>{{ request.requested_at }}</p>
-                    <p class="card-text"><strong>Approved At:</strong> <br/>{{ request.approved_at }}</p>
-                    </div>
-                </a>           
+                    <img class="card-img-top" src="{{ request.book.BookImage.url }}" alt="{{ request.book.BookTitle }}">
+                </a>
+                <div class="card-body">
+                    <a href="{% url 'prev_file' request.book.id  %}">
+                        <h5 class="card-title p-0 m-0">
+                            {{ request.book.BookTitle }}
+                        </h5>
+                        <div class="d-flex flex-row justify-content-center align-items-center ">
+                        <p class="card-text"><strong>Requested At:</strong> <br/>{{ request.requested_at }}</p>
+                        <p class="card-text"><strong>Approved At:</strong> <br/>{{ request.approved_at }}</p>
+                        </div>
+                    </a>           
+                </div>
             </div>
         </div>
-    </div>
-    {% endfor %}
-</div> 
-    {% else %}
-        <p class="text-center">Nothing to see here.</p>
-    {% endif %}
+        {% endfor %}
+        {% else %}
+                <p class="text-center">Nothing to see here.</p>   
+        {% endif %}
+    </div> 
 
 {% endblock %}
 

@@ -159,7 +159,6 @@
         right: 0;
         background-color: white;
         color: black;
-        min-width: 400px;
         box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         border-radius: 5px;
         overflow: hidden;
@@ -529,6 +528,9 @@
             height: 100%;
             gap: 10px;
         }
+        .notification-icon {
+            margin-right: 20px;
+        }
     }
       @media (max-width: 530px) {
         .carousel-indicators{
@@ -575,6 +577,20 @@
         }
         .loc-logo{
             width: 30px;
+        }
+    }
+    @media (max-width: 420px) {
+        .dropdown-item-list{
+            padding-left: 10px;
+        }
+        .dropdown{
+            width:325px;
+        }
+        .dropdown-item{
+            text-wrap: wrap;
+        }
+        .notif-link{
+            font-size: 15px;
         }
     }
 

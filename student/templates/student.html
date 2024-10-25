@@ -541,6 +541,17 @@
             text-wrap: wrap;
         }
     }
+    @media (max-width: 450px) {
+        #logo{
+            height: 55px;
+        }
+        .sidebar-btn-style{
+            width: 30px;
+        }
+        #notification-bell{
+            font-size: 30px;
+        }
+    }
 </style>
 
 {% block style %}
@@ -551,7 +562,7 @@
         <header class="header fixed-top">
             <div class="logo">
                 <span id="sidebar-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
-                    <svg width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="sidebar-btn-style" width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 18L20 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
                         <path d="M4 12L20 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
                         <path d="M4 6L20 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
@@ -652,7 +663,8 @@
                 renderNotifications();
             });
         }
-            // Call fetchNotifications every 10 seconds
+        
+        // Call fetchNotifications every 10 seconds
         setInterval(fetchNotifications, pollingInterval);
         fetchNotifications();  // Fetch immediately on page load
         
@@ -660,7 +672,11 @@
             $('#notification-list').empty();
     
             if (notifications.length > 0) {
-                $('#notification-count').text(notifications.length).show();
+                var unreadCount = notifications.filter(function(notification) {
+                    return !notification.read;
+                }).length;
+                
+                $('#notification-count').text(unreadCount).show();
                 $('#no-notifications').hide();
     
                 var notificationsToDisplay = showingMore ? notifications.length : notificationsToShow;
@@ -724,6 +740,27 @@
                 } else if (notificationType === 'declined') {
                     requestType = 'declined';
                 }
+
+                // Update local state
+                notifications = notifications.map(function(notification) {
+                    if (notification.id === notificationId) {
+                        notification.read = true;
+                    }
+                    return notification;
+                });
+
+                // Update the badge count
+                var unreadCount = notifications.filter(function(notification) {
+                    return !notification.read;
+                }).length;
+
+                if (unreadCount > 0) {
+                    $('#notification-count').text(unreadCount).show();
+                } else {
+                    $('#notification-count').hide();
+                }
+
+                renderNotifications();
                 window.location.href = "{% url 'borrowed_books' %}?requestType=" + requestType;
             });
         }
@@ -735,6 +772,10 @@
                 notifications.forEach(function(notification) {
                     notification.read = true;  // Update local state
                 });
+
+                // Hide the badge
+                $('#notification-count').hide();
+
                 renderNotifications();
             });
         }
@@ -765,6 +806,10 @@
                 $('#notification-dropdown').hide();  // Hide dropdown when clicking outside
             }
         });
+
+        $('#mark-all-read').on('click', function() {
+            markAllAsRead();
+        });
     });
     
     document.getElementById('toggleFooter').addEventListener('click', function() {
@@ -781,8 +826,6 @@
         }
     });
     
-</script>
-<script>
     // Function to send an AJAX request to keep the session alive
     function keepSessionAlive() {
         fetch("{% url 'keep_session_alive' %}", {

@@ -526,6 +526,68 @@
             z-index: 0;
         }
     }
+    @media (max-width: 450px) {
+        .dropdown-item-list{
+            padding-left: 10px;
+        }
+        .dropdown{
+            width:325px;
+        }
+        .dropdown-item{
+            text-wrap: wrap;
+        }
+        .notif-link{
+            font-size: 15px;
+        }
+        .bookmark-content{
+            padding: 20px 0px;
+        }
+        .bookmark-head {
+            display: grid;
+            grid-template-columns: 60px 1fr;
+            grid-template-rows: 1fr 1fr;
+            grid-template-areas:
+            "delete title"
+            "search search";
+        }
+        .search-bar{
+            grid-area: search;
+            margin-top: 10px;
+            justify-content: space-around;
+        }
+        .form-control{
+            width: 250px;
+        }
+        
+        .bookmark-title{
+            grid-area: title;
+            padding: 0px
+        }
+        .Unbook-All-Btn{
+            grid-area: delete;
+            margin-left: 10px;
+            padding: 10px 30px
+        }
+        .modalButtons{
+            padding: 0px;
+        }
+        #modal-borrow-link{
+            width: 136px;
+        }
+        #modal-preview-link{
+            width: 227px;
+            margin: 4px;    
+        }
+        #modal-bookmark-link{
+            width: inherit;
+            margin: 4px;
+        }
+        #generate-citaion{
+            width: inherit;
+        }
+    }
+    
+
         
 </style>
 {% endblock %}
