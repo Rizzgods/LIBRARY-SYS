@@ -34,17 +34,6 @@
         body {
             position: relative;
         }
-        .main-container {
-            display: grid;
-            grid-template-columns: 250px 1fr; 
-            grid-template-rows: 1px 1fr 150px;
-            grid-template-areas:
-            "header header"
-            "content content"
-            "footer footer";
-            height: 100vh;
-            flex: 1;
-        }
         .footer {
             grid-area: footer;
             display: flex;
@@ -90,8 +79,7 @@
         }
         
         .content {
-            margin-top: 150px;
-            grid-area: content;
+            margin-top: 10%;
             position: relative;
             display: flex;
             flex-direction: row;
@@ -125,6 +113,9 @@
             }
         }
         a{
+            display:flex;
+            justify-content: center;
+            align-items: start;
             text-decoration: none;
             color: black;
             transition: color .2s
@@ -253,7 +244,7 @@
         }
         #zoom-controls{
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             justify-content: center;
             align-items: center;
             align-self: flex-start;
@@ -272,7 +263,7 @@
             background-color: #0056b3;
         }
         #page-input {
-            margin-top: 10px;
+            margin-left: 10px;
             padding: 5px;
             width: 50px;
             text-align: center;
@@ -346,9 +337,6 @@
             flex-direction: row;
             margin-top: 10px;
         }
-        .nav-arrow-back{
-            margin-right: 50px;
-        }
         .notif-btn{
             color: rgb(73, 110, 232);
             text-decoration: none !important; 
@@ -361,6 +349,11 @@
             max-height: 300px;  /* Set a maximum height for the dropdown */
             overflow-y: auto;   /* Allow vertical scrolling when content exceeds the height */
         }
+        .logo{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
         .fb-logo{
             width: 40px;
         }
@@ -368,14 +361,56 @@
             width: 35px;
         }
         .speaker-btns{
-            width: 45%;
-        }
-        .speaker-btns{
-            padding: 0px;
+            display:flex;
+            justify-content: center;
         }
         .page-number{
             padding: 0px;
+            display:flex;
+            justify-content: center;
         }
+        .pdf-holder {
+            display: grid;
+            grid-template-columns: 100px 1fr 100px;
+            grid-template-rows: 1fr 100px;
+            grid-template-areas:
+            "arrow-back pdf-viewer arrow-forward"
+            "speaker-btns page-number zoom-controls";
+        }
+        .arrow-forward{
+            grid-area: arrow-forward;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .arrow-back{
+            grid-area: arrow-back;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .pdf-viewer{
+            grid-area: pdf-viewer;
+        
+        }
+        .page-number{
+            grid-area: page-number;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-height: 50px;
+            margin-top: 10px;
+        }
+        #zoom-controls{
+            grid-area: zoom-controls;
+            padding-right: 200px;
+        }
+        .speaker-btns{
+            grid-area: speaker-btns;
+            padding-left: 140px;
+            margin-top: 10px;
+        }
+
 
         @media (max-width: 1250px) {
             .first-footer-text{
@@ -438,14 +473,12 @@
                 text-wrap: wrap;
             }
         }
-        @media (max-width: 425px) {
-            .page-views-count{
-                padding: 5px 10px;
-                text-wrap: wrap;
-                font-size: 13px;
-            }
+        @media (max-width: 435px) {
             #logo{
                 height: 45px;
+            }
+            .logo-img{
+                margin: 0px;
             }
             .header{
                 padding: 5px;
@@ -462,58 +495,61 @@
             .notif-link{
                 font-size: 15px;
             }
+            .page-views-count{
+                padding: 5px 10px;
+            }
             #pdf-container{
                 width: 370px;
             }
             .content{
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                grid-template-rows: 1fr 100px;
+                margin-top: 70%;
+                margin-bottom: 20px;
+            }
+            .pdf-holder {
+                grid-template-rows: auto 1fr auto;
                 grid-template-areas:
-                "pdf-viewer pdf-viewer"
-                "arrow-back arrow-forward";
-                margin-top: 400px;
+                "arrow-back page-number arrow-forward"
+                "pdf-viewer pdf-viewer pdf-viewer"
+                "speaker-btns none zoom-controls";
+                column-gap: 0px;
             }
-            .arrow-back{
-                grid-area: arrow-back;
+            .arrow-back {
                 display: flex;
-                justify-content: flex-end;
+                justify-content: end;
             }
-            .arrow-forward{
-                grid-area: arrow-forward;
-                margin-left: 60px;
-            }
-            .pdf-holder{
-                grid-area: pdf-viewer;
-            }
-
-            .page-count{
-                flex-direction: column;
-            }
-            .speaker-btns, .page-number{
+            
+            .page-number {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                width: 100%;
-            }
-
-            .pdf-viewer{
-                display: grid;
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr 100px;
-                grid-template-areas:
-                "pdf-prev"
-                "zoom-btns";
-            }
-            .pdf-container{
-                grid-area: pdf-prev;
-            }
-            #zoom-controls{
-                grid-area: zoom-btns;
-                flex-direction: row;
             }
             
-
+            .arrow-forward {
+                display: flex;
+                justify-content: start;
+            }
+            
+            .pdf-viewer {
+                overflow: auto;
+                margin: 0px;
+            }
+            
+            .speaker-btns {
+                align-items: center;
+            }
+            
+            #zoom-controls {
+                align-items: center;
+                margin-right: 200px;
+            }
+            .back-icon{
+                font-size: 25px;
+            }
+        }
+        @media(max-width: 380px){
+            .content{
+                margin-top: 75%;
+            }
         }
 
 
@@ -549,48 +585,43 @@
         </div>
     </header>
     <div class="content">
-        <div class="static-div arrow-back">
-            <button onclick="prevPage()" class="nav-arrow nav-arrow-back"><span class="material-symbols-outlined">arrow_back_ios</span></button>
-        </div>
         <div class="pdf-holder">
+            <div class="static-div arrow-back">
+                <button onclick="prevPage()" class="nav-arrow nav-arrow-back">
+                    <span class="material-symbols-outlined">arrow_back_ios</span>
+                </button>
+            </div>
+            <div class="static-div page-number">
+                <span id="page-counter" aria-live="polite"></span>
+                <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)">
+            </div>
+            <div class="static-div arrow-forward">
+                <button onclick="nextPage()" class="nav-arrow">
+                    <span class="material-symbols-outlined">arrow_forward_ios</span>
+                </button>
+            </div>
             <div class="pdf-viewer">
                 <div id="pdf-container" onmousedown="startDragging(event)" onmousemove="drag(event)" onmouseup="stopDragging(event)" oncontextmenu="return false;"></div>
-                <div id="zoom-controls">
-                    <div class="zoom-in">
-                        <button onclick="zoomIn()" class="button-design"><span class="material-symbols-outlined icons">zoom_in</span></button>
-                    </div>
-                    <div class="zoom-out">
-                        <button onclick="zoomOut()" class="button-design"><span class="material-symbols-outlined icons">zoom_out</span></button>
-                    </div>
-                </div>
             </div>
-            <div class="static-div page-count row">
-                <div class="speaker-btns col">
-                    <div id="speaker-controls">
-                        <button onclick="readPage()" class="button-design" data-bs-toggle="tooltip" data-bs-placement="top"
-                            data-bs-custom-class="custom-tooltip"
-                            data-bs-title="Play Text to Speech.">
-                            <span class="material-symbols-outlined icons text-to-speech">text_to_speech</span>
-                        </button>
-                        <button onclick="togglePauseResume()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">pause</span></button>
-                        <button onclick="stopReading()" class="button-design"><span class="material-symbols-outlined icons" id="pauseResumeButton">stop</span></button>
-    
-                        <div id="notification" class="alert alert-info alert-dismissible fade show position-absolute" role="alert" style="display: none;">
-                            Text to Speech has started
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex f-direction-row align-items-center col page-number">
-                    <span id="page-counter" aria-live="polite" style="font-size: 1rem; vertical-align: text-bottom;"></span>
-                    <input type="text" id="page-input" placeholder="Page" onkeydown="jumpToPage(event)" style="font-size: 1rem; margin: 10px 0px 10px 10px ">
-                </div>
+            <div class="speaker-btns">
+                <button onclick="readPage()" class="button-design">
+                    <span class="material-symbols-outlined">text_to_speech</span>
+                </button>
+                <button onclick="togglePauseResume()" class="button-design">
+                    <span class="material-symbols-outlined" id="pauseResumeButton">pause</span>
+                </button>
+                <button onclick="stopReading()" class="button-design">
+                    <span class="material-symbols-outlined" id="pauseResumeButton">stop</span>
+                </button>
             </div>
-        </div>
-        <div class="static-div arrow-forward">
-            <button onclick="nextPage()" class="nav-arrow"><span class="material-symbols-outlined">arrow_forward_ios</span></button>
+            <div id="zoom-controls">
+                <button onclick="zoomIn()" class="button-design">
+                    <span class="material-symbols-outlined">zoom_in</span>
+                </button>
+                <button onclick="zoomOut()" class="button-design">
+                    <span class="material-symbols-outlined">zoom_out</span>
+                </button>
+            </div>
         </div>
     </div>
     <div class="footer">
@@ -628,16 +659,14 @@
             <div></div>
         </div>
     </div>
-       
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
+<script>
 
     let pdfDoc = null;
     let pageNum = 1;
@@ -965,141 +994,168 @@
         }
 
         {% comment %} notif js {% endcomment %}
-        var showingMore = false;  // Track the state of "See More"/"See Less"
-        var notifications = [];   // Store notification data locally
-        var notificationsToShow = 5;  // Default number of notifications to show
-        var pollingInterval = 10000;  // Poll every 10 seconds
-    
-        function fetchNotifications() {
-            $.get("{% url 'fetch_notifications' %}", function(data) {
-                notifications = data;
-                renderNotifications();
-            });
-        }
-            // Call fetchNotifications every 10 seconds
-        setInterval(fetchNotifications, pollingInterval);
-        fetchNotifications();  // Fetch immediately on page load
+        $(document).ready(function() {
+            var showingMore = false;  // Track the state of "See More"/"See Less"
+            var notifications = [];   // Store notification data locally
+            var notificationsToShow = 5;  // Default number of notifications to show
+            var pollingInterval = 10000;  // Poll every 10 seconds
         
-        function renderNotifications() {
-            $('#notification-list').empty();
-    
-            if (notifications.length > 0) {
-                $('#notification-count').text(notifications.length).show();
-                $('#no-notifications').hide();
-    
-                var notificationsToDisplay = showingMore ? notifications.length : notificationsToShow;
-                var limitedNotifications = notifications.slice(0, notificationsToDisplay);
-    
-                limitedNotifications.forEach(function(notification) {
-                    var item = $('<div class="dropdown-item">')
-                        .html(`
-                            <a href="javascript:void(0)" class="notif-link">
-                                <div class="notification-icon-2">
-                                    <span class="material-symbols-outlined icon-2">notification_important</span>
-                                </div>
-                                <div class="notif-message">
-                                    ${notification.message}
-                                    <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
-                                </div>
-                            </a>
-                        `)
-                        .attr('data-id', notification.id)
-                        .toggleClass('read', notification.read)
-                        .click(function() {
-                            markAsReadAndRedirect(notification.id, notification.type);
-                        });
-    
-                    var deleteButton = $('<button class="btn btn-close ms-auto">').html('').click(function(event) {
-                        event.stopPropagation();
-                        deleteNotification(notification.id);
-                    });
-    
-                    item.append(deleteButton);
-                    $('#notification-list').append(item);
+            function fetchNotifications() {
+                $.get("{% url 'fetch_notifications' %}", function(data) {
+                    notifications = data;
+                    renderNotifications();
                 });
-    
-                // Show or hide the See More/See Less button based on the number of notifications
-                if (notifications.length > notificationsToShow) {
-                    $('#see-more-less-btn').show().text(showingMore ? 'See Less' : 'See More');
+            }
+            
+            // Call fetchNotifications every 10 seconds
+            setInterval(fetchNotifications, pollingInterval);
+            fetchNotifications();  // Fetch immediately on page load
+            
+            function renderNotifications() {
+                $('#notification-list').empty();
+        
+                if (notifications.length > 0) {
+                    var unreadCount = notifications.filter(function(notification) {
+                        return !notification.read;
+                    }).length;
+                    
+                    $('#notification-count').text(unreadCount).show();
+                    $('#no-notifications').hide();
+        
+                    var notificationsToDisplay = showingMore ? notifications.length : notificationsToShow;
+                    var limitedNotifications = notifications.slice(0, notificationsToDisplay);
+        
+                    limitedNotifications.forEach(function(notification) {
+                        var item = $('<div class="dropdown-item">')
+                            .html(`
+                                <a href="javascript:void(0)" class="notif-link">
+                                    <div class="notification-icon-2">
+                                        <span class="material-symbols-outlined icon-2">notification_important</span>
+                                    </div>
+                                    <div class="notif-message">
+                                        ${notification.message}
+                                        <div class="notification-time">${new Date(notification.created_at).toLocaleString()}</div>
+                                    </div>
+                                </a>
+                            `)
+                            .attr('data-id', notification.id)
+                            .toggleClass('read', notification.read)
+                            .click(function() {
+                                markAsReadAndRedirect(notification.id, notification.type);
+                            });
+        
+                        var deleteButton = $('<button class="btn btn-close ms-auto">').html('').click(function(event) {
+                            event.stopPropagation();
+                            deleteNotification(notification.id);
+                        });
+        
+                        item.append(deleteButton);
+                        $('#notification-list').append(item);
+                    });
+        
+                    // Show or hide the See More/See Less button based on the number of notifications
+                    if (notifications.length > notificationsToShow) {
+                        $('#see-more-less-btn').show().text(showingMore ? 'See Less' : 'See More');
+                    } else {
+                        $('#see-more-less-btn').hide();
+                    }
                 } else {
+                    $('#notification-list').html('<span class="dropdown-item-text no-notif">No notifications</span>');
+                    $('#notification-count').hide();
                     $('#see-more-less-btn').hide();
                 }
-            } else {
-                $('#notification-list').html('<span class="dropdown-item-text no-notif">No notifications</span>');
-                $('#notification-count').hide();
-                $('#see-more-less-btn').hide();
             }
-        }
+        
+            // Toggle "See More" and "See Less"
+            $('#see-more-less-btn').on('click', function(event) {
+                event.stopPropagation();
+                showingMore = !showingMore;
+                renderNotifications();
+            });
+        
+            function markAsReadAndRedirect(notificationId, notificationType) {
+                $.post("{% url 'mark_notification_read' 0 %}".replace('0', notificationId), {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function() {
+                    let requestType = 'pending';  // Default to pending
+                    if (notificationType === 'approved') {
+                        requestType = 'approved';
+                    } else if (notificationType === 'declined') {
+                        requestType = 'declined';
+                    }
     
-        // Toggle "See More" and "See Less"
-        $('#see-more-less-btn').on('click', function(event) {
-            event.stopPropagation();
-            showingMore = !showingMore;
-            renderNotifications();
-        });
+                    // Update local state
+                    notifications = notifications.map(function(notification) {
+                        if (notification.id === notificationId) {
+                            notification.read = true;
+                        }
+                        return notification;
+                    });
     
-        function markAsReadAndRedirect(notificationId, notificationType) {
-            $.post("{% url 'mark_notification_read' 0 %}".replace('0', notificationId), {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                let requestType = 'pending';  // Default to pending
-                if (notificationType === 'approved') {
-                    requestType = 'approved';
-                } else if (notificationType === 'declined') {
-                    requestType = 'declined';
+                    // Update the badge count
+                    var unreadCount = notifications.filter(function(notification) {
+                        return !notification.read;
+                    }).length;
+    
+                    if (unreadCount > 0) {
+                        $('#notification-count').text(unreadCount).show();
+                    } else {
+                        $('#notification-count').hide();
+                    }
+    
+                    renderNotifications();
+                    window.location.href = "{% url 'borrowed_books' %}?requestType=" + requestType;
+                });
+            }
+        
+            function markAllAsRead() {
+                $.post("{% url 'mark_all_notifications_read' %}", {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function() {
+                    notifications.forEach(function(notification) {
+                        notification.read = true;  // Update local state
+                    });
+    
+                    // Hide the badge
+                    $('#notification-count').hide();
+    
+                    renderNotifications();
+                });
+            }
+        
+            function deleteNotification(notificationId) {
+                $.post("{% url 'delete_notification' 0 %}".replace('0', notificationId), {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                }, function() {
+                    notifications = notifications.filter(function(notif) {
+                        return notif.id !== notificationId;
+                    });
+                    renderNotifications();
+                });
+            }
+        
+            $('#notification-bell').on('click', function() {
+                $('#notification-dropdown').toggle();
+                if ($('#notification-dropdown').is(':visible')) {
+                    fetchNotifications();
                 }
-                window.location.href = "{% url 'borrowed_books' %}?requestType=" + requestType;
             });
-        }
-    
-        function markAllAsRead() {
-            $.post("{% url 'mark_all_notifications_read' %}", {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                notifications.forEach(function(notification) {
-                    notification.read = true;  // Update local state
-                });
-                renderNotifications();
+        
+            setInterval(fetchNotifications, 60000);  // Fetch notifications every 60 seconds
+            fetchNotifications();
+        
+            $(document).click(function(event) {
+                if (!$(event.target).closest('#notification-bell').length && !$(event.target).closest('#notification-dropdown').length) {
+                    $('#notification-dropdown').hide();  // Hide dropdown when clicking outside
+                }
             });
-        }
     
-        function deleteNotification(notificationId) {
-            $.post("{% url 'delete_notification' 0 %}".replace('0', notificationId), {
-                csrfmiddlewaretoken: '{{ csrf_token }}'
-            }, function() {
-                notifications = notifications.filter(function(notif) {
-                    return notif.id !== notificationId;
-                });
-                renderNotifications();
+            $('#mark-all-read').on('click', function() {
+                markAllAsRead();
             });
-        }
-    
-        $('#notification-bell').on('click', function() {
-            $('#notification-dropdown').toggle();
-            if ($('#notification-dropdown').is(':visible')) {
-                fetchNotifications();
-            }
         });
-    
-        setInterval(fetchNotifications, 60000);  // Fetch notifications every 60 seconds
-        fetchNotifications();
-    
-        $(document).click(function(event) {
-            if (!$(event.target).closest('#notification-bell').length && !$(event.target).closest('#notification-dropdown').length) {
-                $('#notification-dropdown').hide();  // Hide dropdown when clicking outside
-            }
-        });
-    
-    
     
     </script>
-    
-    
-    
-    
-    
-
-    
 </body>
 </html>
 
