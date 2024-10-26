@@ -1,0 +1,122 @@
+.header {
+    background-color: rgb(74, 128, 210);
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.header .logo {
+    height: 50px;
+}
+.navbar.fixed-bottom {
+    padding: 5px 0;
+}
+
+.navbar .nav-link {
+    padding: 10px;
+    font-size: 1.5rem;
+}
+
+.navbar .nav-link i {
+    font-size: 1.5rem;
+}
+.card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.card-body {
+    position: relative;
+    overflow: hidden;
+}
+.card-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    padding: 0 10px; /* Add padding to the title */
+}
+.container {
+    padding-bottom: 80px; /* Add padding to the bottom to avoid overlap with the navbar */
+}
+.hidden {
+    display: none;
+}
+        
+.pdf-page {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.pdf-page img {
+    width: 100%;
+    max-width: 600px;  /* Adjust this size as needed */
+    height: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom header styling */
+.pdf-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.pdf-header h1 {
+    font-size: 2rem;
+}
+
+.pdf-header p {
+    color: #6c757d;
+}
+
+@media (max-width: 768px) {
+    .pdf-page img {
+        max-width: 100%;
+    }
+}
+
+/* Mobile-friendly styles for book-info page */
+.book-details-card {
+    margin-bottom: 20px;
+}
+
+.book-details-card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.book-body {
+    padding: 10px;
+}
+
+.book-body .btn-group {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.book-body .btn {
+    flex: 1;
+    margin: 0 5px;
+}
+
+.book-body h5 {
+    font-size: 1.25rem;
+    margin-top: 10px;
+}
+
+.book-body p {
+    font-size: 1rem;
+    margin-bottom: 5px;
+}
+
+/* Ensure the navbar is locked in place */
+.navbar.fixed-bottom {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fff;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}

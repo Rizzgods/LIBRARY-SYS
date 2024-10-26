@@ -51,8 +51,17 @@ INSTALLED_APPS = [
     'adminside',
     'import_export',
     'StudentMobile',
+    'channels',
+    'rest_framework',
 ]
 
+ASGI_APPLICATION = 'storefront.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 MIDDLEWARE = [

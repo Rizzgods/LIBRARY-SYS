@@ -441,4 +441,23 @@ def keep_session_alive(request):
 
 
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import BorrowRequest, ApprovedRequest, DeclinedRequest
+from .serializers import BorrowRequestSerializer, ApprovedRequestSerializer, DeclinedRequestSerializer
+
+@api_view(['GET'])
+def get_borrow_requests(request):
+    borrow_requests = BorrowRequest.objects.all()
+    approved_requests = ApprovedRequest.objects.all()
+    declined_requests = DeclinedRequest.objects.all()
     
+    borrow_requests_serializer = BorrowRequestSerializer(borrow_requests, many=True)
+    approved_requests_serializer = ApprovedRequestSerializer(approved_requests, many=True)
+    declined_requests_serializer = DeclinedRequestSerializer(declined_requests, many=True)
+    
+    return Response({
+        'borrow_requests': borrow_requests_serializer.data,
+        'approved_requests': approved_requests_serializer.data,
+        'declined_requests': declined_requests_serializer.data,
+    })

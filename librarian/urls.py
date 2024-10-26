@@ -25,6 +25,7 @@ urlpatterns = [
     path('edit_book/<int:book_id>/', views.edit_book, name='edit_book'),
     path('reset_filters/', views.reset_filters, name='reset_filters'),
     path('keep-session-alive/', views.keep_session_alive, name='keep_session_alive'),
+    path('api/borrow-requests/', views.get_borrow_requests, name='get_borrow_requests'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
