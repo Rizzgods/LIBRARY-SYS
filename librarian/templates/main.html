@@ -675,125 +675,146 @@
                 </div>
             </div>
 
-            <!-- Upload Section-->
+            <!-- Upload Section -->
             <div id="upload" class="content" style="display: none;">
                 {% if messages %}
-                {% for message in messages %}
-                    {% if message.tags == 'success' %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {% elif message.tags == 'error' %}
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                <li>{{ message }}</li>
-                            </ul>
-                        </div>
-                    {% endif %}
-                {% endfor %}
+                    {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% elif message.tags == 'error' %}
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    <li>{{ message }}</li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
-                <h1 class="mt-4">Upload</h1>
-                <hr>
-                <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'librarian' %}">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="form-group col">
-                            <label for="id_BookTitle">Title:</label>
-                            <input type="text" class="form-control" id="id_BookTitle" name="BookTitle" required>
-                        </div>
-                        <div class="form-group col">
-                            <label for="id_Author">Author:</label>
-                            <input type="text" class="form-control" id="id_Author" name="Author" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="id_Description">Description:</label>
-                        <input type="text" class="form-control" id="id_Description" name="Description" required>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col">
-                            <label for="id_Date">Date:</label>
-                            <input type="date" class="form-control" id="id_Date" name="Date" required>
-                        </div>
-                        <div class="form-group col">
-                            <label for="id_stock">Stock:</label>
-                            <input type="number" class="form-control" id="id_stock" name="stock">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col">
-                            <label for="id_Category">Category:</label>
-                            <select class="form-control" id="id_Category" name="Category" required>
-                                <option value="">Select a category</option>
-                                {% for category in categories %}
-                                    <option value="{{ category.id }}">{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group col">
-                            <label for="id_Subcategories">SubCategory:</label>
-                            <select class="form-control" id="id_Subcategories" name="SubCategory" required>
-                                <option value="">Select a subcategory</option>
-                                {% for subcategory in subcategories %}
-                                    <option value="{{ subcategory.id }}" data-category-id="{{ subcategory.category_id }}">{{ subcategory.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="form-group col">
-                            <label for="id_Subsection">SubSection:</label>
-                            <select class="form-control" id="id_Subsection" name="SubSection" required>
-                                <option value="">Select a subsection</option>
-                                {% for subsection in subsections %}
-                                    <option value="{{ subsection.id }}" data-section-id="{{ subsection.sub_category_id }}">{{ subsection.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>    
-                    </div> 
-                    <div class="checkbox">
-                        <div class="form-group">
-                            <div class="checkbox-text">
-                                <label for="id_eBook" class="no-margin">Ebook:</label>
-                                <input type="checkbox" name="eBook" id="id_eBook">
+
+                <!-- Dropdown to select upload type -->
+                <div class="form-group">
+                    <label for="uploadType">Select Upload Type:</label>
+                    <select class="form-control" id="uploadType" onchange="toggleUploadForms()">
+                        <option value="single">Single Book Upload</option>
+                        <option value="batch">Batch Book Upload</option>
+                    </select>
+                </div>
+
+                <!-- Single Book Upload Form -->
+                <div id="singleBookUploadForm" style="display: block;">
+                    <h1 class="mt-4">Single Book Upload</h1>
+                    <hr>
+                    <form id="uploadForm" method="post" enctype="multipart/form-data" action="{% url 'librarian' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="form-group col">
+                                <label for="id_BookTitle">Title:</label>
+                                <input type="text" class="form-control" id="id_BookTitle" name="BookTitle" required>
+                            </div>
+                            <div class="form-group col">
+                                <label for="id_Author">Author:</label>
+                                <input type="text" class="form-control" id="id_Author" name="Author" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="checkbox-text">
-                                <label for="id_research_paper" class="no-margin">Research Paper:</label>
-                                <input type="checkbox" name="research_paper" id="id_research_paper">
+                            <label for="id_Description">Description:</label>
+                            <input type="text" class="form-control" id="id_Description" name="Description" required>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col">
+                                <label for="id_Date">Date:</label>
+                                <input type="date" class="form-control" id="id_Date" name="Date" required>
+                            </div>
+                            <div class="form-group col">
+                                <label for="id_stock">Stock:</label>
+                                <input type="number" class="form-control" id="id_stock" name="stock">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col">
+                                <label for="id_Category">Category:</label>
+                                <select class="form-control" id="id_Category" name="Category" required>
+                                    <option value="">Select a category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col">
+                                <label for="id_Subcategories">SubCategory:</label>
+                                <select class="form-control" id="id_Subcategories" name="SubCategory" required>
+                                    <option value="">Select a subcategory</option>
+                                    {% for subcategory in subcategories %}
+                                        <option value="{{ subcategory.id }}" data-category-id="{{ subcategory.category_id }}">{{ subcategory.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col">
+                                <label for="id_Subsection">SubSection:</label>
+                                <select class="form-control" id="id_Subsection" name="SubSection" required>
+                                    <option value="">Select a subsection</option>
+                                    {% for subsection in subsections %}
+                                        <option value="{{ subsection.id }}" data-section-id="{{ subsection.sub_category_id }}">{{ subsection.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>    
+                        </div> 
+                        <div class="checkbox">
+                            <div class="form-group">
+                                <div class="checkbox-text">
+                                    <label for="id_eBook" class="no-margin">Ebook:</label>
+                                    <input type="checkbox" name="eBook" id="id_eBook">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="checkbox-text">
+                                    <label for="id_research_paper" class="no-margin">Research Paper:</label>
+                                    <input type="checkbox" name="research_paper" id="id_research_paper">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="checkbox-text">
+                                    <label for="id_hardCopy" class="no-margin">HardCopy:</label>
+                                    <input type="checkbox" name="hardCopy" id="id_hardCopy">
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="checkbox-text">
-                                <label for="id_hardCopy" class="no-margin">HardCopy:</label>
-                                <input type="checkbox" name="hardCopy" id="id_hardCopy">
+                            <label for="id_Language">Language:</label>
+                            <select class="form-control" id="id_Language" name="Language" required>
+                                {% for language in language_choices %}
+                                    <option value="{{ language.0 }}">{{ language.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="form-group bottom-row-text col">
+                                <label for="id_BookFile" class="no-margin">Book File(PDF): </label>
+                                <input type="file" class="form-control-file" id="id_BookFile" name="BookFile" required>
+                            </div>
+                            <div class="form-group bottom-row-text col">
+                                <label for="id_BookImage" class="no-margin">Book Image(JPG): </label>
+                                <input type="file" class="form-control-file" id="id_BookImage" name="BookImage" required>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="id_Language">Language:</label>
-                        <select class="form-control" id="id_Language" name="Language" required>
-                            {% for language in language_choices %}
-                                <option value="{{ language.0 }}">{{ language.1 }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="row">
-                        <div class="form-group bottom-row-text col">
-                            <label for="id_BookFile" class="no-margin">Book File(PDF): </label>
-                            <input type="file" class="form-control-file" id="id_BookFile" name="BookFile" required>
-                        </div>
-                        <div class="form-group bottom-row-text col">
-                            <label for="id_BookImage" class="no-margin">Book Image(JPG): </label>
-                            <input type="file" class="form-control-file" id="id_BookImage" name="BookImage" required>
-                        </div>
-                    </div>
-                    <button type="submit" class="upload" id="uploadButton">Upload</button>
-                </form>
+                        <button type="submit" class="upload" id="uploadButton">Upload</button>
+                    </form>
+                </div>
+
+                <!-- Batch Book Upload Form -->
+                <div id="batchBookUploadForm" style="display: none;">
+                    <h1 class="mt-4">Batch Book Upload</h1>
+                    <hr>
+                    <p>To upload multiple books, please use our batch upload feature:</p>
+                    <a href="{% url 'batch-upload' %}" target="_blank" class="btn btn-primary">Go to Batch Upload</a>
+                </div>
             </div>
-            
+
             <!-- Loading Modal -->
             <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered" role="document">
@@ -807,8 +828,15 @@
                     </div>
                 </div>
             </div>
-            
+
             <script>
+                // Function to toggle between Single and Batch Upload forms
+                function toggleUploadForms() {
+                    const uploadType = document.getElementById('uploadType').value;
+                    document.getElementById('singleBookUploadForm').style.display = uploadType === 'single' ? 'block' : 'none';
+                    document.getElementById('batchBookUploadForm').style.display = uploadType === 'batch' ? 'block' : 'none';
+                }
+
                 document.getElementById('uploadForm').addEventListener('submit', function(event) {
                     const uploadButton = document.getElementById('uploadButton');
                     
@@ -823,6 +851,7 @@
                     });
                 });
             </script>
+
             <!-- Books Section -->
             <div id="books" class="content book-section" style="display: none;">
                 

@@ -154,6 +154,87 @@ def main(request):
     }
     return render(request, 'main.html', context)
 
+def batch_upload_view(request):
+    if not request.user.is_authenticated or not user_is_schoolAdmin(request.user):
+        return redirect('login_user')
+
+    if request.method == 'POST':
+        csv_file = request.FILES.get('csvFile')
+        files = request.FILES.getlist('fileFolder')
+
+        if not csv_file or not files:
+            messages.error(request, "Please upload both a CSV file and a folder with files.")
+            return redirect('your_upload_view_url')
+
+        # Save the uploaded folder files temporarily
+        temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_uploads')
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
+
+        for f in files:
+            file_path = os.path.join(temp_dir, f.name)
+            with default_storage.open(file_path, 'wb+') as destination:
+                for chunk in f.chunks():
+                    destination.write(chunk)
+
+        # Process the CSV file
+        try:
+            # Handle the CSV file, wrapped in a TextIOWrapper to ensure it's read as text
+            csv_file = TextIOWrapper(csv_file.file, encoding='utf-8')
+            reader = csv.DictReader(csv_file)
+            
+            for row in reader:
+                book = Books(
+                    BookTitle=row['BookTitle'],
+                    Author=row['Author'],
+                    Description=row.get('Description', ''),
+                    Date=row['Date'],
+                    Language=row['Language'],
+                    eBook=row['eBook'].lower() == 'true',
+                    research_paper=row['research_paper'].lower() == 'true',
+                    hardCopy=row['hardCopy'].lower() == 'true',
+                    stock=int(row['stock']),
+                )
+                book.save()
+
+                # Link categories and subcategories
+                categories = Category.objects.filter(id__in=row['Category'].split(','))
+                book.Category.add(*categories)
+
+                subcategories = SubCategory.objects.filter(id__in=row['SubCategory'].split(','))
+                book.SubCategory.add(*subcategories)
+
+                # Link the uploaded files by matching filenames
+                book_file_path = os.path.join(temp_dir, row['BookFile'])
+                book_image_path = os.path.join(temp_dir, row['BookImage'])
+
+                if os.path.exists(book_file_path):
+                    with open(book_file_path, 'rb') as bf:
+                        book.BookFile.save(row['BookFile'], File(bf), save=False)
+
+                if os.path.exists(book_image_path):
+                    with open(book_image_path, 'rb') as bi:
+                        book.BookImage.save(row['BookImage'], File(bi), save=False)
+
+                book.save()
+
+            messages.success(request, "Books uploaded successfully!")
+        except Exception as e:
+            messages.error(request, f"Error processing the upload: {e}")
+        finally:
+            # Clean up temporary files
+            for f in files:
+                file_path = os.path.join(temp_dir, f.name)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+            if os.path.exists(temp_dir):
+                os.rmdir(temp_dir)
+
+        return redirect('batch-upload')
+
+    return render(request, 'admin.html')
+
 def reset_filters(request):
     return redirect('librarian')
 
