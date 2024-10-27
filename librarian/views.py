@@ -4,7 +4,7 @@ import time
 from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect,HttpResponseNotAllowed
 from django.urls import reverse
 from django.db.models import Q
 from .forms import BookForm
@@ -257,13 +257,23 @@ def delete_all_recently_deleted_books(request):
     return redirect('librarian')
 
 def delete_recently_deleted_books(request, book_id):
-    if request.method == 'POST':
-        book = get_object_or_404(Books, id=book_id)
-        if book.BookFile:
-            book.BookFile.delete(save=False)
-        if book.BookImage:
-            book.BookImage.delete(save=False)
-        book.delete()
+    # Allow only POST requests
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+
+    # Retrieve the book instance or return 404 if not found
+    book = get_object_or_404(Books, id=book_id)
+
+    # Delete files if they exist
+    if book.BookFile:
+        book.BookFile.delete(save=False)
+    if book.BookImage:
+        book.BookImage.delete(save=False)
+
+    # Delete the book record
+    book.delete()
+
+    # Redirect to the librarian view after deletion
     return redirect('librarian')
 
 @login_required
