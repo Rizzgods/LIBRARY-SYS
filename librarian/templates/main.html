@@ -1534,12 +1534,19 @@
                 </div>
             </div>
             
+
+            
+            <!-- jQuery and Bootstrap JS -->
+            <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+            
         </div>
         </main>
     </div>
 
 
-
+ <!-- borrow request script-->
     <script>
         async function fetchBorrowRequests() {
             try {
@@ -1740,11 +1747,11 @@
     
             // Determine which table to filter based on the active tab
             if (activeTab === 'pending') {
-                table = document.querySelectorAll('#pendingRequestsContainer tr');
+                table = document.querySelectorAll('#pendingRequestsContainer tbody tr');
             } else if (activeTab === 'approved') {
-                table = document.querySelectorAll('#approvedRequestsContainer tr');
+                table = document.querySelectorAll('#approvedRequestsContainer tbody tr');
             } else if (activeTab === 'declined') {
-                table = document.querySelectorAll('#declinedRequestsContainer tr');
+                table = document.querySelectorAll('#declinedRequestsContainer tbody tr');
             }
     
             // Filter the rows in the determined table
@@ -1772,122 +1779,53 @@
         // Initial fetch
         fetchBorrowRequests();
     </script>
-
  <!-- jQuery and Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+            <!-- borrow request script-->
 <script>
     function showTab(event, tabId) {
         event.preventDefault();
-    
-        // Hide all tab content
+                
+                    // Hide all tab content
         $('.tab-pane').removeClass('show active').addClass('hidden');
-    
-        // Remove active classes from all tabs
+                
+                    // Remove active classes from all tabs
         $('#bookStatusTabs a').removeClass('text-blue-600 border-blue-600 active')
-                              .addClass('text-gray-600 border-transparent');
-    
-        // Show the selected tab content
+            .addClass('text-gray-600 border-transparent');
+                
+                    // Show the selected tab content
         $('#' + tabId).removeClass('hidden').addClass('show active');
-    
-        // Add active class to the selected tab
+                
+                    // Add active class to the selected tab
         $(event.currentTarget).addClass('border-blue-600 active')
-                              .removeClass('border-transparent');
-        
-        // Update search placeholder based on active tab
-        const tabText = $(event.currentTarget).text();
-        $('#searchRequests').attr('placeholder', 'Search ' + tabText);
-        $('#searchRequests').val(''); // Clear search input
-        filterRequests(); // Reset the filter for the current tab
+            .removeClass('border-transparent');
     }
-
-    function filterRequests() {
-        // Get the search input and the active tab
-        const input = $('#searchRequests').val().toLowerCase();
-        const activeTab = $('.tab-pane.show.active').attr('id');
-        let table;
-
-        // Determine which table to filter based on the active tab
-        if (activeTab === 'borrowed') {
-            table = $('#borrowedTable tr');
-        } else if (activeTab === 'returned') {
-            table = $('#returnedTable tr');
-        } else if (activeTab === 'logs') {
-            table = $('#logsTable tr');
-        }
-
-        // Filter the rows in the determined table, skipping the header row
-        table.each(function(index) {
-            if (index === 0) return; // Skip the header row
-            const row = $(this);
-            const text = row.text().toLowerCase();
-            if (text.includes(input)) {
-                row.show();
-            } else {
-                row.hide();
-            }
-        });
-    }
-
-    // Add an event listener for the search input
-    $('#searchRequests').on('keyup', filterRequests);
-
-    // Function to view book details
+            
+                // Function to view book details
     function viewBookDetails(imageUrl, title, description) {
         $('#viewBookImage').attr('src', imageUrl);
         $('#viewBookTitle').text(title);
         $('#viewBookDescription').text(description);
         $('#viewBookModal').modal('show');
     }
-
+            
     function selectTab(tabId, tabText) {
-        // Hide all tab content
+                    // Hide all tab content
         $('.tab-pane').removeClass('show active');
-        // Show selected tab
+                    // Show selected tab
         $('#' + tabId).addClass('show active');
-        // Update dropdown button text
+                    // Update dropdown button text
         $('#borrowRequestDropdown').text(tabText);
-        // Update search placeholder based on selected tab
-        $('#searchRequests').attr('placeholder', 'Search ' + tabText);
-        // Clear search input
-        $('#searchRequests').val('');
-        // Reset the filter for the current tab
-        filterRequests();
     }
-    
-    function filterRequests() {
-        // Get the search input and the active tab
-        const input = $('#searchRequests').val().toLowerCase();
-        const activeTab = $('.tab-pane.show').attr('id');
-        let table;
-    
-        // Determine which table to filter based on the active tab
-        if (activeTab === 'pending') {
-            table = $('#pendingTable tr');
-        } else if (activeTab === 'approved') {
-            table = $('#approvedTable tr');
-        } else if (activeTab === 'declined') {
-            table = $('#declinedTable tr');
-        }
-    
-        // Filter the rows in the determined table
-        table.each(function() {
-            const row = $(this);
-            const text = row.text().toLowerCase();
-            if (text.includes(input)) {
-                row.show();
-            } else {
-                row.hide();
-            }
-        });
-    }
-    
-    // Add an event listener for the search input
-    $('#searchRequests').on('keyup', filterRequests);
-    </script>
-    
+            
+                // Ensure "Pending Requests" tab is selected by default when the page loads
+    $(document).ready(function() {
+        selectTab('pending', 'Pending Requests');
+    });
+</script>
 
 
 
