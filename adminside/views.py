@@ -105,12 +105,6 @@ def batch_upload_view(request):
     return render(request, 'admin.html')
 
 
-
-    
-
-
-
-
 def import_csv(request):
     if request.method == 'POST':
         if 'csv_file' in request.FILES:
@@ -183,11 +177,11 @@ def book_page_views(request):
         latest_activity=Max('login_time')
     )
     
-    # Retrieve the user activities corresponding to the most recent login time
+    # Retrieve the user activities corresponding to the most recent login time and order by latest
     user_activities = UserActivity.objects.filter(
         active=True,
         login_time__in=[activity['latest_activity'] for activity in latest_user_activities]
-    )
+    ).order_by('-login_time')
     
     # Calculate the count of distinct users who logged in this month
     current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -211,7 +205,7 @@ def book_page_views(request):
     user_total = student_total + lib_total
 
     # Retrieve all user logs and users
-    user_logs = UserActivity.objects.all()
+    user_logs = UserActivity.objects.all().order_by('-login_time')  # Order all user logs by latest activity
     users = User.objects.all()
 
     # Render the template with the necessary data
@@ -227,71 +221,9 @@ def book_page_views(request):
         'ebook_titles': ebook_titles,
         'borrow': borrow,
     })
+
     # Retrieve all books and sort them by page views in descending order
-    books = Books.objects.all().order_by('-PageViews')[:10]
     
-    top_books = Books.objects.filter(eBook=True).order_by('-TimesBorrow')[:4]
-    
-    ebook = Books.objects.filter(eBook=True)
-
-    
-    # Extract necessary data (book titles and times borrowed)
-    ebook_titles = [book.BookTitle for book in ebook]
-    times_borrowed = [book.TimesBorrow for book in top_books]
-
-    # Get the most recent user activity for each user
-    latest_user_activities = UserActivity.objects.filter(
-        active=True
-    ).values('user').annotate(
-        latest_activity=Max('login_time')
-    )
-    
-    # Retrieve the user activities corresponding to the most recent login time
-    user_activities = UserActivity.objects.filter(
-        active=True,
-        login_time__in=[activity['latest_activity'] for activity in latest_user_activities]
-    )
-    
-    # Calculate the count of distinct users who logged in this month
-    current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    next_month_start = (current_month_start + timezone.timedelta(days=31)).replace(day=1)
-    distinct_users_count_this_month = UserActivity.objects.filter(
-        login_time__gte=current_month_start,
-        login_time__lt=next_month_start
-    ).values('user').distinct().count()
-
-    # Extract book titles and page views
-    book_titles = [book.BookTitle for book in books]
-    page_views = [book.PageViews for book in books]
-
-    ebook_titles = [top_books.BookTitle for top_books in top_books]
-    borrow = [top_books.TimesBorrow for top_books in top_books]
-
-    Student_total = Account.objects.distinct().count()
-    lib_total = Librarian.objects.distinct().count()
-    user_logs = UserActivity.objects.all()
-    user_total = Student_total + lib_total
-    users = User.objects.all()
-
-    if not request.user.is_authenticated:
-        return redirect('login_user')
-    
-    # Render the template with the necessary data
-    return render(request, 'book_page_views.html', {
-    'book_titles': book_titles, 
-    'page_views': page_views, 
-    'user_activities': user_activities, 
-    'distinct_users_count_this_month': distinct_users_count_this_month,
-    'user_total':user_total,
-    'user_logs':user_logs,
-    'users': users,  # Add this line to pass the users variable
-    'times_borrowed': times_borrowed,
-    'ebook_titles':ebook_titles ,
-    'borrow':borrow ,
-    })
-
-
-# views.py
 
 from django.shortcuts import render, redirect
 from .forms import AccountForm, LibrarianForm
