@@ -69,7 +69,10 @@
         border-radius: 50%;
     }
     .no-notif{
-            font-size: 1rem;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            font-size: 2rem;
             padding: 10px 25px;
         }
     .notif-link{
@@ -528,9 +531,6 @@
         .notification-icon {
             margin-right: 20px;
         }
-        .dropdown-item-list{
-            padding-left: 10px;
-        }
         .dropdown{
             width: 400px;
         }
@@ -891,6 +891,10 @@
             updateReadMoreVisibility();
         });
     });
+
+    function handleImageError(image) {
+        image.src = '../../media/books/images/backup-img.jpg';
+    }
 </script>
     {% block script %}{% endblock %}
 </body>

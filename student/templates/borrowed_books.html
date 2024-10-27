@@ -278,7 +278,6 @@
         font-size: 1rem;
         padding: 10px 25px;
     }
-      
       .dropdown-menu.show {
         transform: scaleY(0);
         opacity: 1;
@@ -502,7 +501,7 @@
         <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ request.book.id }}">
             <div class="card d-flex justify-content-center align-items-center">
                 <a href="{% url 'prev_file' request.book.id  %}">
-                    <img class="card-img-top" src="{{ request.book.BookImage.url }}" alt="{{ request.book.BookTitle }}">
+                    <img class="card-img-top" src="{{ request.book.BookImage.url }}" alt="..." onerror="handleImageError(this);">
                 </a>
                 <div class="card-body">
                     <a href="{% url 'prev_file' request.book.id  %}">

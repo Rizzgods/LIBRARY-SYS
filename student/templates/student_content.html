@@ -163,6 +163,7 @@
         border-radius: 5px;
         overflow: hidden;
         z-index: 1;
+        width: 700px;
     }
 
      .dropdown-item {
@@ -171,6 +172,7 @@
         align-items: center;
         padding: 10px;
         border-bottom: 1px solid #ddd;
+        text-wrap: wrap;
     }
     
     .dropdown-item:last-child {
@@ -579,12 +581,13 @@
             width: 30px;
         }
     }
-    @media (max-width: 420px) {
+    @media (max-width: 430px) {
         .dropdown-item-list{
             padding-left: 10px;
         }
         .dropdown{
             width:325px;
+            z-index: 1000;
         }
         .dropdown-item{
             text-wrap: wrap;
@@ -718,7 +721,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -756,7 +759,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -795,7 +798,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -835,7 +838,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -860,7 +863,7 @@
             <div class="modal-body">
                 <div class="book-info">
                     <div class="book-img">
-                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
+                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image" onerror="handleImageError(this);">
                     </div>
                     <div class="book-data">
                         <div class="modal-book-text">

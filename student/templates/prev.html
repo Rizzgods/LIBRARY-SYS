@@ -18,6 +18,7 @@
         html{
             width:100%;
             height: 100%;
+            overflow: auto;
         }
         .notification-time {
             font-size: 0.8rem;
@@ -95,9 +96,9 @@
             background-color: rgb(74, 128, 210);
             top: 0;
             position: fixed;
-            z-index: top;
+            z-index: 1030;
             grid-area: header;
-            width:100%;
+            width: 100%;
             height: 100px;
             animation: fadeInHeader 0.5s ease forwards;
             flex-wrap: nowrap;
@@ -143,15 +144,25 @@
             right: 0;
             background-color: white;
             color: black;
+            width: 700px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             border-radius: 5px;
             overflow: hidden;
             z-index: 1;
         }
-    
-         .dropdown-item {
+        #notification-dropdown {
+            max-height: 300px;  /* Set a maximum height for the dropdown */
+            overflow-y: auto;   /* Allow vertical scrolling when content exceeds the height */
+        }
+        .dropdown-header {
             display: flex;
-            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+        }
+    
+        .dropdown-item {
+            display: flex;
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid #ddd;
@@ -171,6 +182,29 @@
         .dropdown-item:not(.read) {
             font-weight: bold;
         }
+        .dropdown-menu.show {
+            transform: scaleY(0);
+            opacity: 1;
+            width: 218px;
+            background-color: transparent;
+            border: none;
+            position: relative;
+            padding: 0;
+          }
+          #li-dropdown{
+            padding: 0;
+            margin: 20;
+          }
+          .dropdown-btn{
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            background-color: transparent;
+            border: none;
+            color: white;
+            padding: 20px;
+          }
+          
         .notification-icon, .notification-icon-2 {
             width: 45px;
             height: 45px;
@@ -313,10 +347,11 @@
         .notif-link{
             display: flex;
             flex-direction: row;
+            justify-content: start;
             border-right: 1px solid rgba(0, 0, 0, 0.3);
             flex-grow: 1;
             margin-right: 10px;
-        }
+          }
         .text-to-speech{
             display: flex;
             flex-direction: row;
@@ -340,7 +375,9 @@
         .notif-btn{
             color: rgb(73, 110, 232);
             text-decoration: none !important; 
-            font-weight: bold
+            font-weight: bold;
+            font-size: 0.875rem;
+            padding: 0.25rem;
           }
           .notif-btn:hover{
             color: rgba(73, 110, 232, .5);
@@ -482,6 +519,7 @@
             }
             .header{
                 padding: 5px;
+                width: 100%;
             }
             .dropdown-item-list{
                 padding-left: 10px;
@@ -559,7 +597,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
 </head>
 <body>
-    <header class="header fixed-top">
+    <header class="header">
         <div class="logo">
             <a href="#" id="back-button" onclick="history.go(-1); return false;"><span class="material-symbols-outlined back-icon">arrow_back</span></a>
             <a href="{% url 'view' %}"class="logo-img">
@@ -575,7 +613,6 @@
                     <button id="mark-all-read" class="btn btn-link notif-btn">Mark All as Read</button>
                     <button id="see-more-less-btn" class="btn btn-link notif-btn" style="display: none;">See More</button>
                 </div>
-        
                 <!-- Notification list -->
                 <ul id="notification-list" class="dropdown-item-list"></ul>
         

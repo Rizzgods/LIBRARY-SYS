@@ -633,7 +633,7 @@
                   data-views="{{ book.PageViews }}"
                   data-id="{{ book.id }}"
                   data-available="{{ book.available|yesno:"true,false" }}">
-                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
+                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}" onerror="handleImageError(this);">
             </span>
             <div class="card-body">
                 <h5 class="card-title">{{ book.BookTitle }}</h5>
@@ -700,7 +700,7 @@
             <div class="modal-body">
                 <div class="book-info">
                     <div class="book-img">
-                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
+                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image" onerror="handleImageError(this);">
                     </div>
                     <div class="book-data">
                         <div class="modal-book-text">
