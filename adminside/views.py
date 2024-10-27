@@ -105,12 +105,6 @@ def batch_upload_view(request):
     return render(request, 'admin.html')
 
 
-
-    
-
-
-
-
 def import_csv(request):
     if request.method == 'POST':
         if 'csv_file' in request.FILES:
@@ -183,11 +177,11 @@ def book_page_views(request):
         latest_activity=Max('login_time')
     )
     
-    # Retrieve the user activities corresponding to the most recent login time
+    # Retrieve the user activities corresponding to the most recent login time and order by latest
     user_activities = UserActivity.objects.filter(
         active=True,
         login_time__in=[activity['latest_activity'] for activity in latest_user_activities]
-    )
+    ).order_by('-login_time')
     
     # Calculate the count of distinct users who logged in this month
     current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -211,7 +205,7 @@ def book_page_views(request):
     user_total = student_total + lib_total
 
     # Retrieve all user logs and users
-    user_logs = UserActivity.objects.all()
+    user_logs = UserActivity.objects.all().order_by('-login_time')  # Order all user logs by latest activity
     users = User.objects.all()
 
     # Render the template with the necessary data
@@ -227,6 +221,7 @@ def book_page_views(request):
         'ebook_titles': ebook_titles,
         'borrow': borrow,
     })
+
     # Retrieve all books and sort them by page views in descending order
     books = Books.objects.all().order_by('-PageViews')[:10]
     
