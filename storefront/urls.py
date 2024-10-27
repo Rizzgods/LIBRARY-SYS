@@ -26,7 +26,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('student/',include('student.urls') ),
-    path('librarian/',include('librarian.urls')),
+    path('',include('librarian.urls')),
     path("__debug__/", include("debug_toolbar.urls")),
     path('userauth/', include('userauth.urls')),
     path('adminside/',include('adminside.urls')),
