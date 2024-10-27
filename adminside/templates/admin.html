@@ -31,11 +31,6 @@
             {% endfor %}
         {% endif %}
 
-
-        <!-- Error Message Section -->
-
-        
-
         <!-- Upload Form -->
         <div class="card shadow-lg">
             <div class="card-body p-4">
@@ -44,15 +39,24 @@
                     <!-- CSV File Upload -->
                     <div class="mb-4">
                         <label for="csvFile" class="form-label">Upload CSV File:</label>
-                        <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
+                        <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required onchange="handleCSVUpload(event)">
                         <small class="form-text text-muted">Please upload a valid CSV file.</small>
                     </div>
 
                     <!-- Folder Upload -->
                     <div class="mb-4">
                         <label for="fileFolder" class="form-label">Upload Folder with Files:</label>
-                        <input type="file" class="form-control" id="fileFolder" name="fileFolder" webkitdirectory directory multiple required>
+                        <input type="file" class="form-control" id="fileFolder" name="fileFolder" webkitdirectory directory multiple required onchange="handleFolderUpload(event)">
                         <small class="form-text text-muted">Select a folder containing files related to the books.</small>
+                    </div>
+
+                    <!-- CSV Preview Table -->
+                    <div id="csvPreview" class="mt-4" style="display:none;">
+                        <h5 class="text-center">CSV Preview</h5>
+                        <table class="table table-bordered table-striped" id="previewTable">
+                            <thead class="table-dark"></thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
 
                     <!-- Submit Button -->
@@ -66,5 +70,124 @@
 
     <!-- Bootstrap 5 JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- JavaScript for CSV and Folder Preview -->
+    <script>
+        let folderFiles = {};
+        let csvContent = "";
+        let isFolderUploaded = false;
+        let isCSVUploaded = false;
+    
+        function handleFolderUpload(event) {
+            const files = event.target.files;
+            folderFiles = {};
+    
+            for (let file of files) {
+                folderFiles[file.name] = URL.createObjectURL(file);
+            }
+            isFolderUploaded = true;
+            showPreviewIfReady();
+        }
+    
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type === 'text/csv') {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    csvContent = e.target.result;
+                    isCSVUploaded = true;
+                    showPreviewIfReady();
+                };
+                reader.readAsText(file);
+            } else {
+                alert("Please upload a valid CSV file.");
+            }
+        }
+    
+        function showPreviewIfReady() {
+            if (isFolderUploaded && isCSVUploaded) {
+                displayCSVPreview(csvContent);
+            }
+        }
+    
+        function displayCSVPreview(content) {
+            const previewTable = document.getElementById('previewTable');
+            const csvPreview = document.getElementById('csvPreview');
+            const lines = content.split("\n").filter(line => line.trim());
+            previewTable.querySelector('thead').innerHTML = '';
+            previewTable.querySelector('tbody').innerHTML = '';
+    
+            let errors = [];
+    
+            if (lines.length) {
+                const headers = lines[0].split(",");
+                const headerRow = document.createElement('tr');
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                });
+                previewTable.querySelector('thead').appendChild(headerRow);
+    
+                for (let i = 1; i < lines.length; i++) {
+                    const row = document.createElement('tr');
+                    const cells = lines[i].split(",");
+    
+                    cells.forEach((cell, index) => {
+                        const td = document.createElement('td');
+                        const header = headers[index].toLowerCase();
+    
+                        if (header.includes("image") || header.includes("file")) {
+                            const expectedFileName = cell.trim();
+                            const expectedExtension = expectedFileName.split('.').pop();
+    
+                            // Check if the file exists in the folder and has the expected extension
+                            if (folderFiles[expectedFileName]) {
+                                if (!expectedFileName.endsWith(`.${expectedExtension}`)) {
+                                    errors.push(`The file ${expectedFileName} has a mismatched format as per the CSV specification.`);
+                                }
+                                // Display image or link if file exists
+                                if (header.includes("image")) {
+                                    const img = document.createElement('img');
+                                    img.src = folderFiles[expectedFileName];
+                                    img.alt = 'Image Preview';
+                                    img.style.width = '50px';
+                                    td.appendChild(img);
+                                } else if (header.includes("file")) {
+                                    const link = document.createElement('a');
+                                    link.href = folderFiles[expectedFileName];
+                                    link.target = '_blank';
+                                    link.textContent = 'View File';
+                                    td.appendChild(link);
+                                }
+                            } else {
+                                // Display error if the file does not exist
+                                errors.push(`The file ${expectedFileName} specified in the CSV was not found in the uploaded folder.`);
+                                td.textContent = `File Not Found`;
+                            }
+                        } else {
+                            // Convert true/false values to yes/no for regular text cells
+                            if (cell.trim().toLowerCase() === 'true') {
+                                td.textContent = 'Yes';
+                            } else if (cell.trim().toLowerCase() === 'false') {
+                                td.textContent = 'No';
+                            } else {
+                                td.textContent = cell;
+                            }
+                        }
+                        row.appendChild(td);
+                    });
+                    previewTable.querySelector('tbody').appendChild(row);
+                }
+                csvPreview.style.display = 'block';
+    
+                // Display error messages if there are any
+                if (errors.length > 0) {
+                    alert(errors.join("\n"));
+                }
+            }
+        }
+    </script>
+    
 </body>
 </html>
