@@ -613,10 +613,24 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label for="csvFile" class="form-label">Upload CSV File</label>
-                <input class="form-control" type="file" id="csvFile" name="csv_file" accept=".csv">
+                <input class="form-control" type="file" id="csvFile" name="csv_file" accept=".csv" onchange="previewCSV()">
             </div>
-            <button type="submit" class="btn btn-primary">Upload</button>
+            <button type="submit" class="btn btn-primary" id="uploadCSVButton">Upload</button>
         </form>
+    
+        <!-- Preview Section -->
+        <div id="csvPreview" style="display: none; margin-top: 20px;">
+            <h5>CSV Preview:</h5>
+            <table class="table table-striped" id="csvPreviewTable">
+                <thead>
+                    <!-- Table headers will be inserted here -->
+                </thead>
+                <tbody>
+                    <!-- Table data rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}
@@ -627,6 +641,57 @@
             </div>
         {% endif %}
     </div>
+    
+    <script>
+        function previewCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            const previewTable = document.getElementById('csvPreviewTable');
+            const previewSection = document.getElementById('csvPreview');
+    
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const csvData = event.target.result;
+                    const rows = csvData.split('\n').slice(0, 5);  // Preview first 5 rows
+                    const tableHeaders = rows[0].split(',').map(header => header.trim());
+    
+                    // Clear previous preview
+                    previewTable.querySelector('thead').innerHTML = '';
+                    previewTable.querySelector('tbody').innerHTML = '';
+    
+                    // Create headers
+                    const headerRow = document.createElement('tr');
+                    tableHeaders.forEach(header => {
+                        const th = document.createElement('th');
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    });
+                    previewTable.querySelector('thead').appendChild(headerRow);
+    
+                    // Populate preview with data rows
+                    rows.slice(1).forEach(row => {
+                        const rowData = row.split(',').map(cell => cell.trim());
+                        const rowElement = document.createElement('tr');
+                        rowData.forEach(cell => {
+                            const td = document.createElement('td');
+                            td.textContent = cell;
+                            rowElement.appendChild(td);
+                        });
+                        previewTable.querySelector('tbody').appendChild(rowElement);
+                    });
+    
+                    // Show preview section
+                    previewSection.style.display = 'block';
+                };
+    
+                reader.readAsText(file);
+            } else {
+                // Hide preview if no file selected
+                previewSection.style.display = 'none';
+            }
+        }
+    </script>
     
     
     <!-- Script to manage content display -->

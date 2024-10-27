@@ -33,7 +33,7 @@ def batch_upload_view(request):
 
         if not csv_file or not files:
             messages.error(request, "Please upload both a CSV file and a folder with files.")
-            return redirect('your_upload_view_url')
+            return redirect('batch-upload')
 
         # Save the uploaded folder files temporarily
         temp_dir = os.path.join(settings.MEDIA_ROOT, 'temp_uploads')
@@ -106,9 +106,7 @@ def batch_upload_view(request):
 
 
 
-
-
-
+    
 
 
 
