@@ -147,8 +147,6 @@ def book_detail(request, book_id):
     return render(request, 'info.html', context)
 
 
-
-
 def prev_file(request, book_id):
     book = get_object_or_404(Books, id=book_id)
     
@@ -161,10 +159,7 @@ def prev_file(request, book_id):
     
     # Bypass authentication and permission checks if the book is an eBook
     if book.eBook:
-        context = {
-            'book': book,
-        }
-        return render(request, 'prev.html', context)
+        return render(request, 'prev.html', {'book': book})
     
     # Check if the user is authenticated
     if not request.user.is_authenticated:
@@ -172,12 +167,10 @@ def prev_file(request, book_id):
     
     # Check if there exists an approved request for the book and user
     if ApprovedRequest.objects.filter(book=book, requested_by=request.user).exists():
-        context = {
-            'book': book,
-        }
-        return render(request, 'prev.html', context)
+        return render(request, 'prev.html', {'book': book})
     else:
-        return HttpResponseForbidden("You don't have permission to access this book.")
+        # Render forbidden.html with a styled message
+        return render(request, 'forbidden.html')
 
 def search_suggestions(request):
     query = request.GET.get('q', '')
