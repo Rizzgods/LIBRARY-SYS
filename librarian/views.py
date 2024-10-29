@@ -16,6 +16,7 @@ from .models import ApprovedRequest, Books, Category, LANGUAGE_CHOICES, BorrowRe
 from django.db.models.functions import TruncYear, ExtractYear
 from librarian.utils import delete_expired_borrow_requests
 from student.models import Notification
+from django.views.decorators.http import require_POST
 
 
 
@@ -389,31 +390,23 @@ def approve_request_view(request, request_id):
     return redirect('librarian')
 
 
-@login_required
+@require_POST
 def decline_request_view(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    
-    if request.method == "POST":
-        decline_reason = request.POST.get('decline_reason_input', 'No reason provided')
-        
-        DeclinedRequest.objects.create(
-            book=borrow_request.book,
-            requested_by=borrow_request.requested_by,
-            requested_at=borrow_request.requested_at,
-            decline_reason=decline_reason
-        )
-        
-        # Create a notification for the declined request
-        Notification.objects.create(
-            user=borrow_request.requested_by,
-            message=f"Your request for {borrow_request.book.BookTitle} was declined. Reason: {decline_reason}",
-            notification_type='declined'  # Set notification type
-        )
-        
-        borrow_request.delete()
-        messages.success(request, 'Request successfully declined.')
-        
-    return redirect('librarian')
+    decline_reason = request.POST.get('decline_reason_input', 'Other')
+
+    # Create DeclinedRequest with the captured decline reason
+    declined_request = DeclinedRequest.objects.create(
+        book=borrow_request.book,
+        requested_by=borrow_request.requested_by,
+        requested_at=borrow_request.requested_at,
+        decline_reason=decline_reason
+    )
+    # Delete the original borrow request if required
+    borrow_request.delete()
+
+    return redirect('librarian')  # Or wherever you want to redirect
+
 
 @login_required
 def toggle_book_status(request, request_id):

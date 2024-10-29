@@ -734,35 +734,42 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             }, function() {
                 let requestType = 'pending';  // Default to pending
+        
+                // Based on the notificationType, we'll change the requestType for redirect
                 if (notificationType === 'approved') {
                     requestType = 'approved';
                 } else if (notificationType === 'declined') {
                     requestType = 'declined';
+                } else if (notificationType === 'expired') {
+                    requestType = 'expired';
                 }
-
-                // Update local state
+        
+                // Update local state to mark notification as read
                 notifications = notifications.map(function(notification) {
                     if (notification.id === notificationId) {
                         notification.read = true;
                     }
                     return notification;
                 });
-
+        
                 // Update the badge count
                 var unreadCount = notifications.filter(function(notification) {
                     return !notification.read;
                 }).length;
-
+        
                 if (unreadCount > 0) {
                     $('#notification-count').text(unreadCount).show();
                 } else {
                     $('#notification-count').hide();
                 }
-
+        
                 renderNotifications();
-                window.location.href = "{% url 'borrowed_books' %}?requestType=" + requestType;
+        
+                // Redirect the user to the request history page with a query parameter for the request type
+                window.location.href = "{% url 'request_history' %}?requestType=" + requestType + "&notificationId=" + notificationId;
             });
         }
+        
     
         function markAllAsRead() {
             $.post("{% url 'mark_all_notifications_read' %}", {
