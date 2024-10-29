@@ -1783,7 +1783,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <form method="post" action="/librarian/borrow_requests/decline/${request.id}/">
+                                        <form method="post" action="/borrow_requests/decline/${request.id}/">
                                             <input type="hidden" name="csrfmiddlewaretoken" value="${getCsrfToken()}">
                                             <input type="hidden" id="declineReasonInput${request.id}" name="decline_reason_input">
                                             <button type="submit" class="btn btn-danger" 
