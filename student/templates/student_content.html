@@ -409,6 +409,37 @@
         flex: 1;
         padding-right: 10px;
       }
+      .home-active{
+        background-color:rgba(255, 255, 255, 0.1);
+    }
+
+    /* Default sidebar width */
+    .side-bar {
+        width: 250px; /* Adjust as needed */
+        transition: width 0.3s ease; /* Smooth transition */
+    }
+
+    /* Minimized sidebar width */
+    .side-bar.minimized {
+        width: 150px; /* Set minimized width */
+    }
+
+    /* Adjustments for inner sidebar items when minimized */
+    .side-bar.minimized .navbar-desc {
+        font-size: 0.9rem; /* Optional: reduce font size */
+    }
+
+    /* Optional: hide or resize text in minimized state */
+    .side-bar.minimized .navbar-desc li span,
+    .side-bar.minimized .logout span {
+        font-size: 1.2rem; /* Optional: adjust icon size */
+    }
+
+    /* Adjust main container if it needs to expand with minimized sidebar */
+    #main-container.with-sidebar-minimized {
+        margin-left: 150px; /* Adjust according to sidebar width */
+        transition: margin-left 0.3s ease;
+    }
       
 
 
@@ -598,23 +629,6 @@
     }
 
 </style>
-
-{% endblock %}
-
-{% block nav %}
-<a href="{% url 'view' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
-<a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-<a href="{% url 'change-password' %}" target="_blank" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>Change Password</li></a>
-<li id="li-dropdown"><div>
-    <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
-    </button>
-    <ul class="dropdown-menu animate-dropdown">
-        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
-        <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
-    </ul>
-  </div>
-</li>
 
 {% endblock %}
 
@@ -1200,17 +1214,13 @@
         var offcanvasElement = document.getElementById('offcanvasScrolling');
         var sideBarElement = document.querySelector('.side-bar');
         var mainContainer = document.getElementById('main-container');
-    
-        offcanvasElement.addEventListener('hidden.bs.offcanvas', function() {
-            sideBarElement.classList.remove('show');
-            mainContainer.classList.remove('with-sidebar');
+
+        offcanvasElement.addEventListener('toggle.bs.offcanvas', function() {
+            // Toggle the minimized class instead of show
+            sideBarElement.classList.toggle('minimized');
+            mainContainer.classList.toggle('with-sidebar-minimized');
         });
-    
-        offcanvasElement.addEventListener('show.bs.offcanvas', function() {
-            sideBarElement.classList.add('show');
-            mainContainer.classList.add('with-sidebar');
-        });
-    
+
         const modal = document.getElementById('bookDetailModal');
     
         function openBookDetailModal(book) {
