@@ -161,6 +161,7 @@
         border-radius: 5px;
         overflow: hidden;
         z-index: 1;
+        width: 700px;
     }
 
      .dropdown-item {
@@ -169,6 +170,7 @@
         align-items: center;
         padding: 10px;
         border-bottom: 1px solid #ddd;
+        text-wrap: wrap;
     }
     
     .dropdown-item:last-child {
@@ -405,6 +407,37 @@
         flex: 1;
         padding-right: 10px;
       }
+      .home-active{
+        background-color:rgba(255, 255, 255, 0.1);
+    }
+
+    /* Default sidebar width */
+    .side-bar {
+        width: 250px; /* Adjust as needed */
+        transition: width 0.3s ease; /* Smooth transition */
+    }
+
+    /* Minimized sidebar width */
+    .side-bar.minimized {
+        width: 150px; /* Set minimized width */
+    }
+
+    /* Adjustments for inner sidebar items when minimized */
+    .side-bar.minimized .navbar-desc {
+        font-size: 0.9rem; /* Optional: reduce font size */
+    }
+
+    /* Optional: hide or resize text in minimized state */
+    .side-bar.minimized .navbar-desc li span,
+    .side-bar.minimized .logout span {
+        font-size: 1.2rem; /* Optional: adjust icon size */
+    }
+
+    /* Adjust main container if it needs to expand with minimized sidebar */
+    #main-container.with-sidebar-minimized {
+        margin-left: 150px; /* Adjust according to sidebar width */
+        transition: margin-left 0.3s ease;
+    }
       
 
 
@@ -577,12 +610,13 @@
             width: 30px;
         }
     }
-    @media (max-width: 420px) {
+    @media (max-width: 430px) {
         .dropdown-item-list{
             padding-left: 10px;
         }
         .dropdown{
             width:325px;
+            z-index: 1000;
         }
         .dropdown-item{
             text-wrap: wrap;
@@ -596,6 +630,7 @@
 
 {% endblock %}
 
+<<<<<<< HEAD
 {% block nav %}
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 <a href="{% url 'view' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
@@ -614,6 +649,8 @@
 
 {% endblock %}
 
+=======
+>>>>>>> 471b49f02f019ee4ffd1e80323af3276f9bcd0b0
 {% block body %}
 {% load static %}
 <!-- Carousel and other sections here -->
@@ -717,7 +754,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -755,7 +792,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -794,7 +831,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -834,7 +871,7 @@
             <div class="item">
                 <a class="card-link">
                     <div class="card">
-                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="...">
+                        <img src="{{ item.BookImage.url }}" class="card-img-top" alt="..." onerror="handleImageError(this);">
                         <div class="card-body preview-title">
                             <h5 class="card-title card-preview-title">{{ item.BookTitle }}</h5>
                         </div>
@@ -859,7 +896,7 @@
             <div class="modal-body">
                 <div class="book-info">
                     <div class="book-img">
-                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
+                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image" onerror="handleImageError(this);">
                     </div>
                     <div class="book-data">
                         <div class="modal-book-text">
@@ -1204,17 +1241,13 @@
         var offcanvasElement = document.getElementById('offcanvasScrolling');
         var sideBarElement = document.querySelector('.side-bar');
         var mainContainer = document.getElementById('main-container');
-    
-        offcanvasElement.addEventListener('hidden.bs.offcanvas', function() {
-            sideBarElement.classList.remove('show');
-            mainContainer.classList.remove('with-sidebar');
+
+        offcanvasElement.addEventListener('toggle.bs.offcanvas', function() {
+            // Toggle the minimized class instead of show
+            sideBarElement.classList.toggle('minimized');
+            mainContainer.classList.toggle('with-sidebar-minimized');
         });
-    
-        offcanvasElement.addEventListener('show.bs.offcanvas', function() {
-            sideBarElement.classList.add('show');
-            mainContainer.classList.add('with-sidebar');
-        });
-    
+
         const modal = document.getElementById('bookDetailModal');
     
         function openBookDetailModal(book) {

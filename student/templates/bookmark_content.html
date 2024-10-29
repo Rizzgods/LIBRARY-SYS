@@ -344,6 +344,9 @@
         justify-content: center;
         align-items: center;
     }
+    .bookmark-active{
+        background-color:rgba(255, 255, 255, 0.1);
+    }
 
 
 
@@ -592,22 +595,6 @@
 </style>
 {% endblock %}
 
-{% block nav %}
-<a href="{% url 'view' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
-<a href="{% url 'bookmark' %}" class="navbar-desc"><li class="active"><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-<a href="{% url 'change-password' %}" target="_blank" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>Change Password</li></a>
-<li id="li-dropdown"><div>
-    <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
-    </button>
-    <ul class="dropdown-menu animate-dropdown">
-        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
-        <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
-    </ul>
-  </div>
-</li>
-{% endblock %}
-
 {% block body %}
 {% load static %}
 <div class="bookmark-head rpw">
@@ -633,7 +620,7 @@
                   data-views="{{ book.PageViews }}"
                   data-id="{{ book.id }}"
                   data-available="{{ book.available|yesno:"true,false" }}">
-                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}">
+                <img src="{{ book.BookImage.url }}" class="card-img-top" alt="{{ book.BookTitle }}" onerror="handleImageError(this);">
             </span>
             <div class="card-body">
                 <h5 class="card-title">{{ book.BookTitle }}</h5>
@@ -700,7 +687,7 @@
             <div class="modal-body">
                 <div class="book-info">
                     <div class="book-img">
-                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image">
+                        <img src="" alt="" id="modal-book-image" class="img-fluid book-image" onerror="handleImageError(this);">
                     </div>
                     <div class="book-data">
                         <div class="modal-book-text">
