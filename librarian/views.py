@@ -239,18 +239,53 @@ def batch_upload_view(request):
 def reset_filters(request):
     return redirect('librarian')
 
+def get_subcategories(request, category_id):
+    subcategories = SubCategory.objects.filter(category_id=category_id).values('id', 'name')
+    return JsonResponse({'subcategories': list(subcategories)})
+
+def get_subsections(request, subcategory_id):
+    subsections = SubSection.objects.filter(sub_category_id=subcategory_id).values('id', 'name')
+    return JsonResponse({'subsections': list(subsections)})
+
 def edit_book(request, book_id):
     book = get_object_or_404(Books, id=book_id)
+    categories = Category.objects.all()
+    
+    # Fetch subcategories and subsections based on the current book's categories
+    subcategories = SubCategory.objects.filter(category__in=book.Category.all())
+    subsections = SubSection.objects.filter(sub_category__in=book.SubCategory.all())
+
     if request.method == 'POST':
-        form = BookForm(request.POST, instance=book)
+        form = BookForm(request.POST, request.FILES, instance=book)
         if form.is_valid():
-            form.save()
-            return redirect('librarian')
+            book = form.save(commit=False)
+
+            # Check if a new image is uploaded
+            if 'BookImage' in request.FILES:
+                book.BookImage = request.FILES['BookImage']
+
+            # Save the book instance
+            book.save()
+
+            # Update the many-to-many relationships
+            form.save_m2m()  # This saves the many-to-many relationships
+
+            messages.success(request, 'Book updated successfully!')
+            return redirect('librarian')  # Redirect to the list of books or another appropriate page
+        else:
+            messages.error(request, 'Please correct the errors below.')
+
     else:
         form = BookForm(instance=book)
-    
-    return render(request, 'editbooks.html', {'form': form, 'book': book})
 
+    context = {
+        'form': form,
+        'book': book,
+        'categories': categories,
+        'subcategories': subcategories,
+        'subsections': subsections,
+    }
+    return render(request, 'editbooks.html', context)
 
 @login_required
 def approve_request(request, request_id):

@@ -1,399 +1,282 @@
 {% load custom_tags2 %}
-
-
 {% load static %}
-
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href={% static "playground/school_Logo.png" %}>
-    <!-- Bootstrap CSS -->
+    <link rel="icon" href="{% static 'playground/school_Logo.png' %}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-    <!--search-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <!--help-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <!--ebook icon-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <!--article icon-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <!--research Paper-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <!--Bookmark-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <!--Close-->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <title>Edit Book</title>
 
     <style>
-        *{
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
         }
-        .main-content {
-            background-color: #fff;
-            padding: 20px 50px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 60vw;
-            height: 75vh;
-            margin-left: 30px;
-            z-index: 1;
-            position: relative;
+
+        body {
+            background-color: #fff;  /* Changed to pure white */
         }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        .card {
+            background-color: #fff;  /* Ensured card background is also white */
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
         h1 {
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 20px;
             color: #333;
             text-align: center;
         }
+
         .form-group label {
             font-weight: bold;
+            color: #555;
         }
-        .form-check-label {
-            margin-left: 5px;
-            font-weight: normal;
-        }
-        button[type="submit"] {
+
+        button[type="submit"], 
+        .cancel-btn {
             width: 100%;
             padding: 10px;
             font-size: 16px;
             color: #fff;
-            background-color: #007bff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             margin-top: 20px;
         }
+
+        button[type="submit"] {
+            background-color: #007bff;
+        }
+
         button[type="submit"]:hover {
             background-color: #0056b3;
         }
-        a {
-            display: block;
-            text-align: center;
-            margin-top: 10px;
-            color: #007bff;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .checkbox{
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-        .checkbox-text{
-            display:flex;
-            flex-direction: row-reverse;
-            border: 1px solid rgb(74, 128, 210); 
-            border-radius: 10px;
-            color: white;
-            background-color: rgb(74, 128, 210);
-            padding: 10px 30px 10px 10px;
-            font-weight: bold;
-            position: relative
-        }
-        .form-check-input{
-            transform: translate(15px, 0px);
-        }
-        .form-group-bot{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            text-align: center;
-        }
-        .form-group-bot a{
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis;
-        }
-        .title, .main-title{
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        .main-title{
-            font-size: 1.6rem;
-        }
-        .sub-text{
-            font-size: 1rem;
-        }
-        #id_BookImage, #id_BookFile{
-            margin-left: auto;
-        }
-        .main-container{
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
 
+        .cancel-btn {
+            background-color: #dc3545;
+        }
 
+        .cancel-btn:hover {
+            background-color: #c82333;
+        }
 
-            background-image: url({% static '/BG2.jpg' %});
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: cover;
-            height: 100vh;
-        }
-        .blur {
-            display: flex;
-            position: absolute;
-            z-index: 0;
-            top: 0;
-            left: 0;
-            background-color: rgba(112, 112, 112, 0.349);
-            width: 100%;
-            height: 100%;
-            backdrop-filter: blur(2px);
-        }
-        .bookImgPrev{
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-            background: white;
-            border-radius: 8px;
-            padding: 25px;
-        }
-        .editBtn-container{
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            margin-top: 50px;
-            gap: 20px;
-        }
-        .editBtn{
-            padding: 20px 10px !important; 
-            margin: 0px !important;
-            border-radius: 8px !important;       
-        }
-        .editBtn:hover{
-            text-decoration: none;
-        }
-        .marginBottom{
-            margin-bottom: 30px;
-        }
-        .prev-img{
-            max-width: 100%; height: auto;
-            max-height: 600px;
-            max-width: 425px;
+        .prev-img {
+            max-width: 100%;
+            max-height: 300px;
             object-fit: cover;
             border-radius: 8px;
+            margin: 20px 0;
         }
 
-        @media (max-width: 1250px) {
-            html{
-                overflow: hidden;
-            }
-            .main-container{
-                flex-direction: row;
-                width: 100vw;
-            }
-            .main-content{
-                height: 95vh;
-            }
-            .marginBottom{
-                margin-bottom: 0px;
-            }
-            .prev-img{
-                max-height: 300px;
-                max-width: 212.5px;
+        .checkbox-label {
+            font-weight: normal;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .prev-img {
+                max-height: 200px;
             }
         }
-        @media (max-width: 768px) {
-            html{
-                overflow: auto;
-            }
-            .main-container{
-                height: auto;
-            }
-            .main-content{
-                height: auto;
-            }
+        .custom-textarea {
+            width: 100%; /* Ensure it takes the full width */
+            resize: vertical; /* Allow vertical resizing only */
+            min-height: 100px; /* Set a minimum height */
+            max-height: 300px; /* Set a maximum height */
+            padding: 10px; /* Optional: add padding for better text readability */
+            border: 1px solid #ced4da; /* Optional: add a border */
+            border-radius: 4px; /* Optional: rounded corners */
+            font-family: Arial, Helvetica, sans-serif; /* Optional: consistent font */
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="blur">
-        </div>
-        <div class="bookImgPrev">
-            <h1 class="book-cover-title main-title">Book Cover Preview</h1>
-            {% if book.BookImage %}
-                <img id="preview-image" src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid prev-img">
-            {% else %}
-                <img id="preview-image" src="" alt="No image available" class="img-fluid prev-img" style="display:none;">
-                <p id="no-image-text">No image available</p>
-            {% endif %}
-        </div>
-        <div class="main-content">
+    <div class="container">
+        <div class="card p-4">
             <h1 class="main-title">Edit Book</h1>
-            <form method="post" enctype="multipart/form-data" action="{% url 'librarian' %}">
+            <div class="text-center">
+                <h2 class="book-cover-title">Book Cover Preview</h2>
+                {% if book.BookImage %}
+                    <img id="preview-image" src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid prev-img">
+                {% else %}
+                    <img id="preview-image" src="" alt="No image available" class="img-fluid prev-img" style="display:none;">
+                    <p id="no-image-text">No image available</p>
+                {% endif %}
+            </div>
+            <form method="post" enctype="multipart/form-data" action="{% url 'edit_book' book.id %}">
+                {% csrf_token %}
                 <div class="row">
-                    {% csrf_token %}
-                    <div class="col">
-                        <div class="row ">
-                            <div class="form-group col marginBottom">
-                                <label for="id_BookTitle"  class="title">Title:</label>
-                                <input type="text" class="form-control" id="id_BookTitle" name="BookTitle" required value="{{form.BookTitle.value}}">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="id_BookTitle">Title:</label>
+                            <input type="text" class="form-control" id="id_BookTitle" name="BookTitle" required value="{{ form.BookTitle.value }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_Author">Author:</label>
+                            <input type="text" class="form-control" id="id_Author" name="Author" required value="{{ form.Author.value }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_Description">Description:</label>
+                            <textarea class="custom-textarea" id="id_Description" name="Description" required rows="4">{{ form.Description.value }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_Date">Date:</label>
+                            <input type="date" class="form-control" id="id_Date" name="Date" value="{{ form.Date.value|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_stock">Stock:</label>
+                            <input type="number" class="form-control" id="id_stock" name="stock" value="{{ form.stock.value }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_Language">Language:</label>
+                            <select class="form-control" id="id_Language" name="Language" required>
+                                <option value="">Select a language</option>
+                                {% for language_value, language_label in form.Language.field.choices %}
+                                    <option value="{{ language_value }}" {% if language_value == book.Language %}selected{% endif %}>{{ language_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group col">
+                            <label for="id_Category">Category:</label>
+                            <select class="form-control" id="id_Category" name="Category" required>
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if category in book.Category.all %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col">
+                            <label for="id_Subcategory">SubCategory:</label>
+                            <select class="form-control" id="id_Subcategory" name="SubCategory" required>
+                                <option value="">Select a subcategory</option>
+                                {% for subcategory in subcategories %}
+                                    <option value="{{ subcategory.id }}" {% if subcategory in book.SubCategory.all %}selected{% endif %}>{{ subcategory.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-group col">
+                            <label for="id_Subsection">SubSection:</label>
+                            <select class="form-control" id="id_Subsection" name="SubSection" required>
+                                <option value="">Select a subsection</option>
+                                {% for subsection in subsections %}
+                                    <option value="{{ subsection.id }}" {% if subsection in book.SubSection.all %}selected{% endif %}>{{ subsection.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col">
+                                <label class="checkbox-label">Ebook:</label>
+                                <input class="form-check-input" type="checkbox" id="id_eBook" name="eBook" {% if book.ebook %}checked{% endif %}>
                             </div>
                             <div class="form-group col">
-                                <label for="id_Author" class="title">Author:</label>
-                                <input type="text" class="form-control" id="id_Author" name="Author" required value="{{ form.Author.value }}">
+                                <label class="checkbox-label">Research Paper:</label>
+                                <input class="form-check-input" type="checkbox" id="id_research_paper" name="research_paper" {% if book.research_paper %}checked{% endif %}>
+                            </div>
+                            <div class="form-group col">
+                                <label class="checkbox-label">HardCopy:</label>
+                                <input class="form-check-input" type="checkbox" id="id_hardCopy" name="hardCopy" {% if book.hardCopy %}checked{% endif %}>
                             </div>
                         </div>
-                        <div class="form-group marginBottom">
-                            <label for="id_Description" class="title">Description:</label>
-                            <input type="text" class="form-control" id="id_Description" name="Description" required value="{{ form.Description.value }}">
+                        <div class="form-group col">
+                            <label for="id_BookFile">Book File (PDF):</label>
+                            <input type="file" class="form-control-file" id="id_BookFile" name="BookFile" accept=".pdf">
+                            <small class="form-text text-muted">Upload a PDF file of the book.</small>
                         </div>
-                        <div class="row marginBottom">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="id_Date" class="title">Date:</label>
-                                    <input type="date" class="form-control" id="id_Date" name="Date" value="{{ form.Date.value|date:'Y-m-d' }}" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="id_stock" class="title">Stock:</label>
-                                    <input type="number" class="form-control" id="id_stock" name="stock" value="{{ form.stock.value }}">
-                                </div>
-                            </div>
+
+                        <div class="form-group col">
+                            <label for="id_BookImage">Book Image (JPG):</label>
+                            <input type="file" class="form-control-file" id="id_BookImage" name="BookImage" accept=".jpg, .jpeg">
+                            <small class="form-text text-muted">Upload a JPG or PNG image of the book cover.</small>
                         </div>
-                        <div class="form-group marginBottom">
-                            <label for="id_Language" class="title">Language:</label>
-                            <select class="form-control" id="id_Language" name="Language" required>
-                                <option value="">{{form.Language.value}}</option>
-                                    <option value="">Select a language</option>
-                                {% for language_value, language_label in form.Language.field.choices %}
-                                    <option value="{{ language_value }}">{{ language_label }}</option>
-                                {% endfor %}
-                            </select>  
-                        </div>
-                    </div>    
-                    <div class="col">
-                        <div class="row marginBottom">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="id_Category" class="title">Category:</label>
-                                    <select class="form-control" id="id_Category" name="Category" required>
-                                        <option value="">Select a category</option>
-                                        {% for category_value, category_label in form.Category.field.choices %}
-                                            <option value="{{ category_value }}">{{ category_label }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="id_Subcategories" class="title">SubCategory:</label>
-                                    <select class="form-control" id="id_Subcategories" name="SubCategory" required>
-                                        <option value="{{ form.SubCategory.value }}">{{ form.SubCategory.label }}</option>
-                                            <option value="">Select a subcategory</option>
-                                        {% for subcategory_value, subcategory_label in form.SubCategory.field.choices %}
-                                            <option value="{{ subcategory_value }}">{{ subcategory_label }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="id_Subsection" class="title">SubSection:</label>
-                                    <select class="form-control" id="id_Subsection" name="SubSection" required>
-                                        <option value="">Select a subsection</option>
-                                        {% for subsection_value, subsection_label in form.subsection.field.choices %}
-                                            <option value="{{ subsection_value }}">{{ subsection_label }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="checkbox marginBottom">
-                            <div class="form-group">
-                                <div class="checkbox-text">
-                                    <label for="id_eBook" class="no-margin title">Ebook:</label>
-                                    <input class="form-check-input" type="checkbox" id="id_eBook" name="eBook" {% if book.ebook %}checked{% endif %}>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="checkbox-text">
-                                    <label for="id_research_paper" class="no-margin title">Research Paper:</label>
-                                    <input class="form-check-input" type="checkbox" id="id_research_paper" name="research_paper" {% if book.research_paper %}checked{% endif %}>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="checkbox-text">
-                                    <label for="id_hardCopy" class="no-margin title">HardCopy:</label>
-                                    <input class="form-check-input" type="checkbox" id="id_hardCopy" name="hardCopy" {% if book.hardCopy %}checked{% endif %}>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row marginBottom">
-                            <div class="col-md-6">
-                                <div class="form-group-bot">
-                                    <label for="id_BookFile" class="title">Book File (PDF):</label>
-                                    {{form.BookFile}}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group-bot">
-                                    <label for="id_BookImage" class="title">Book Image (JPG):</label>
-                                    {{form.BookImage}}
-                                </div>
-                            </div>
-                        </div>
-                    </div>     
+                    </div>
                 </div>
-                <div class="editBtn-container row-4">
-                    <button type="submit" class="editBtn btn-primary title">Upload</button>
-                    <a href="{% url 'go_back' %}" class="editBtn btn-danger title col-6">Cancel</a>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <a href="{% url 'go_back' %}" class="btn cancel-btn">Cancel</a>
                 </div>
-            </form>  
+            </form>
         </div>
     </div>
-    
+
     <script>
         document.getElementById('id_BookImage').addEventListener('change', function(event) {
             var file = event.target.files[0];
-            var previewImage = document.getElementById('preview-image');
-            var noImageText = document.getElementById('no-image-text');
-
             if (file) {
                 var reader = new FileReader();
-
                 reader.onload = function(e) {
+                    var previewImage = document.getElementById('preview-image');
                     previewImage.src = e.target.result;
                     previewImage.style.display = 'block';
-                    if (noImageText) {
-                        noImageText.style.display = 'none'; 
-                    }
+                    document.getElementById('no-image-text').style.display = 'none';
                 };
-
-                reader.readAsDataURL(file); 
-            } else {
-                previewImage.style.display = 'none'; 
-                if (noImageText) {
-                    noImageText.style.display = 'block'; 
-                }
+                reader.readAsDataURL(file);
             }
         });
 
-        function toggleCheckboxes(id1, id2) {
-            var checkbox1 = document.getElementById(id1);
-            var checkbox2 = document.getElementById(id2);
-            if (checkbox1.checked) {
-                checkbox2.checked = false;
+        function toggleCheckboxes(selectedCheckbox, otherCheckbox) {
+            var selected = document.getElementById(selectedCheckbox);
+            var other = document.getElementById(otherCheckbox);
+    
+            // If the selected checkbox is checked, uncheck the other
+            if (selected.checked) {
+                other.checked = false;
             }
         }
+        // Add event listeners to the checkboxes
+        document.getElementById('id_eBook').addEventListener('change', function() {
+            toggleCheckboxes('id_eBook', 'id_research_paper');
+        });
+
+        document.getElementById('id_research_paper').addEventListener('change', function() {
+            toggleCheckboxes('id_research_paper', 'id_eBook');
+        });
+
+        document.getElementById('id_Category').addEventListener('change', function() {
+            var categoryId = this.value;
+        
+            // Fetch subcategories based on selected category
+            fetch(`/get_subcategories/${categoryId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    var subcategorySelect = document.getElementById('id_Subcategory');
+                    subcategorySelect.innerHTML = '<option value="">Select a subcategory</option>';
+                    data.subcategories.forEach(subcategory => {
+                        subcategorySelect.innerHTML += `<option value="${subcategory.id}">${subcategory.name}</option>`;
+                    });
+                });
+        });
+
+        document.getElementById('id_Subcategory').addEventListener('change', function() {
+            var subcategoryId = this.value;
+        
+            // Fetch subsections based on selected subcategory
+            fetch(`/get_subsections/${subcategoryId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    var subsectionSelect = document.getElementById('id_Subsection');
+                    subsectionSelect.innerHTML = '<option value="">Select a subsection</option>';
+                    data.subsections.forEach(subsection => {
+                        subsectionSelect.innerHTML += `<option value="${subsection.id}">${subsection.name}</option>`;
+                    });
+                })
+        });
     </script>
 </body>
 </html>

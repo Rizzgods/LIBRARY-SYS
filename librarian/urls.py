@@ -27,7 +27,8 @@ urlpatterns = [
     path('keep-session-alive/', views.keep_session_alive, name='keep_session_alive'),
     path('api/borrow-requests/', views.get_borrow_requests, name='get_borrow_requests'),
     path('batch-upload/', views.batch_upload_view, name='batch-upload'),
-
+    path('get_subcategories/<int:category_id>/', views.get_subcategories, name='get_subcategories'),
+    path('get_subsections/<int:subcategory_id>/', views.get_subsections, name='get_subsections'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
