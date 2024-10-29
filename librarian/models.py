@@ -163,21 +163,28 @@ class ReturnLog(models.Model):
 @receiver(post_save, sender=ApprovedRequest)
 def create_approved_notification(sender, instance, created, **kwargs):
     if created:
-        Notification.objects.create(
-            user=instance.requested_by,
-            message=f"Your request for {instance.book.BookTitle} has been approved.",
-            notification_type='approved'  # Set notification type
-        )
+        try:
+            Notification.objects.create(
+                user=instance.requested_by,
+                message=_("Your request for {book_title} has been approved.").format(book_title=instance.book.BookTitle),
+                notification_type='approved'
+            )
+        except Exception as e:
+            # Log the error or handle it
+            print(f"Error creating notification: {e}")
 
 @receiver(post_save, sender=DeclinedRequest)
 def create_declined_notification(sender, instance, created, **kwargs):
     if created:
-        # Ensure the reason is included in the message and convert to title case
         decline_reason = instance.decline_reason.title() if instance.decline_reason else 'No Reason Provided'
-        
-        # Create the notification with the formatted reason and notification_type set to 'declined'
-        Notification.objects.create(
-            user=instance.requested_by,
-            message=f"Your request for {instance.book.BookTitle} has been declined. Reason: {decline_reason}",
-            notification_type='declined'  # Set notification type
-        )
+        try:
+            Notification.objects.create(
+                user=instance.requested_by,
+                message=_("Your request for {book_title} has been declined. Reason: {reason}").format(
+                    book_title=instance.book.BookTitle, 
+                    reason=decline_reason
+                ),
+                notification_type='declined'
+            )
+        except Exception as e:
+            print(f"Error creating notification: {e}")

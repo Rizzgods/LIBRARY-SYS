@@ -346,8 +346,6 @@
         }
     }
         
-
-        
 </style>
 {% endblock %}
 
@@ -457,10 +455,10 @@
                 <tbody>
                     {% for request in declined_requests %}
                         <tr>
-                            <td>{{ request.book }}</td>
-                            <td>{{ request.requested_at }}</td>
-                            <td>{{ request.declined_at }}</td>
-                            <td>{{ request.decline_reason }}</td>
+                            <td data-label="Book">{{ request.book }}</td>
+                            <td data-label="Requested At">{{ request.requested_at }}</td>
+                            <td data-label="Declined At">{{ request.declined_at }}</td>
+                            <td data-label="Reason">{{ request.decline_reason }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
