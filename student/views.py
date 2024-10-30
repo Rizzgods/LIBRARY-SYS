@@ -12,31 +12,31 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.utils import timezone
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash, logout
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from .forms import CustomPasswordChangeForm
+
 
 
 @login_required
 def change_password(request):
     if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
+        form = CustomPasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Important to keep the user logged in
+            update_session_auth_hash(request, user)  # Keeps the user logged in
             messages.success(request, 'Your password was successfully updated!')
             return redirect('login_user')
         else:
             messages.error(request, 'Please correct the error below.')
     else:
-        form = PasswordChangeForm(request.user)
+        form = CustomPasswordChangeForm(request.user)
     
     return render(request, 'edit_pass.html', {
         'form': form,
         'user': request.user
     })
-
 
 
 def student(request):
