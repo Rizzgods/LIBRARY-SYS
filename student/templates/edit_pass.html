@@ -303,19 +303,7 @@
 {% endblock %}
 
 {% block nav %}
-<a href="{% url 'view' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
-<a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-<a href="{% url 'change-password' %}" target="_blank" class="navbar-desc"><li class="active"><span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>Change Password</li></a>
-<li id="li-dropdown"><div>
-    <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
-    </button>
-    <ul class="dropdown-menu animate-dropdown">
-        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
-        <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
-    </ul>
-  </div>
-</li>
+
 
 {% endblock %}
 

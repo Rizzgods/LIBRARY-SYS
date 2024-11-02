@@ -278,6 +278,11 @@
         
         
 <!-- Template: book_page_views.html -->
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
+                <span class="sr-only">Loading...</span>
+            </div>
+            
             <div id="analytics-section">
                 <h2>User List</h2>
                 <!-- Filters Row -->
@@ -285,20 +290,20 @@
                     <!-- Dropdown filter for selecting the role -->
                     <div class="col-md-2">
                         <label for="role-filter" class="form-label">Filter by Role:</label>
-                        <select id="role-filter" class="form-select" onchange="filterTableByRole()">
+                        <select id="role-filter" class="form-select">
                             <option value="">All Roles</option>
                             <option value="Student">Student</option>
                             <option value="Librarian">Librarian</option>
                         </select>
                     </div>
-
+            
                     <!-- Search input for filtering by username -->
                     <div class="col-md-10">
                         <label for="search-input1" class="form-label">Search by Username:</label>
-                        <input type="text" id="search-input1" class="form-control" onkeyup="searchTableByUsernameAndDetails()" placeholder="Search for usernames..">
+                        <input type="text" id="search-input1" class="form-control" placeholder="Search for usernames..">
                     </div>
                 </div>
-
+            
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -376,6 +381,9 @@
                     });
                 
                     $('#confirmAction').click(function() {
+                        // Show loading spinner
+                        $('#loadingSpinner').show();
+                
                         $.ajax({
                             url: '{% url "toggle_user_status" %}',
                             method: 'POST',
@@ -398,6 +406,10 @@
                                         location.reload(); // Refresh the page
                                     }, 500);
                                 }
+                            },
+                            complete: function() {
+                                // Hide loading spinner
+                                $('#loadingSpinner').hide();
                             }
                         });
                     });
@@ -437,11 +449,23 @@
                         var filter = input.value.toLowerCase();
                         var table = document.getElementById('user-list-tbody');
                         var rows = table.getElementsByTagName("tr");
+                        var anyMatch = false;
+                
+                        // Remove the "no matches" row if it exists
+                        var noMatchesRow = document.getElementById('no-matches-row');
+                        if (noMatchesRow) {
+                            noMatchesRow.remove();
+                        }
+                
+                        // If the search input is blank, reset the state of the table
+                        if (filter === "") {
+                            for (var i = 0; i < rows.length; i++) {
+                                rows[i].style.display = ""; // Show all rows
+                            }
+                            return;
+                        }
                 
                         for (var i = 0; i < rows.length; i++) {
-                            // Skip hidden rows
-                            if (rows[i].style.display === "none") continue;
-                
                             var usernameCell = rows[i].getElementsByTagName("td")[0];
                             var emailCell = rows[i].getElementsByTagName("td")[1];
                             var nameCell = rows[i].getElementsByTagName("td")[2];
@@ -454,17 +478,26 @@
                             var role = roleCell ? roleCell.textContent.toLowerCase() : "";
                 
                             // Check if any of the fields match the search filter
-                            if (username.indexOf(filter) > -1 || email.indexOf(filter) > -1 || name.indexOf(filter) > -1 || role.indexOf(filter) > -1) {
+                            if (username.includes(filter) || email.includes(filter) || name.includes(filter) || role.includes(filter)) {
                                 rows[i].style.display = ""; // Show row
+                                anyMatch = true;
                             } else {
                                 rows[i].style.display = "none"; // Hide row
                             }
+                        }
+                
+                        // If no rows match, display a "no matches" row
+                        if (!anyMatch) {
+                            noMatchesRow = document.createElement('tr');
+                            noMatchesRow.id = 'no-matches-row';
+                            noMatchesRow.innerHTML = `<td colspan="6">No "${input.value}" matches from the records</td>`;
+                            table.appendChild(noMatchesRow);
                         }
                     }
                 
                     // Attach event listeners
                     document.getElementById("role-filter").addEventListener("change", filterTableByRole);
-                    document.getElementById("search-input1").addEventListener("keyup", searchTableByUsernameAndDetails);
+                    document.getElementById("search-input1").addEventListener("input", searchTableByUsernameAndDetails);
                 });
             </script>
 
