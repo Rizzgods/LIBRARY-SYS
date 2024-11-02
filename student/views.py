@@ -290,6 +290,8 @@ def bookmark_toggle(request):
         return JsonResponse({'bookmarked': bookmarked})
     return JsonResponse({'error': 'Invalid request'})
 
+from django.contrib import messages
+
 @login_required
 def borrow_request(request, book_id):
     book = get_object_or_404(Books, pk=book_id)

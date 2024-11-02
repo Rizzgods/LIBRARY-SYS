@@ -907,6 +907,46 @@
     </div>
 </div>
 
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <p>Please wait while we validate your request...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border-left-color: #09f;
+        animation: spin 1s ease infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+</style>
+
+
+
 <!--Bookmark Notifs-->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="AddNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -964,22 +1004,6 @@
     </div>
     {% endif %}
 </div>
-
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    {% if messages %}
-    <div id="borrowMessageToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="me-auto">Request Sent</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            {% for message in messages %}
-                {{ message }}
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-</div>
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     <div id="BookmarkNotif" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
@@ -1001,19 +1025,7 @@
         </div>
     </div>
 </div>
-<!-- Loading Modal -->
-<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-                <p>Please wait while your request is being processed...</p>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -1022,25 +1034,27 @@
             var toast = new bootstrap.Toast(toastEl);
             toast.show();
         }
-    
+
         var bookDetailModal = document.getElementById('bookDetailModal');
     
         bookDetailModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
-            var title = button.getAttribute('data-title');
-            var author = button.getAttribute('data-author');
-            var description = button.getAttribute('data-description');
-            var date = button.getAttribute('data-date');
-            var category = button.getAttribute('data-category');
-            var language = button.getAttribute('data-language');
-            var image = button.getAttribute('data-image');
-            var views = button.getAttribute('data-views');
-            var bookId = button.getAttribute('data-id');
-            var borrowLink = button.getAttribute('data-borrow-link');
-            var previewLink = button.getAttribute('data-preview-link');
-            var isEbook = button.getAttribute('data-is-ebook') === 'true';
-            var isResearchPaper = button.getAttribute('data-is-research-paper') === 'true';
-    
+            var book = {
+                title: button.getAttribute('data-title'),
+                author: button.getAttribute('data-author'),
+                description: button.getAttribute('data-description'),
+                date: button.getAttribute('data-date'),
+                category: button.getAttribute('data-category'),
+                language: button.getAttribute('data-language'),
+                image: button.getAttribute('data-image'),
+                views: button.getAttribute('data-views'),
+                id: button.getAttribute('data-id'),
+                borrowLink: button.getAttribute('data-borrow-link'),
+                previewLink: button.getAttribute('data-preview-link'),
+                isEbook: button.getAttribute('data-is-ebook') === 'true',
+                isResearchPaper: button.getAttribute('data-is-research-paper') === 'true'
+            };
+
             var modalImage = bookDetailModal.querySelector('#modal-book-image');
             var modalBookTitle = bookDetailModal.querySelector('#modal-book-title');
             var modalBookAuthor = bookDetailModal.querySelector('#modal-book-author');
@@ -1052,32 +1066,32 @@
             var modalBorrowLink = bookDetailModal.querySelector('#modal-borrow-link');
             var modalPreviewLink = bookDetailModal.querySelector('#modal-preview-link');
             var modalBookmarkLink = bookDetailModal.querySelector('#modal-bookmark-link');
-    
-            modalImage.src = image;
-            modalBookTitle.textContent = title;
-            modalBookAuthor.textContent = author;
-            modalBookDescription.textContent = description;
-            modalBookDate.textContent = date;
-            modalBookCategory.textContent = category;
-            modalBookLanguage.textContent = language;
-            modalBookViews.textContent = views;
-            modalPreviewLink.href = previewLink;
-            modalBookmarkLink.setAttribute('data-book-id', bookId);
-            modalBorrowLink.href = borrowLink;
-    
+
+            modalImage.src = book.image;
+            modalBookTitle.textContent = book.title;
+            modalBookAuthor.textContent = book.author;
+            modalBookDescription.textContent = book.description;
+            modalBookDate.textContent = book.date;
+            modalBookCategory.textContent = book.category;
+            modalBookLanguage.textContent = book.language;
+            modalBookViews.textContent = book.views;
+            modalPreviewLink.href = book.previewLink;
+            modalBookmarkLink.setAttribute('data-book-id', book.id);
+            modalBorrowLink.href = book.borrowLink;
+
             // Update borrow button text based on book type
-            if (isEbook) {
+            if (book.isEbook) {
                 modalBorrowLink.innerHTML = '<i class="fas fa-book"></i> Borrow Hard Copy';
-            } else if (isResearchPaper) {
+            } else if (book.isResearchPaper) {
                 modalBorrowLink.innerHTML = '<i class="fas fa-book"></i> Borrow';
             } else {
                 modalBorrowLink.innerHTML = '<i class="fas fa-book"></i> Borrow';
             }
-    
+
             // Check bookmark status
             $.ajax({
                 type: 'GET',
-                url: `{% url 'bookmark_status' 0 %}`.replace('0', bookId),
+                url: `{% url 'bookmark_status' 0 %}`.replace('0', book.id),
                 success: function(response) {
                     if (response.bookmarked) {
                         modalBookmarkLink.innerHTML = '<i class="fas fa-bookmark"></i> Unbookmark';
@@ -1087,13 +1101,13 @@
                 }
             });
         });
-    
+
         // Handle bookmark toggle
         $('#modal-bookmark-link').on('click', function(event) {
             event.preventDefault();
             const bookId = $(this).data('book-id');
             const delayInMilliseconds = 500;
-    
+        
             $.ajax({
                 type: 'POST',
                 url: "{% url 'bookmark_toggle' %}",
@@ -1121,40 +1135,20 @@
                 }
             });
         });
-    
+
         document.getElementById('generate-citation').addEventListener('click', function () {
             var title = document.getElementById('modal-book-title').textContent;
             var author = document.getElementById('modal-book-author').textContent;
             var date = document.getElementById('modal-book-date').textContent;
             var publisher = document.getElementById('modal-book-category').textContent; // Assuming category as publisher for this example
-    
+
             var citation = `${author} (${date}). ${title}. ${publisher}.`;
             document.getElementById('apaCitationOutput').value = citation;
-    
+
             var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
             citationModal.show();
         });
-    
-        const borrowButton = document.getElementById('modal-borrow-link');
-        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-    
-        borrowButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            const isApproved = this.getAttribute('data-approved') === 'true';
-    
-            if (isApproved) {
-                alert("You have already been approved to borrow this book.");
-            } else {
-                // Show loading spinner
-                loadingModal.show();
-    
-                // Simulate loading time
-                setTimeout(function() {
-                    window.location.href = borrowButton.href; // Proceed with the borrow request
-                }, 2000);
-            }
-        });
-    
+
         $('.owl-carousel').each(function() {
             var maxHeight = 0;
             $(this).find('.owl-item').each(function() {
@@ -1163,9 +1157,9 @@
                     maxHeight = itemHeight;
                 }
             });
-    
+        
             $(this).find('.owl-item').css('height', maxHeight + 'px');
-    
+        
             $(this).owlCarousel({
                 loop: false,
                 margin: 10,
@@ -1182,7 +1176,7 @@
                     }
                 }
             });
-    
+        
             // Add mouse wheel scroll functionality
             $(this).on('wheel', function(e) {
                 e.preventDefault();
@@ -1193,23 +1187,23 @@
                 }
             });
         });
-    
+
         var offcanvasElement = document.getElementById('offcanvasScrolling');
         var sideBarElement = document.querySelector('.side-bar');
         var mainContainer = document.getElementById('main-container');
-    
+
         offcanvasElement.addEventListener('hidden.bs.offcanvas', function() {
             sideBarElement.classList.remove('show');
             mainContainer.classList.remove('with-sidebar');
         });
-    
+
         offcanvasElement.addEventListener('show.bs.offcanvas', function() {
             sideBarElement.classList.add('show');
             mainContainer.classList.add('with-sidebar');
         });
-    
+
         const modal = document.getElementById('bookDetailModal');
-    
+
         function openBookDetailModal(book) {
             document.getElementById('modal-book-image').src = book.image;
             document.getElementById('modal-book-title').innerText = book.title;
@@ -1222,10 +1216,10 @@
             document.getElementById('modal-borrow-link').href = book.borrowLink;
             document.getElementById('modal-preview-link').href = book.previewLink;
             document.getElementById('modal-bookmark-link').dataset.bookId = book.id;
-    
+
             document.getElementById('modal-book-title').style.setProperty('text-transform', 'capitalize', 'important');
             document.getElementById('modal-book-author').style.setProperty('text-transform', 'capitalize', 'important');
-    
+
             // Update borrow button text based on book type
             const borrowButton = document.getElementById('modal-borrow-link');
             if (book.isEbook) {
@@ -1235,11 +1229,11 @@
             } else {
                 borrowButton.innerHTML = '<i class="fas fa-book"></i> Borrow';
             }
-    
+
             // Show the modal
             $('#bookDetailModal').modal('show');
         }
-    
+
         // Bind event listeners to elements that trigger the modal
         document.querySelectorAll('.special').forEach(element => {
             element.addEventListener('click', function() {
@@ -1261,7 +1255,7 @@
                 openBookDetailModal(book);
             });
         });
-    
+
         const filterForm = document.getElementById('filterForm');
         const searchButton = document.getElementById('searchButton');
         const resetButton = document.getElementById('resetButton');
@@ -1286,12 +1280,11 @@
             // Optionally, reload the page to reset the filters
             window.location.href = window.location.pathname;
         });
-    
+
         $(".draggable").draggable({
             handle: ".modal-header" // Specify the header as the handle for dragging
         });
-    
-        // WAG BURAHIN. YAN NAGPAPAGANA SA SEARCH SA HOME
+
         // Search functionality
         $('#search-inputs').on('input', function() {
             var query = $(this).val();
@@ -1330,41 +1323,72 @@
         });
     
         $(document).on('click', '.suggestion-item', function() {
-            var bookId = $(this).attr('data-id');
-            var bookTitle = $(this).attr('data-title');
-            var bookAuthor = $(this).attr('data-author');
-            var bookDescription = $(this).attr('data-description');
-            var bookDate = $(this).attr('data-date');
-            var bookCategory = $(this).attr('data-category');
-            var bookLanguage = $(this).attr('data-language');
-            var bookImage = $(this).attr('data-image');
-            var bookViews = $(this).attr('data-views');
-    
-            if (!bookId) {
+            var book = {
+                id: $(this).attr('data-id'),
+                title: $(this).attr('data-title'),
+                author: $(this).attr('data-author'),
+                description: $(this).attr('data-description'),
+                date: $(this).attr('data-date'),
+                category: $(this).attr('data-category'),
+                language: $(this).attr('data-language'),
+                image: $(this).attr('data-image'),
+                views: $(this).attr('data-views')
+            };
+        
+            if (!book.id) {
                 console.error('Book ID is missing.');
                 return;
             }
-    
+        
             // Set modal content
-            $('#modal-book-image').attr('src', bookImage);
-            $('#modal-book-title').text(bookTitle);
-            $('#modal-book-author').text(bookAuthor);
-            $('#modal-book-description').text(bookDescription);
-            $('#modal-book-date').text(bookDate);
-            $('#modal-book-category').text(bookCategory);
-            $('#modal-book-language').text(bookLanguage);
-            $('#modal-book-views').text(bookViews);
-    
+            $('#modal-book-image').attr('src', book.image);
+            $('#modal-book-title').text(book.title);
+            $('#modal-book-author').text(book.author);
+            $('#modal-book-description').text(book.description);
+            $('#modal-book-date').text(book.date);
+            $('#modal-book-category').text(book.category);
+            $('#modal-book-language').text(book.language);
+            $('#modal-book-views').text(book.views);
+        
             // Construct URLs dynamically using the book ID
-            var borrowUrl = "{% url 'borrow_request' 0 %}".replace('0', bookId);
-            var previewUrl = "{% url 'prev_file' 0 %}".replace('0', bookId);
-    
+            var borrowUrl = "{% url 'borrow_request' 0 %}".replace('0', book.id);
+            var previewUrl = "{% url 'prev_file' 0 %}".replace('0', book.id);
+        
             // Set the href attributes for the borrow and preview links
             $('#modal-borrow-link').attr('href', borrowUrl);
             $('#modal-preview-link').attr('href', previewUrl);
         });
+
+        // Show loading spinner when borrow button is clicked
+        var borrowButton = document.getElementById('modal-borrow-link');
+        var loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+
+        borrowButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            loadingModal.show();
+
+            fetch(borrowButton.href, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.json();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+            .finally(() => {
+                loadingModal.hide();
+            });
+        });
     });
-    
+
     function copyCitation() {
         var citationText = document.getElementById('apaCitationOutput').value;
         navigator.clipboard.writeText(citationText).then(function () {
@@ -1373,7 +1397,5 @@
             console.error('Could not copy text: ', err);
         });
     }
-    
-
 </script>
 {% endblock %}
