@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.exceptions import ValidationError
 
 class CustomPasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
@@ -26,3 +27,13 @@ class CustomPasswordChangeForm(PasswordChangeForm):
             'id': 'new_password2'
         })
     )
+
+    def clean_new_password1(self):
+        old_password = self.cleaned_data.get("old_password")
+        new_password1 = self.cleaned_data.get("new_password1")
+        
+        # Check if the old password is the same as the new password
+        if old_password and new_password1 and old_password == new_password1:
+            raise ValidationError("The new password cannot be the same as the old password.")
+        
+        return new_password1

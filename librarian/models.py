@@ -33,14 +33,14 @@ class Category(models.Model):
         return self.name
 
 class SubCategory(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name='subcategories', on_delete=models.CASCADE)
     name = models.CharField(max_length=100, default="Def")
     code = models.CharField(max_length=100, default="")
     def __str__(self):
         return  self.code + '-' + self.name
     
 class SubSection(models.Model):
-    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    sub_category = models.ForeignKey(SubCategory, related_name='subsections', on_delete=models.CASCADE)
     name = models.CharField(max_length=100, default="Def")
     code = models.CharField(max_length=100, default="")
     def __str__(self):

@@ -52,7 +52,6 @@
         .btn-custom:hover {
             background-color: #0056b3;
         }
-        /* Styling for scrollable horizontal description cells */
         .description-cell {
             max-width: 180px; /* Limit the width of the description */
             overflow-x: auto; /* Enable horizontal scrolling */
@@ -64,7 +63,6 @@
 </head>
 <body>
     <div class="container mt-5">
-        <!-- Page Header -->
         <div class="text-center mb-4">
             <h2>Batch Upload Books</h2>
             <p class="text-muted">Upload a CSV file and a folder containing the relevant files.</p>
@@ -86,27 +84,23 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Upload Form -->
         <div class="card mb-4">
             <div class="card-body">
                 <form method="POST" action="{% url 'batch-upload' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     
-                    <!-- CSV File Upload -->
                     <div class="mb-4">
                         <label for="csvFile" class="form-label">Upload CSV File:</label>
                         <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required onchange="handleCSVUpload(event)">
-                        <div class="form-text">Please upload a valid CSV file.</div>
+                        <div class="form-text">Please upload a valid CSV file. Maximum size: 20MB.</div>
                     </div>
 
-                    <!-- Folder Upload -->
                     <div class="mb-4">
                         <label for="fileFolder" class="form-label">Upload Folder with Files:</label>
                         <input type="file" class="form-control" id="fileFolder" name="fileFolder" webkitdirectory directory multiple required onchange="handleFolderUpload(event)">
-                        <div class="form-text">Select a folder containing files related to the books.</div>
+                        <div class="form-text">Select a folder containing files related to the books. Maximum total size: 100MB.</div>
                     </div>
 
-                    <!-- CSV Preview Table -->
                     <div id="csvPreview" class="mt-4" style="display:none;">
                         <h5 class="text-center mb-3">FILES TO BE UPLOADED</h5>
                         <div class="table-responsive">
@@ -117,7 +111,6 @@
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-custom">Upload</button>
                     </div>
@@ -126,7 +119,6 @@
         </div>
     </div>
 
-    <!-- Image Modal -->
     <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -142,25 +134,44 @@
     
     <!-- JavaScript for CSV and Folder Preview -->
     <script>
-        let folderFiles = {};
-        let csvContent = "";
-        let isFolderUploaded = false;
-        let isCSVUploaded = false;
-    
+        const MAX_CSV_SIZE = 20 * 1024 * 1024; // 20MB for CSV
+        const MAX_FOLDER_SIZE = 100 * 1024 * 1024; // 100MB for total folder upload
+
+        let totalFolderSize = 0; // Track total size of files in the folder
+
+        function validateFileSize(file) {
+            if (file.size > MAX_CSV_SIZE) {
+                alert(`The CSV file exceeds the maximum size limit of ${MAX_CSV_SIZE / (1024 * 1024)} MB.`);
+                return false;
+            }
+            return true;
+        }
+
         function handleFolderUpload(event) {
             const files = event.target.files;
             folderFiles = {};
-    
+            totalFolderSize = 0; // Reset total folder size for each upload
+            let isValid = true;
+
             for (let file of files) {
+                totalFolderSize += file.size; // Accumulate the total size
                 folderFiles[file.name] = URL.createObjectURL(file);
             }
-            isFolderUploaded = true;
-            showPreviewIfReady();
+
+            if (totalFolderSize > MAX_FOLDER_SIZE) {
+                alert(`The total folder size exceeds the maximum limit of ${MAX_FOLDER_SIZE / (1024 * 1024)} MB.`);
+                isValid = false;
+            }
+
+            if (isValid) {
+                isFolderUploaded = true;
+                showPreviewIfReady();
+            }
         }
-    
+
         function handleCSVUpload(event) {
             const file = event.target.files[0];
-            if (file && file.type === 'text/csv') {
+            if (file && file.type === 'text/csv' && validateFileSize(file)) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     csvContent = e.target.result;
@@ -172,22 +183,22 @@
                 alert("Please upload a valid CSV file.");
             }
         }
-    
+
         function showPreviewIfReady() {
             if (isFolderUploaded && isCSVUploaded) {
                 displayCSVPreview(csvContent);
             }
         }
-    
+
         function displayCSVPreview(content) {
             const previewTable = document.getElementById('previewTable');
             const csvPreview = document.getElementById('csvPreview');
             const lines = content.split("\n").filter(line => line.trim());
             previewTable.querySelector('thead').innerHTML = '';
             previewTable.querySelector('tbody').innerHTML = '';
-    
+
             let errors = [];
-    
+
             if (lines.length) {
                 const headers = lines[0].split(",");
                 const headerRow = document.createElement('tr');
@@ -197,23 +208,22 @@
                     headerRow.appendChild(th);
                 });
                 previewTable.querySelector('thead').appendChild(headerRow);
-    
+
                 for (let i = 1; i < lines.length; i++) {
                     const row = document.createElement('tr');
                     const cells = lines[i].split(",");
-    
+
                     cells.forEach((cell, index) => {
                         const td = document.createElement('td');
                         const header = headers[index].toLowerCase();
-    
+
                         if (header.includes("description")) {
-                            // Apply specific CSS class to the description cell
                             td.classList.add('description-cell');
                             td.textContent = cell.trim();
                         } else if (header.includes("image") || header.includes("file")) {
                             const expectedFileName = cell.trim();
                             const expectedExtension = expectedFileName.split('.').pop();
-    
+
                             if (folderFiles[expectedFileName]) {
                                 if (!expectedFileName.endsWith(`.${expectedExtension}`)) {
                                     errors.push(`The file ${expectedFileName} has a mismatched format as per the CSV specification.`);
@@ -237,26 +247,27 @@
                                 td.textContent = `File Not Found`;
                             }
                         } else {
-                            td.textContent = cell.trim().toLowerCase() === 'true' ? 'Yes' : cell.trim().toLowerCase() === 'false' ? 'No' : cell;
+                            td.textContent = cell.trim();
                         }
                         row.appendChild(td);
                     });
                     previewTable.querySelector('tbody').appendChild(row);
                 }
-                csvPreview.style.display = 'block';
-    
+
                 if (errors.length > 0) {
-                    alert(errors.join("\n"));
+                    alert("Errors found:\n" + errors.join("\n"));
                 }
+
+                csvPreview.style.display = 'block';
             }
         }
 
         function showFullImage(src) {
-            document.getElementById('modalImage').src = src;
-            var imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = src;
+            const imageModal = new bootstrap.Modal(document.getElementById('imageModal'));
             imageModal.show();
         }
     </script>
-    
 </body>
 </html>

@@ -16,7 +16,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">  
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 
 
@@ -69,7 +70,10 @@
         border-radius: 50%;
     }
     .no-notif{
-            font-size: 1rem;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+            font-size: 2rem;
             padding: 10px 25px;
         }
     .notif-link{
@@ -158,6 +162,7 @@
     .side-bar.hide {
         animation: slideOutSidebar .1s ease forwards;
         position: fixed;
+        transform: translateX(-100%);
     }
 
     .sidebar-nav{
@@ -250,9 +255,6 @@
     }
     .logout:hover {
         cursor: pointer;
-    }
-    .active{
-        background-color:rgba(255, 255, 255, 0.1);
     }
 
 
@@ -391,6 +393,7 @@
     }
     .offcanvas{
         z-index: 1;
+        width: 100%;
     }
     .offcanvas-start{
         height: 0%;
@@ -484,6 +487,10 @@
     .loc-logo{
         width: 35px;
     }
+    .borrow-active, .history-active{
+        max-width: 208.7px;
+
+    }
 
     @media (max-width: 1500px) {
         .first-footer-text{
@@ -527,9 +534,6 @@
         }
         .notification-icon {
             margin-right: 20px;
-        }
-        .dropdown-item-list{
-            padding-left: 10px;
         }
         .dropdown{
             width: 400px;
@@ -589,6 +593,19 @@
         <div class="offcanvas offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
             <div class="offcanvas-body side-bar show">
                 <ul class="sidebar-nav">
+                    <a href="{% url 'view' %}" class="navbar-desc"><li class="home-active"><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
+                    <a href="{% url 'bookmark' %}" class="navbar-desc"><li class="bookmark-active"><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
+                    <a href="{% url 'change-password' %}" target="_blank" class="navbar-desc"><li class="changepass-active"><span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>Change Password</li></a>
+                    <li id="li-dropdown" class="borrow-active history-active"><div>
+                        <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
+                        </button>
+                        <ul class="dropdown-menu animate-dropdown">
+                            <a class="sub-nav" href="{% url 'borrowed_books' %}"><li class="borrow-active"><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
+                            <a class="sub-nav" href="{% url 'request_history' %}"><li class="history-active"><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
+                        </ul>
+                    </div>
+                    </li>
                     {% block nav %}{% endblock %}
                 </ul>
                 
@@ -898,6 +915,10 @@
             updateReadMoreVisibility();
         });
     });
+
+    function handleImageError(image) {
+        image.src = '../../media/books/images/backup-img.jpg';
+    }
 </script>
     {% block script %}{% endblock %}
 </body>

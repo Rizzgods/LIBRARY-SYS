@@ -278,7 +278,6 @@
         font-size: 1rem;
         padding: 10px 25px;
     }
-      
       .dropdown-menu.show {
         transform: scaleY(0);
         opacity: 1;
@@ -353,6 +352,10 @@
         transform: translateY(-10px);
         z-index: 1;
     }
+    .borrow-active{
+        background-color:rgba(255, 255, 255, 0.1);
+    }
+      
     
       
       @media (max-width: 1200px) {
@@ -474,22 +477,6 @@
 </style>
 {% endblock %}
 
-{% block nav %}
-<a href="{% url 'view' %}" class="navbar-desc"><li><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
-<a href="{% url 'bookmark' %}" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-<a href="{% url 'change-password' %}" target="_blank" class="navbar-desc"><li><span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>Change Password</li></a>
-<li id="li-dropdown"><div>
-    <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
-    </button>
-    <ul class="dropdown-menu animate-dropdown show">
-        <a class="sub-nav" href="{% url 'borrowed_books' %}"><li class="active"><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
-        <a class="sub-nav" href="{% url 'request_history' %}"><li><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
-    </ul>
-  </div>
-</li>
-{% endblock %}
-
 {% block body %}
     {% load static %}
     <div class="d-flex justify-content-center">
@@ -502,7 +489,7 @@
         <div class="col-sm-3 mb-4 bookmark-card" id="book-card-{{ request.book.id }}">
             <div class="card d-flex justify-content-center align-items-center">
                 <a href="{% url 'prev_file' request.book.id  %}">
-                    <img class="card-img-top" src="{{ request.book.BookImage.url }}" alt="{{ request.book.BookTitle }}">
+                    <img class="card-img-top" src="{{ request.book.BookImage.url }}" alt="..." onerror="handleImageError(this);">
                 </a>
                 <div class="card-body">
                     <a href="{% url 'prev_file' request.book.id  %}">
@@ -572,6 +559,15 @@
             }
         });
     });
+    window.onload = function() {
+        // Target the dropdown menu element
+        var dropdownMenu = document.querySelector('.dropdown-menu');
+
+        // Add the 'show' class to make it visible on load
+        if (dropdownMenu) {
+            dropdownMenu.classList.add('show');
+        }
+    };
 </script>
 
 {% endblock %}
