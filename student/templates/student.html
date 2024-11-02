@@ -94,12 +94,12 @@
     }
     .main-container {
         display: grid;
-        grid-template-columns: 250px 1fr; 
-        grid-template-rows: 1px 1fr 150px;
+        grid-template-columns: 100px 1fr; 
+        grid-template-rows: auto 1fr 150px;
         grid-template-areas:
         "header header"
-        "content content"
-        "footer footer";
+        "sidebar content"
+        "sidebar footer";
         height: 100vh;
         flex: 1;
     }
@@ -114,15 +114,6 @@
     .form-control {
         margin: 5px;
     }
-    .main-container.with-sidebar{
-        grid-template-areas:
-            "header header"
-            "sidebar content"
-            "sidebar footer";
-        animation: resizeContainer .2s ease;
-        height: 100vh;
-        flex: 1;
-    }
     
     .content {
         grid-area: content;
@@ -130,7 +121,13 @@
         flex-direction: column;
         flex: 1;
         max-width: 100vw;
+        transition: margin-left 0.3s ease;
     }
+    /* Adjust content margin when sidebar is expanded */
+  .content.expanded, .footer.expanded {
+    margin-left: 200px;
+  }
+    
     .footer {
         grid-area: footer;
         display: flex;
@@ -139,31 +136,22 @@
         padding: 10px 20px;
         align-self: flex-end;
     }
-    .offcanvas-body{
-        z-index: 10 !important;
-    }
     .side-bar {
         display: flex;
         flex-direction: column;
         justify-content: start;
         align-items: center;
+        grid-area: sidebar;
         background-color: rgb(74, 128, 210);
         position: fixed;
-        width: 250px;
-        height: 95vh;
-        padding-bottom: 10vh;
+        margin-top: 100px;
+        height: 100%;
         z-index: 10 !important;
         animation: slideOutSidebar .1s ease forwards;
     }
-    .side-bar.show {
-        animation: slideInSidebar .1s ease forwards;
-        position: fixed;
-    }
-    .side-bar.hide {
-        animation: slideOutSidebar .1s ease forwards;
-        position: fixed;
-        transform: translateX(-100%);
-    }
+    .side-bar.expanded {
+        width: 250px;
+      }
 
     .sidebar-nav{
         display: flex;
@@ -171,13 +159,15 @@
         align-items: start;
         flex-direction: column;
         list-style: none;
-        margin: none;
+        width: 100%;
         padding: 20px 0;
     }
     .sidebar-nav li{
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 100%;
-        padding: 20px 0px;
-        padding-left: 32px;
+        padding: 10px;
         color: white;
     }
     .bookmark{
@@ -216,6 +206,7 @@
     }
     .navbar-icon{
         padding-right: 3px;
+        font-size: 1.8rem;
     }
     .navbar-text, .navbar-icon{
         text-decoration: none;
@@ -224,12 +215,11 @@
     .navbar-text:hover, .bookmark:hover, .navbar-icon:hover{
         cursor: pointer;
     }
-    .navbar-text:hover{
-        border-radius:10px;
-        border: 2px solid transparent;
-        background-color: rgba(255, 255, 255, 0.1);
-        transition: background-color 0.3s ease;
-        padding: 5px 10px 5px 10px;
+    .navbar-text{
+        display: none;
+    }
+    .navbar-text.expand{
+        display: block;
     }
     .navbar-desc{
         color: white;
@@ -247,14 +237,15 @@
         justify-content: center;
         align-items: center;
         color: white;
-        width:100%;
-        padding: 10px 0;
-        margin-top: auto;
-        margin-bottom: 10px;
+        flex-grow: 1;
+        padding-top: 20px;
         font-size: 1.2rem;
     }
     .logout:hover {
         cursor: pointer;
+    }
+    #notification-bell, #no-notification, .icon-2{
+        font-size: 2rem;
     }
 
 
@@ -391,13 +382,6 @@
     .item:hover{
         transform: translateY(-10px);
     }
-    .offcanvas{
-        z-index: 1;
-        width: 100%;
-    }
-    .offcanvas-start{
-        height: 0%;
-    }
     .logo-img{
         margin-left: 10px;
     }
@@ -444,6 +428,89 @@
         overflow: hidden;
         transition: max-height 0.2s ease-in-out;
     }
+    .side-bar {
+        width: 100px; /* Expanded width */
+        transition: width 0.3s ease;
+        overflow: hidden;
+    }
+
+    .side-bar.minimized {
+        width: 50px; /* Minimized width */
+    }
+
+    .side-bar .navbar-desc {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0px;
+    }
+
+    .side-bar .navbar-desc li {
+        list-style: none;
+    }
+
+    .side-bar.minimized .navbar-desc li {
+        display: none; /* Hide text when minimized */
+    }
+
+    .side-bar .dropdown-btn {
+        width: 100%;
+        text-align: left;
+        justify-content: center;
+    }
+
+    .side-bar .dropdown-menu {
+        width: 100%;
+    }
+
+    .side-bar .sub-nav{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+    }
+    .sub-nav{
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        width: fit-content;
+      }
+      .sub-icon{
+        font-size: 1.5rem;
+        vertical-align: middle;
+        padding-right: 5px;
+      }
+
+    .side-bar .sub-icon {
+        font-size: 20px;
+    }
+    .dropdown-menu.show {
+        opacity: 1;
+        background-color: transparent;
+        border: none;
+        position: relative;
+        padding: 0;
+      }
+      #li-dropdown{
+        margin-bottom: 100px;
+      }
+      .dropdown-btn{
+        box-sizing: border-box;
+        height: 100%;
+        background-color: transparent;
+        border: none;
+        color: white;
+      }
+      .sub-li{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+      }
+      
 
     
     
@@ -559,10 +626,10 @@
 {% endblock %}
 
 <body>
-    <div class="main-container with-sidebar" id="main-container">
+    <div class="main-container" id="main-container">
         <header class="header fixed-top">
             <div class="logo">
-                <span id="sidebar-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
+                <span id="sidebar-toggle" type="button">
                     <svg class="sidebar-btn-style" width="35px" height="35px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M4 18L20 18" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
                         <path d="M4 12L20 12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
@@ -590,34 +657,57 @@
                 </div>
             </div>
         </header>
-        <div class="offcanvas offcanvas-start show" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
-            <div class="offcanvas-body side-bar show">
-                <ul class="sidebar-nav">
-                    <a href="{% url 'view' %}" class="navbar-desc"><li class="home-active"><span class="material-symbols-outlined navbar-icon" alt="home">home</span>Home</li></a>
-                    <a href="{% url 'bookmark' %}" class="navbar-desc"><li class="bookmark-active"><span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>Bookmark</li></a>
-                    <a href="{% url 'change-password' %}" target="_blank" class="navbar-desc"><li class="changepass-active"><span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>Change Password</li></a>
-                    <li id="li-dropdown" class="borrow-active history-active"><div>
+        <div class="side-bar" id="sidebar">
+            <ul class="sidebar-nav">
+                <a href="{% url 'view' %}" class="navbar-desc">
+                    <li class="active">
+                        <span class="material-symbols-outlined navbar-icon" alt="home">home</span>
+                        <span class="navbar-text">Home</span>
+                    </li>
+                </a>
+                <a href="{% url 'bookmark' %}" class="navbar-desc">
+                    <li>
+                        <span class="material-symbols-outlined bookmark navbar-icon" alt="bookmark">bookmark</span>
+                        <span class="navbar-text">Bookmark</span>
+                    </li>
+                </a>
+                <a href="{% url 'change-password' %}" target="_blank" class="navbar-desc">
+                    <li>
+                        <span class="material-symbols-outlined bookmark navbar-icon" alt="change password">password</span>
+                        <span class="navbar-text">Change Password</span>
+                    </li>
+                </a>
+                <li id="li-dropdown">
+                    <div>
                         <button class="dropdown-btn dropdown-toggle navbar-desc" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="material-symbols-outlined navbar-icon">book_2</span>Book Borrow
+                            <span class="material-symbols-outlined navbar-icon">book_2</span>
+                            <span class="navbar-text">Book Borrow</span>
                         </button>
                         <ul class="dropdown-menu animate-dropdown">
-                            <a class="sub-nav" href="{% url 'borrowed_books' %}"><li class="borrow-active"><span class="material-symbols-outlined sub-icon">menu_book</span>Borrowed Books</li></a>
-                            <a class="sub-nav" href="{% url 'request_history' %}"><li class="history-active"><span class="material-symbols-outlined sub-icon ">history</span>Borrow History</li></a>
+                            <a class="sub-nav" href="{% url 'borrowed_books' %}">
+                                <li class="sub-li">
+                                    <span class="material-symbols-outlined sub-icon">menu_book</span>
+                                    <span class="navbar-text">Borrowed Books</span>
+                                </li>
+                            </a>
+                            <a class="sub-nav" href="{% url 'request_history' %}">
+                                <li class="sub-li">
+                                    <span class="material-symbols-outlined sub-icon">history</span>
+                                    <span class="navbar-text">Borrow History</span>
+                                </li>
+                            </a>
                         </ul>
                     </div>
-                    </li>
-                    {% block nav %}{% endblock %}
-                </ul>
-                
-                <div class="logout">
-                    <a href="{% url 'logout_user' %}"><span class="material-symbols-outlined navbar-icon navbar-text">logout</span></a>
-                </div>
+                </li>
+            </ul>
+            <div class="logout">
+                <a href="{% url 'logout_user' %}"><span class="material-symbols-outlined navbar-icon navbar-text" style="display: block;">logout</span></a>
             </div>
         </div>
-        <div class="content">
+        <div class="content" id="content">
             {% block body %}{% endblock %}
         </div>
-        <div class="footer">
+        <div class="footer" id="footer">
             <div class="first-footer hidden">
                 <span>Contact Us: </span>
                 <ul class="footer-details">
@@ -667,6 +757,25 @@
   
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const content = document.getElementById('content');
+        const footer = document.getElementById('footer');
+        const toggleButton = document.getElementById('sidebar-toggle');
+        const navText = document.getElementsByClassName('navbar-text');
+
+        toggleButton.addEventListener('click', function() {
+            // Toggle only the 'expanded' class
+            sidebar.classList.toggle('expanded');
+            content.classList.toggle('expanded');
+            footer.classList.toggle('expanded');
+            // Toggle the 'expanded' class on the navbar-text elements
+            for (let i = 0; i < navText.length; i++) {
+                navText[i].classList.toggle('expand');
+            }
+        });
+    });
+
     $(document).ready(function() {
         var showingMore = false;  // Track the state of "See More"/"See Less"
         var notifications = [];   // Store notification data locally
