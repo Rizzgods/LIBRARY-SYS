@@ -139,80 +139,6 @@
         left: 50%;
         transform: translate(-50%, -50%);
     }
-    {% comment %} notif {% endcomment %}
-
-    .notification-badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: red;
-        color: white;
-        border-radius: 50%;
-        padding: 5px 10px;
-        font-size: 12px;
-        transform: translate(10px, -10px);
-    }
-    .dropdown {
-        display: none;
-        position: absolute;
-        top: 45px;
-        right: 0;
-        background-color: white;
-        color: black;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        border-radius: 5px;
-        overflow: hidden;
-        z-index: 1;
-        width: 700px;
-    }
-
-     .dropdown-item {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        text-wrap: wrap;
-    }
-    
-    .dropdown-item:last-child {
-        border-bottom: none;
-    }
-    
-    .dropdown-item:hover {
-        background-color: #f1f1f1;
-    }
-    
-    .dropdown-item.read {
-        font-weight: normal;
-    }
-    .dropdown-item:not(.read) {
-        font-weight: bold;
-    }
-    .notification-icon, .notification-icon-2 {
-        width: 45px;
-        height: 45px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-    .icon-2:hover{
-        color: white;
-    }
-    .notification-icon {
-        margin-right: 75px;
-        border-radius: 50%;
-        background-color: #e9ecef;
-    }
-    .notification-icon .badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: red;
-        color: white;
-        border-radius: 50%;
-    }
     .btn-close{
         width: 10px;
         height: 10px;
@@ -246,13 +172,6 @@
         justify-content: center;
         align-items: center;
 
-    }
-    .notif-message{
-        padding-right: 10px;
-    }
-    .no-notif{
-        font-size: 1rem;
-        padding: 10px 25px;
     }
     .owl-nav span{
         font-size: 1.5rem;
@@ -342,19 +261,6 @@
         border-radius: 0 0 10px 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-      .navbar-icon:hover {
-        color: white;
-      }
-      .icon-2:hover{
-        color: black;
-      }
-      .notif-link{
-        display: flex;
-        flex-direction: row;
-        border-right: 1px solid rgba(0, 0, 0, 0.3);
-        flex-grow: 1;
-        margin-right: 10px;
-      }
       .carousel{
         display: flex;
         flex-shrink: 1;
@@ -368,194 +274,6 @@
       }
       .home-active{
         background-color:rgba(255, 255, 255, 0.1);
-    }
-
-   
-
-
-      @media (max-width: 1200px) {
-        .main-container {
-            display: grid;
-            grid-template-columns:1fr; 
-            grid-template-rows: 1px 1fr 100px;
-            grid-template-areas:
-            "header header"
-            "content content"
-            "footer footer";
-            height: 100vh;
-            max-width: 100vw;
-            flex: 1;
-        }
-        .main-container.with-sidebar {
-            display: grid;
-            grid-template-columns:1fr; 
-            grid-template-rows: 1px 1fr 100px;
-            grid-template-areas:
-            "header header"
-            "content content"
-            "footer footer";
-            height: 100vh;
-            max-width: 100vw;
-            flex: 1;
-            
-        }
-       
-        .offcanvas{
-            z-index: 2;
-        }
-        /* Sidebar stays fixed and overlays the content on small screens */
-        .side-bar {
-            width: auto;
-            height: 95vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 1; /* Ensure it overlays on top of the content */
-            transform: translateX(-100%); /* Initially off-screen */
-            transition: transform 0.1s ease; /* Smooth transition */
-        }
-        
-        .side-bar.show {
-            transform: translateX(0); /* Sidebar slides in */
-            transition-delay: 0.1s; /* Delay before the sidebar slides in */
-        }
-        
-        .side-bar.hide {
-            transform: translateX(-100%); /* Sidebar slides out */
-            transition-delay: 0.1s; /* Delay before the sidebar slides out */
-        }
-        
-
-        .content {
-            padding-top: 50px; /* Avoid overlap with header */
-            display: flex;
-            flex:1;
-            max-width: 100vw;
-            padding-bottom: 65px;
-        }
-        .modal-dialog{
-            max-width: 80vw;
-        }
-        .book-details{
-            height: auto;
-        }
-        .first-footer{
-            gap: 0px;
-            padding-top: 0px;
-        }
-    }
-
-      @media (max-width: 768px) {
-        .main-container {
-            grid-template-columns:1fr;
-            grid-template-rows: 1px 1fr 150px;
-            grid-template-areas:
-                "header header"
-                "content content"
-                "footer footer"; /* No sidebar in the layout */
-            flex: 1;
-            max-width: 100vw;
-        }
-
-        /* Sidebar stays fixed and overlays the content on small screens */
-        .side-bar {
-            width: auto;
-            height: 95vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            transform: translateX(-100%); /* Initially off-screen */
-            transition: transform 0.3s ease; /* Smooth transition */
-        }
-
-        .side-bar.show {
-            transform: translateX(0); /* Sidebar slides in from the left */
-        }
-
-        .side-bar.hide {
-            transform: translateX(-100%); /* Sidebar slides out */
-        }
-        .modal-content{
-            width: 100%;
-        }
-        .book-info{
-            flex-direction: column;
-        }
-        .text1{
-            margin: 0;
-        }
-        .btn-mdl{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            gap: 10px;
-        }
-        .notification-icon {
-            margin-right: 20px;
-        }
-    }
-      @media (max-width: 530px) {
-        .carousel-indicators{
-            z-index: 1;
-        }
-        .carousel{
-            margin-top: 50px;
-        }
-        .modal-content{
-            width: 117%;
-        }
-        .book-info{
-            flex-direction: column;
-        }
-        .text1{
-            margin: 0;
-        }
-        .modalButtons{
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            grid-template-areas:
-            "borrow preview"
-            "bookmark generate-citation";
-        }
-        #modal-borrow-link{
-            grid-area: borrow;
-        }
-        #modal-preview-link{
-            grid-area: preview;
-            margin-right: 10px;
-        }
-        #modal-bookmark-link{
-            grid-area: bookmark;
-            margin-left: 10px;
-        }
-        #generate-citaion{
-            grid-area: generate-citation;
-        }
-        .form-control{
-            width: 100px;
-        }
-        .fb-logo{
-            width: 35px;
-        }
-        .loc-logo{
-            width: 30px;
-        }
-    }
-    @media (max-width: 430px) {
-        .dropdown-item-list{
-            padding-left: 10px;
-        }
-        .dropdown{
-            width:325px;
-            z-index: 1000;
-        }
-        .dropdown-item{
-            text-wrap: wrap;
-        }
-        .notif-link{
-            font-size: 15px;
-        }
     }
 
 </style>
@@ -949,21 +667,12 @@
     </div>
 </div>
 <!-- Loading Modal -->
-<<<<<<< HEAD
-<div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content text-center">
-            <div class="modal-body">
-                <div class="spinner-border" role="status">
-                    <span class="visually-hidden">Loading...</span>
-=======
 <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body text-center">
                 <div class="spinner-border text-primary" role="status">
                     <span class="sr-only">Loading...</span>
->>>>>>> aedc6cf83d4fe67ad72e6620ddef275cc3756535
                 </div>
                 <p>Please wait while your request is being processed...</p>
             </div>
@@ -1107,22 +816,9 @@
                 // Simulate loading time
                 setTimeout(function() {
                     window.location.href = borrowButton.href; // Proceed with the borrow request
-<<<<<<< HEAD
                 }, 2000); // Set the loading time to 2 seconds (2000 ms)
-=======
-                }, 2000);
->>>>>>> aedc6cf83d4fe67ad72e6620ddef275cc3756535
             }
         });
-<<<<<<< HEAD
-    
-=======
-            
-<<<<<<< HEAD
-=======
->>>>>>> a643e87ac0fd4e8af6213bee305e34b8aaa71ef6
->>>>>>> b0f4ff7fcf7ec3929f8c1767367b7a197c440fd2
->>>>>>> aedc6cf83d4fe67ad72e6620ddef275cc3756535
         $('.owl-carousel').each(function() {
             var maxHeight = 0;
             $(this).find('.owl-item').each(function() {
