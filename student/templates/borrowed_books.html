@@ -4,17 +4,9 @@
 
 {% block style %}
 <style>
-    .notification-time {
-        font-size: 0.8rem;
-        color: grey;
-        margin-left: auto;
-    }
     .content {
         padding: 0 50px;
         margin-top: 150px;
-    }
-    .active {
-        background-color: rgba(255, 255, 255, 0.1);
     }
     .bookmark-head {
         display: flex;
@@ -70,16 +62,6 @@
     .card-footer {
         display: flex;
         justify-content: center;
-    }
-    @media (max-width: 768px) {
-        .navbar-left img {
-            height: 40px;
-        }
-    }
-    @media (max-width: 576px) {
-        .navbar-right {
-            gap: 10px;
-        }
     }
     .preview-title {
         max-height: 75px;
@@ -167,85 +149,6 @@
         left: 50%;
         transform: translate(-50%, -50%);
     }
-    .notification-badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: red;
-        color: white;
-        border-radius: 50%;
-        padding: 5px 10px;
-        font-size: 12px;
-        transform: translate(10px, -10px);
-    }
-    .dropdown {
-        display: none;
-        position: absolute;
-        top: 45px;
-        right: 0;
-        background-color: white;
-        color: black;
-        min-width: 300px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        border-radius: 5px;
-        overflow: hidden;
-        z-index: 1;
-    }
-
-     .dropdown-item {
-        display: flex;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-    }
-    
-    .dropdown-item:last-child {
-        border-bottom: none;
-    }
-    
-    .dropdown-item:hover {
-        background-color: #f1f1f1;
-    }
-    
-    .dropdown-item.read {
-        font-weight: normal;
-    }
-    .dropdown-item:not(.read) {
-        font-weight: bold;
-    }
-    .notification-icon, .notification-icon-2 {
-        width: 45px;
-        height: 45px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-    }
-    .notification-icon {
-        margin-right: 75px;
-        border-radius: 50%;
-        background-color: #e9ecef;
-    }
-    .notif-message{
-        margin: 0 10px;
-    }
-    .notification-icon .badge {
-        position: absolute;
-        top: 0;
-        right: 0;
-        background-color: red;
-        color: white;
-        border-radius: 50%;
-    }
-    .material-symbols-outlined {
-        font-size: 35px;
-        cursor: pointer;
-        transition: color 0.3s;
-    }
-
-    .material-symbols-outlined:hover {
-        color: #808080;
-    }
     .btn-close{
         width: 10px;
         height: 10px;
@@ -274,46 +177,6 @@
         border: 2px solid rgb(74, 128, 210);
         background-color: white;
     }
-    .no-notif{
-        font-size: 1rem;
-        padding: 10px 25px;
-    }
-      .dropdown-menu.show {
-        transform: scaleY(0);
-        opacity: 1;
-        width: 218px;
-        background-color: transparent;
-        border: none;
-        position: relative;
-        padding: 0;
-      }
-      #li-dropdown{
-        padding: 0;
-        margin: 20;
-      }
-      .dropdown-btn{
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-        background-color: transparent;
-        border: none;
-        color: white;
-        padding: 20px;
-      }
-      .sub-nav{
-        color: white;
-        font-weight: bold;
-        font-size: 1rem;
-        width: 100%;
-      }
-      .sub-icon{
-        font-size: 1.5rem;
-        vertical-align: middle;
-        padding-right: 5px;
-      }
-      .navbar-icon:hover {
-        color: white;
-      }
       .bookmark-title{
         display:flex;
         justify-content: center;
@@ -327,153 +190,14 @@
       }
       .Unbook-Icon:hover{
         color: white ;
-      }
-      .icon-2:hover{
-        color: black;
-      }
-      .notif-link{
-        display: flex;
-        flex-direction: row;
-        border-right: 1px solid rgba(0, 0, 0, 0.3);
-        flex-grow: 1;
-        margin-right: 10px;
-      }
-      .dropdown-menu.show {
-        transform: scaleY(0);
-        opacity: 1;
-        transform: translate(0px, 0px);
-        width: 218px;
-        background-color: transparent;
-        border: none;
-        position: relative;
-        padding: 0;
-      }
+      }    
       .card:hover {
         transform: translateY(-10px);
         z-index: 1;
     }
     .borrow-active{
         background-color:rgba(255, 255, 255, 0.1);
-    }
-      
-    
-      
-      @media (max-width: 1200px) {
-        .main-container {
-            display: grid;
-            grid-template-columns:1fr; 
-            grid-template-rows: 1px 1fr 150px;
-            grid-template-areas:
-            "header header"
-            "content content"
-            "footer footer";
-            height: 100vh;
-            max-width: 100vw;
-            flex: 1;
-        }
-        .main-container.with-sidebar {
-            display: grid;
-            grid-template-columns:1fr; 
-            grid-template-rows: 1px 1fr 150px;
-            grid-template-areas:
-            "header header"
-            "content content"
-            "footer footer";
-            height: 100vh;
-            max-width: 100vw;
-            flex: 1;
-        }
-       
-
-        /* Sidebar stays fixed and overlays the content on small screens */
-        .side-bar {
-            width: auto;
-            height: 95vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            transform: translateX(-100%); /* Initially off-screen */
-            transition: transform 0.3s ease; /* Smooth transition */
-        }
-
-        .side-bar.show {
-            transform: translateX(0); /* Sidebar slides in from the left */
-        }
-
-        .side-bar.hide {
-            transform: translateX(-100%); /* Sidebar slides out */
-        }
-
-        .content {
-            display: flex;
-            flex:1;
-            max-width: 100vw;
-        }
-        .card{
-            max-width: 300px;
-            max-height: 520px;
-        }
-        .modal-dialog{
-            max-width: 80vw;
-        }
-        .book-details{
-            height: auto;
-        }
-        .first-footer{
-            gap: 0px;
-            padding-top: 0px;
-        }
-        #li-dropdown{
-            max-width: 218px;
-        }
-        .bookmark-card {
-            flex: 1 1 calc(33.33% - 20px); /* 3 cards per row */
-        }
-     
-    }
-
-      @media (max-width: 768px) {
-       
-        .card{
-            max-width: 200px;
-        }
-        .bookmark-content{
-            padding: 0px;
-        }
-        .bookmark-card {
-            flex: 1 1 calc(50% - 20px); /* 2 cards per row */
-        }
-    }
-    @media (max-width: 600px) {
-        .card{
-            max-width: inherit;
-        }
-        .notification-icon {
-            margin-right: 20px;
-        }
-        .bookmark-card {
-            flex: 1 1 calc(100% - 20px); /* 1 card per row */
-        }
-        .card:hover {
-            z-index: 0;
-        }
-    }
-    @media (max-width: 420px) {
-        .dropdown-item-list{
-            padding-left: 10px;
-        }
-        .dropdown{
-            width:325px;
-        }
-        .dropdown-item{
-            text-wrap: wrap;
-        }
-        .notif-link{
-            font-size: 15px;
-        }
-    }
-
-        
+    }       
 </style>
 {% endblock %}
 
