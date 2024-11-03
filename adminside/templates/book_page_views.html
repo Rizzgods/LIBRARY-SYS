@@ -278,73 +278,124 @@
         
         
 <!-- Template: book_page_views.html -->
-            <!-- Loading Spinner -->
-            <div id="loadingSpinner" class="spinner-border text-primary" role="status" style="display: none;">
-                <span class="sr-only">Loading...</span>
-            </div>
-            
-            <div id="analytics-section">
-                <h2>User List</h2>
-                <!-- Filters Row -->
-                <div class="row mb-3">
-                    <!-- Dropdown filter for selecting the role -->
-                    <div class="col-md-2">
-                        <label for="role-filter" class="form-label">Filter by Role:</label>
-                        <select id="role-filter" class="form-select">
-                            <option value="">All Roles</option>
-                            <option value="Student">Student</option>
-                            <option value="Librarian">Librarian</option>
-                        </select>
-                    </div>
-            
-                    <!-- Search input for filtering by username -->
-                    <div class="col-md-10">
-                        <label for="search-input1" class="form-label">Search by Username:</label>
-                        <input type="text" id="search-input1" class="form-control" placeholder="Search for usernames..">
-                    </div>
-                </div>
-            
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Name</th>
-                                <th>Role</th>   
-                                <th>Active</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-list-tbody">
-                            {% for user in users %}
-                            <tr id="user-row-{{ user.id }}">
-                                <td>{{ user.username }}</td>
-                                <td>{{ user.email }}</td>
-                                <td>{{ user.first_name }}, {{ user.last_name }}</td>
-                                <td>
-                                    {% for group in user.groups.all %}
-                                        {{ group.name }}{% if not forloop.last %}, {% endif %}
-                                    {% endfor %}
-                                </td>
-                                <td id="user-status-{{ user.id }}">{{ user.is_active }}</td>
-                                <td>
-                                    <button 
-                                        class="btn {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#confirmDisableModal" 
-                                        data-user-id="{{ user.id }}" 
-                                        data-user-status="{{ user.is_active }}">
-                                        {% if user.is_active %}Disable{% else %}Activate{% endif %}
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div id="analytics-section">
+    <h2>User List</h2>
 
+    <!-- Filters Row -->
+    <div class="row mb-3">
+        <div class="col-md-2">
+            <label for="role-filter" class="form-label">Filter by Role:</label>
+            <select id="role-filter" class="form-select">
+                <option value="">All Roles</option>
+                <option value="Student">Student</option>
+                <option value="Librarian">Librarian</option>
+            </select>
+        </div>
+
+        <div class="col-md-10">
+            <label for="search-input1" class="form-label">Search by Username:</label>
+            <input type="text" id="search-input1" class="form-control" placeholder="Search for usernames..">
+        </div>
+    </div>
+
+    <!-- User List Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Active</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="user-list-tbody">
+                {% for user in users %}
+                <tr id="user-row-{{ user.id }}">
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.first_name }}, {{ user.last_name }}</td>
+                    <td>
+                        {% for group in user.groups.all %}
+                            {{ group.name }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td id="user-status-{{ user.id }}">{{ user.is_active }}</td>
+                    <td>
+                        <button 
+                            class="btn {% if user.is_active %}btn-danger{% else %}btn-success{% endif %}" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#confirmDisableModal" 
+                            data-user-id="{{ user.id }}" 
+                            data-user-status="{{ user.is_active }}">
+                            {% if user.is_active %}Disable{% else %}Activate{% endif %}
+                        </button>
+                        <button 
+                            class="btn btn-primary" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#keyModal" 
+                            data-user-id="{{ user.id }}">
+                            Key
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Loading Spinner Modal -->
+<div class="modal fade" id="loadingSpinnerModal" tabindex="-1" role="dialog" aria-labelledby="loadingSpinnerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only"></span>
+                </div>
+                <p>Please wait...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <p id="successModalMessage"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Key Modal -->
+<div class="modal fade" id="keyModal" tabindex="-1" role="dialog" aria-labelledby="keyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <p>New Password: <span id="newPassword"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Key Modal -->
+<div class="modal fade" id="confirmKeyModal" tabindex="-1" role="dialog" aria-labelledby="confirmKeyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <p>Are you sure you want to reset the password?</p>
+                <button type="button" class="btn btn-danger" id="confirmKeyAction">Yes</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
             <!-- Modal -->
             <div class="modal fade" id="confirmDisableModal" tabindex="-1" aria-labelledby="confirmDisableModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -369,136 +420,178 @@
             <!-- Include Bootstrap Bundle (includes Bootstrap JS and Popper.js) -->
 
             <script>
-                $(document).ready(function() {
-                    var userId, userStatus;
-                
-                    $('#confirmDisableModal').on('show.bs.modal', function(event) {
-                        var button = $(event.relatedTarget);
-                        userId = button.data('user-id');
-                        userStatus = button.data('user-status');
-                        var actionText = userStatus ? 'disable' : 'activate';
-                        $('#action-text').text(actionText);
-                    });
-                
-                    $('#confirmAction').click(function() {
-                        // Show loading spinner
-                        $('#loadingSpinner').show();
-                
-                        $.ajax({
-                            url: '{% url "toggle_user_status" %}',
-                            method: 'POST',
-                            data: {
-                                'user_id': userId,
-                                'csrfmiddlewaretoken': '{{ csrf_token }}'
-                            },
-                            success: function(response) {
-                                if (response.status == 'success') {
-                                    var newStatus = response.new_status;
-                                    $('#user-status-' + userId).text(newStatus);
-                                    var newButtonText = newStatus ? 'Disable' : 'Activate';
-                                    var newButtonClass = newStatus ? 'btn btn-danger' : 'btn btn-success';
-                                    $('button[data-user-id="' + userId + '"]').text(newButtonText).removeClass('btn-success btn-danger').addClass(newButtonClass);
-                                    $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
-                                    $('#confirmDisableModal').modal('hide');
-                                    localStorage.setItem('activeSection', 'analytics-section'); // Store the active section
-                                    setTimeout(function() {
-                                        alert('Successfully ' + (newStatus ? 'activated' : 'disabled'));
-                                        location.reload(); // Refresh the page
-                                    }, 500);
+                    $(document).ready(function() {
+                        var userId, userStatus;
+                    
+                        $('#confirmDisableModal').on('show.bs.modal', function(event) {
+                            var button = $(event.relatedTarget);
+                            userId = button.data('user-id');
+                            userStatus = button.data('user-status');
+                            var actionText = userStatus ? 'disable' : 'activate';
+                            $('#action-text').text(actionText);
+                        });
+                    
+                        $('#confirmAction').click(function() {
+                            // Show loading spinner modal
+                            $('#loadingSpinnerModal').modal('show');
+                    
+                            $.ajax({
+                                url: '{% url "toggle_user_status" %}',
+                                method: 'POST',
+                                data: {
+                                    'user_id': userId,
+                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                },
+                                success: function(response) {
+                                    if (response.status == 'success') {
+                                        var newStatus = response.new_status;
+                                        $('#user-status-' + userId).text(newStatus);
+                                        var newButtonText = newStatus ? 'Disable' : 'Activate';
+                                        var newButtonClass = newStatus ? 'btn btn-danger' : 'btn btn-success';
+                                        $('button[data-user-id="' + userId + '"]').text(newButtonText).removeClass('btn-success btn-danger').addClass(newButtonClass);
+                                        $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
+                                        $('#confirmDisableModal').modal('hide');
+                                        localStorage.setItem('activeSection', 'analytics-section'); // Store the active section
+                                        setTimeout(function() {
+                                            $('#successModalMessage').text('Successfully ' + (newStatus ? 'activated' : 'disabled'));
+                                            $('#successModal').modal('show');
+                                            setTimeout(function() {
+                                                $('#successModal').modal('hide');
+                                                location.reload(); // Refresh the page
+                                            }, 2000);
+                                        }, 500);
+                                    }
+                                },
+                                complete: function() {
+                                    // Hide loading spinner modal
+                                    $('#loadingSpinnerModal').modal('hide');
                                 }
-                            },
-                            complete: function() {
-                                // Hide loading spinner
-                                $('#loadingSpinner').hide();
+                            });
+                        });
+                    
+                        // Check local storage for active section and display it
+                        var activeSection = localStorage.getItem('activeSection');
+                        if (activeSection) {
+                            document.getElementById('overview-section').style.display = 'none';
+                            document.getElementById('active-section').style.display = 'none';
+                            document.getElementById('analytics-section').style.display = 'none';
+                            document.getElementById('Create-section').style.display = 'none';
+                            document.getElementById('csv-section').style.display = 'none';
+                            document.getElementById(activeSection).style.display = 'block';
+                        }
+                        localStorage.removeItem('activeSection'); // Clear the stored section after activation
+                    
+                        function filterTableByRole() {
+                            var filterValue = document.getElementById("role-filter").value.toLowerCase();
+                            var table = document.getElementById("user-list-tbody");
+                            var rows = table.getElementsByTagName("tr");
+                    
+                            for (var i = 0; i < rows.length; i++) {
+                                var roleCell = rows[i].getElementsByTagName("td")[3]; // Assuming role is in the fourth column
+                                if (roleCell) {
+                                    var role = roleCell.textContent || roleCell.innerText;
+                                    if (filterValue === "" || role.toLowerCase().indexOf(filterValue) > -1) {
+                                        rows[i].style.display = "";
+                                    } else {
+                                        rows[i].style.display = "none";
+                                    }
+                                }
                             }
+                        }
+                    
+                        function searchTableByUsernameAndDetails() {
+                            var input = document.getElementById('search-input1');
+                            var filter = input.value.toLowerCase();
+                            var table = document.getElementById('user-list-tbody');
+                            var rows = table.getElementsByTagName("tr");
+                            var anyMatch = false;
+                    
+                            // Remove the "no matches" row if it exists
+                            var noMatchesRow = document.getElementById('no-matches-row');
+                            if (noMatchesRow) {
+                                noMatchesRow.remove();
+                            }
+                    
+                            // If the search input is blank, reset the state of the table
+                            if (filter === "") {
+                                for (var i = 0; i < rows.length; i++) {
+                                    rows[i].style.display = ""; // Show all rows
+                                }
+                                return;
+                            }
+                    
+                            for (var i = 0; i < rows.length; i++) {
+                                var usernameCell = rows[i].getElementsByTagName("td")[0];
+                                var emailCell = rows[i].getElementsByTagName("td")[1];
+                                var nameCell = rows[i].getElementsByTagName("td")[2];
+                                var roleCell = rows[i].getElementsByTagName("td")[3];
+                    
+                                // Extract text content
+                                var username = usernameCell ? usernameCell.textContent.toLowerCase() : "";
+                                var email = emailCell ? emailCell.textContent.toLowerCase() : "";
+                                var name = nameCell ? nameCell.textContent.toLowerCase() : "";
+                                var role = roleCell ? roleCell.textContent.toLowerCase() : "";
+                    
+                                // Check if any of the fields match the search filter
+                                if (username.includes(filter) || email.includes(filter) || name.includes(filter) || role.includes(filter)) {
+                                    rows[i].style.display = ""; // Show row
+                                    anyMatch = true;
+                                } else {
+                                    rows[i].style.display = "none"; // Hide row
+                                }
+                            }
+                    
+                            // If no rows match, display a "no matches" row
+                            if (!anyMatch) {
+                                noMatchesRow = document.createElement('tr');
+                                noMatchesRow.id = 'no-matches-row';
+                                noMatchesRow.innerHTML = `<td colspan="6">No "${input.value}" matches from the records</td>`;
+                                table.appendChild(noMatchesRow);
+                            }
+                        }
+                    
+                        // Attach event listeners
+                        document.getElementById("role-filter").addEventListener("change", filterTableByRole);
+                        document.getElementById("search-input1").addEventListener("input", searchTableByUsernameAndDetails);
+                    
+                        // Handle key button click
+                        $('#keyModal').on('show.bs.modal', function(event) {
+                            var button = $(event.relatedTarget);
+                            var userId = button.data('user-id');
+                            $('#confirmKeyModal').data('user-id', userId).modal('show');
+                        });
+                    
+                        $('#confirmKeyAction').click(function() {
+                            var userId = $('#confirmKeyModal').data('user-id');
+                    
+                            // Show loading spinner modal
+                            $('#loadingSpinnerModal').modal('hide');
+                    
+                            $.ajax({
+                                url: '{% url "generate_new_password" %}',
+                                method: 'POST',
+                                data: {
+                                    'user_id': userId,
+                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                },
+                                success: function(response) {
+                                    if (response.status == 'success') {
+                                        $('#newPassword').text(response.new_password);
+                                        $('#keyModal').modal('show');
+                                        $('#loadingSpinnerModal').modal('hide');
+                                    } else {
+                                        $('#errorModalMessage').text(response.message);
+                                        $('#errorModal').modal('show');
+                                    }
+                                },
+                                complete: function() {
+                                    // Hide loading spinner modal
+                                    $('#loadingSpinnerModal').modal('hide');
+                                    $('#confirmKeyModal').modal('hide');
+                                }
+                            });
                         });
                     });
-                
-                    // Check local storage for active section and display it
-                    var activeSection = localStorage.getItem('activeSection');
-                    if (activeSection) {
-                        document.getElementById('overview-section').style.display = 'none';
-                        document.getElementById('active-section').style.display = 'none';
-                        document.getElementById('analytics-section').style.display = 'none';
-                        document.getElementById('Create-section').style.display = 'none';
-                        document.getElementById('csv-section').style.display = 'none';
-                        document.getElementById(activeSection).style.display = 'block';
-                    }
-                    localStorage.removeItem('activeSection'); // Clear the stored section after activation
-                
-                    function filterTableByRole() {
-                        var filterValue = document.getElementById("role-filter").value.toLowerCase();
-                        var table = document.getElementById("user-list-tbody");
-                        var rows = table.getElementsByTagName("tr");
-                
-                        for (var i = 0; i < rows.length; i++) {
-                            var roleCell = rows[i].getElementsByTagName("td")[3]; // Assuming role is in the fourth column
-                            if (roleCell) {
-                                var role = roleCell.textContent || roleCell.innerText;
-                                if (filterValue === "" || role.toLowerCase().indexOf(filterValue) > -1) {
-                                    rows[i].style.display = "";
-                                } else {
-                                    rows[i].style.display = "none";
-                                }
-                            }
-                        }
-                    }
-                
-                    function searchTableByUsernameAndDetails() {
-                        var input = document.getElementById('search-input1');
-                        var filter = input.value.toLowerCase();
-                        var table = document.getElementById('user-list-tbody');
-                        var rows = table.getElementsByTagName("tr");
-                        var anyMatch = false;
-                
-                        // Remove the "no matches" row if it exists
-                        var noMatchesRow = document.getElementById('no-matches-row');
-                        if (noMatchesRow) {
-                            noMatchesRow.remove();
-                        }
-                
-                        // If the search input is blank, reset the state of the table
-                        if (filter === "") {
-                            for (var i = 0; i < rows.length; i++) {
-                                rows[i].style.display = ""; // Show all rows
-                            }
-                            return;
-                        }
-                
-                        for (var i = 0; i < rows.length; i++) {
-                            var usernameCell = rows[i].getElementsByTagName("td")[0];
-                            var emailCell = rows[i].getElementsByTagName("td")[1];
-                            var nameCell = rows[i].getElementsByTagName("td")[2];
-                            var roleCell = rows[i].getElementsByTagName("td")[3];
-                
-                            // Extract text content
-                            var username = usernameCell ? usernameCell.textContent.toLowerCase() : "";
-                            var email = emailCell ? emailCell.textContent.toLowerCase() : "";
-                            var name = nameCell ? nameCell.textContent.toLowerCase() : "";
-                            var role = roleCell ? roleCell.textContent.toLowerCase() : "";
-                
-                            // Check if any of the fields match the search filter
-                            if (username.includes(filter) || email.includes(filter) || name.includes(filter) || role.includes(filter)) {
-                                rows[i].style.display = ""; // Show row
-                                anyMatch = true;
-                            } else {
-                                rows[i].style.display = "none"; // Hide row
-                            }
-                        }
-                
-                        // If no rows match, display a "no matches" row
-                        if (!anyMatch) {
-                            noMatchesRow = document.createElement('tr');
-                            noMatchesRow.id = 'no-matches-row';
-                            noMatchesRow.innerHTML = `<td colspan="6">No "${input.value}" matches from the records</td>`;
-                            table.appendChild(noMatchesRow);
-                        }
-                    }
-                
-                    // Attach event listeners
-                    document.getElementById("role-filter").addEventListener("change", filterTableByRole);
-                    document.getElementById("search-input1").addEventListener("input", searchTableByUsernameAndDetails);
-                });
             </script>
 
         <div id="Create-section">

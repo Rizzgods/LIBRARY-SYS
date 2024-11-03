@@ -355,3 +355,26 @@ def logout_user(request):
     messages.success(request, ("You were Logged Out!"))
     url = reverse('login_user')
     return redirect (url)
+
+
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+import random
+import string
+
+@csrf_exempt
+def generate_new_password(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        try:
+            user = User.objects.get(id=user_id)
+            new_password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            user.set_password(new_password)
+            user.save()
+            return JsonResponse({'status': 'success', 'new_password': new_password})
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'User not found'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=400)
