@@ -317,10 +317,13 @@ def edit_book(request, book_id):
 @login_required
 def approve_request(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    ApprovedRequest.objects.create(
+    
+    # Create an approved request with the expiration time set
+    approved_request = ApprovedRequest.objects.create(
         book=borrow_request.book,
         requested_by=borrow_request.requested_by,
         requested_at=borrow_request.requested_at,
+        expires_at=timezone.now() + timedelta(days=7)  # Set expiration to 7 days from now
     )
     borrow_request.delete()
     return redirect('librarian')

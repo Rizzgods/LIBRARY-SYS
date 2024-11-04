@@ -1817,13 +1817,18 @@
             });
             thead.appendChild(headerRow);
         
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toISOString().split('T')[0]; // This will give you YYYY-MM-DD
+            }
             requests.forEach(request => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${request.book_title}</td>
                     <td>${request.requested_by_name}</td>
-                    <td>${request.requested_at}</td>
-                    <td>${request.expires_at}</td>
+                    <td>${formatDate(request.requested_at)}</td>
+                    <td>${formatDate(request.expires_at)}</td>
                     <td>${request.file_type}</td>
                     <td>
                         ${!requestType ? `
