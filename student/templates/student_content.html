@@ -221,13 +221,15 @@
         display: flex;
         justify-content: center;
     }
-    .search-inputs{
+    
+    .search-inputs {
         padding: 10px 150px 10px 20px;
         border-radius: 20px;
         border: 2px solid black;
         font-size: 18px;
         transition: all 0.3s ease;
         margin-bottom: 10px;
+        width: 100%; /* Ensure the input takes full width */
     } 
     .form-control{
         width:50%;
@@ -237,6 +239,11 @@
         border-bottom: 1px solid #ddd;
         display: flex;
         align-items: center;
+        cursor: pointer;
+    }
+    
+    .suggestion-item:last-child {
+        border-bottom: none;
     }
     
     .suggestion-item img {
@@ -250,16 +257,17 @@
     }
     .suggestions {
         position: absolute;
-        top: 85%;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 100%; /* Position right below the search input */
+        left: 0;
+        right: 0; /* Stretch to full width of parent */
         width: 100%;
-        max-width: 350px;
+        max-height: 300px; /* Limit height and enable scrolling if many suggestions */
+        overflow-y: auto;
         border: 1px solid #ccc;
         background: #fff;
-        z-index: 10;
-        border-radius: 0 0 10px 10px;
+        z-index: 1000; /* Ensure it appears above other content */
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: none; /* Hide by default, show via JavaScript */
     }
       .carousel{
         display: flex;
@@ -289,6 +297,7 @@
         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
         <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        <!--Add more slides as you want-->
     </div>
     <div class="carousel-inner">
         <div class="carousel-item active">
@@ -312,7 +321,6 @@
 </div>
 
 
-<!-- Filter Form -->
 <div class="filter-container">
     <div class="search-contain">
         <input type="text" class="search-inputs" id="search-inputs" placeholder="Search for books...">
@@ -350,7 +358,6 @@
                 <option value="research" {% if filter_params.file_type == 'research' %}selected{% endif %}>Research Papers</option>
             </select>
     
-            <!-- Add Search and Reset buttons -->
             <button type="button" id="searchButton" class="btn btn-primary">Filter</button>
             <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
         </form>
@@ -682,6 +689,127 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        $('.owl-carousel').each(function() {
+            var maxHeight = 0;
+            $(this).find('.owl-item').each(function() {
+                var itemHeight = $(this).height();
+                if (itemHeight > maxHeight) {
+                    maxHeight = itemHeight;
+                }
+            });
+    
+            $(this).find('.owl-item').css('height', maxHeight + 'px');
+    
+            $(this).owlCarousel({
+                loop: false,
+                margin: 10,
+                nav: true,
+                responsive: {
+                    0: {
+                        items: 2
+                    },
+                    600: {
+                        items: 4
+                    },
+                    1000: {
+                        items: 5
+                    }
+                }
+            });
+    
+            // Add mouse wheel scroll functionality
+            $(this).on('wheel', function(e) {
+                e.preventDefault();
+                if (e.originalEvent.deltaY > 0) {
+                    $(this).trigger('next.owl.carousel');
+                } else {
+                    $(this).trigger('prev.owl.carousel');
+                }
+            });
+        });
+        $('#search-inputs').on('input', function() {
+            var query = $(this).val();
+            if (query.length >= 3) {
+                $.ajax({
+                    url: "{% url 'search_suggestions' %}",
+                    data: { q: query },
+                    method: 'GET',
+                    success: function(data) {
+                        $('#suggestions').empty();
+                        if (data.length === 0) {
+                            $('#suggestions').append('<div class="suggestion-item">No results found</div>');
+                        } else {
+                            data.forEach(function(book) {
+                                var suggestion = $('<div class="suggestion-item" data-id="' + book.id + '" data-title="' + book.title + '" data-author="' + book.author + '" data-description="' + book.description + '" data-date="' + book.date + '" data-category="' + book.category + '" data-language="' + book.language + '" data-image="' + book.image_url + '" data-views="' + book.views + '">')
+                                    .append($('<img>').attr('src', book.image_url))
+                                    .append($('<span>').text(book.title + ' by ' + book.author));
+                                $('#suggestions').append(suggestion);
+                            });
+                        }
+                        $('#suggestions').show(); // Make sure to show the suggestions
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('AJAX Error:', textStatus, errorThrown);
+                        $('#suggestions').empty().append('<div class="suggestion-item">Error fetching suggestions</div>').show();
+                    }
+                });
+            } else {
+                $('#suggestions').hide();
+            }
+        });
+        
+        // Hide suggestions when clicking outside
+        $(document).on('click', function(event) {
+            if (!$(event.target).closest('.search-contain').length) {
+                $('#suggestions').hide();
+            }
+        });
+        //pag pinindot mo yung suggestion eto yung modal na lalabas
+        $(document).on('click', '.suggestion-item', function() {
+            var bookId = $(this).attr('data-id');
+            var bookTitle = $(this).attr('data-title');
+            var bookAuthor = $(this).attr('data-author');
+            var bookDescription = $(this).attr('data-description');
+            var bookDate = $(this).attr('data-date');
+            var bookCategory = $(this).attr('data-category');
+            var bookLanguage = $(this).attr('data-language');
+            var bookImage = $(this).attr('data-image');
+            var bookViews = $(this).attr('data-views');
+            var isEbook = $(this).attr('data-is-ebook') === 'true';
+            var isResearchPaper = $(this).attr('data-is-research-paper') === 'true';
+        
+            // Set modal content
+            $('#modal-book-image').attr('src', bookImage);
+            $('#modal-book-title').text(bookTitle);
+            $('#modal-book-author').text(bookAuthor);
+            $('#modal-book-description').text(bookDescription);
+            $('#modal-book-date').text(bookDate);
+            $('#modal-book-category').text(bookCategory);
+            $('#modal-book-language').text(bookLanguage);
+            $('#modal-book-views').text(bookViews);
+        
+            // Construct URLs dynamically using the book ID
+            var borrowUrl = "{% url 'borrow_request' 0 %}".replace('0', bookId);
+            var previewUrl = "{% url 'prev_file' 0 %}".replace('0', bookId);
+        
+            // Set the href attributes for the borrow and preview links
+            $('#modal-borrow-link').attr('href', borrowUrl);
+            $('#modal-preview-link').attr('href', previewUrl);
+        
+            // Update borrow button text based on book type
+            var modalBorrowLink = $('#modal-borrow-link');
+            if (isEbook) {
+                modalBorrowLink.html('<i class="fas fa-book"></i> Borrow Hard Copy');
+            } else if (isResearchPaper) {
+                modalBorrowLink.html('<i class="fas fa-book"></i> Borrow');
+            } else {
+                modalBorrowLink.html('<i class="fas fa-book"></i> Borrow');
+            }
+        
+            // Show the modal
+            $('#bookDetailModal').modal('show');
+        });
+        
         var toastEl = document.getElementById('borrowMessageToast');
         if (toastEl) {
             var toast = new bootstrap.Toast(toastEl);
@@ -752,129 +880,6 @@
                 }
             });
         });
-    
-        // Handle bookmark toggle
-        $('#modal-bookmark-link').on('click', function(event) {
-            event.preventDefault();
-            const bookId = $(this).data('book-id');
-            const delayInMilliseconds = 500;
-    
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'bookmark_toggle' %}",
-                data: {
-                    'book_id': bookId,
-                    'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                success: function(response) {
-                    if (response.bookmarked) {
-                        $('#modal-bookmark-link').html('<i class="fas fa-bookmark"></i> Unbookmark');
-                        const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
-                        toastBootstrap.show();
-                    } else {
-                        $('#modal-bookmark-link').html('<i class="fas fa-bookmark"></i> Bookmark');
-                        const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
-                        toastBootstrap.show();
-                    }
-                    setTimeout(function() {
-                        location.reload();
-                    }, delayInMilliseconds);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Bookmark toggle failed:', error);
-                    alert('An error occurred while toggling the bookmark. Please try again.');
-                }
-            });
-        });
-    
-        document.getElementById('generate-citation').addEventListener('click', function () {
-            var title = document.getElementById('modal-book-title').textContent;
-            var author = document.getElementById('modal-book-author').textContent;
-            var date = document.getElementById('modal-book-date').textContent;
-            var publisher = document.getElementById('modal-book-category').textContent; // Assuming category as publisher for this example
-    
-            var citation = `${author} (${date}). ${title}. ${publisher}.`;
-            document.getElementById('apaCitationOutput').value = citation;
-    
-            var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
-            citationModal.show();
-        });
-    
-        const borrowButton = document.getElementById('modal-borrow-link');
-        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-    
-        borrowButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            const isApproved = this.getAttribute('data-approved') === 'true';
-    
-            if (isApproved) {
-                alert("You have already been approved to borrow this book.");
-            } else {
-                // Show loading spinner
-                loadingModal.show();
-    
-                // Simulate loading time
-                setTimeout(function() {
-                    window.location.href = borrowButton.href; // Proceed with the borrow request
-<<<<<<< HEAD
-                }, 2000);
-            }
-        });
-
-=======
-                }, 2000); // Set the loading time to 2 seconds (2000 ms)
-            }
-        });
->>>>>>> a4b62ec23379b694ff2ad272b3d797bcafe81290
-        $('.owl-carousel').each(function() {
-            var maxHeight = 0;
-            $(this).find('.owl-item').each(function() {
-                var itemHeight = $(this).height();
-                if (itemHeight > maxHeight) {
-                    maxHeight = itemHeight;
-                }
-            });
-    
-            $(this).find('.owl-item').css('height', maxHeight + 'px');
-    
-            $(this).owlCarousel({
-                loop: false,
-                margin: 10,
-                nav: true,
-                responsive: {
-                    0: {
-                        items: 2
-                    },
-                    600: {
-                        items: 4
-                    },
-                    1000: {
-                        items: 5
-                    }
-                }
-            });
-    
-            // Add mouse wheel scroll functionality
-            $(this).on('wheel', function(e) {
-                e.preventDefault();
-                if (e.originalEvent.deltaY > 0) {
-                    $(this).trigger('next.owl.carousel');
-                } else {
-                    $(this).trigger('prev.owl.carousel');
-                }
-            });
-        });
-    
-        var offcanvasElement = document.getElementById('offcanvasScrolling');
-        var sideBarElement = document.querySelector('.side-bar');
-        var mainContainer = document.getElementById('main-container');
-
-        offcanvasElement.addEventListener('toggle.bs.offcanvas', function() {
-            // Toggle the minimized class instead of show
-            sideBarElement.classList.toggle('minimized');
-            mainContainer.classList.toggle('with-sidebar-minimized');
-        });
-
         const modal = document.getElementById('bookDetailModal');
     
         function openBookDetailModal(book) {
@@ -957,81 +962,84 @@
         $(".draggable").draggable({
             handle: ".modal-header" // Specify the header as the handle for dragging
         });
+        // Handle bookmark toggle
+        $('#modal-bookmark-link').on('click', function(event) {
+            event.preventDefault();
+            const bookId = $(this).data('book-id');
+            const delayInMilliseconds = 500;
     
-        // WAG BURAHIN. YAN NAGPAPAGANA SA SEARCH SA HOME
-        // Search functionality
-        $('#search-inputs').on('input', function() {
-            var query = $(this).val();
-            if (query.length >= 3) {
-                $.get("{% url 'search_suggestions' %}", { q: query }, function(data) {
-                    $('#suggestions').empty();
-                    data.forEach(function(book) {
-                        var suggestion = $('<div class="suggestion-item" data-bs-toggle="modal" data-bs-target="#bookDetailModal">')
-                            .attr('data-title', book.title)
-                            .attr('data-author', book.author)
-                            .attr('data-description', book.description)
-                            .attr('data-date', book.date)
-                            .attr('data-category', book.category)
-                            .attr('data-language', book.language)
-                            .attr('data-image', book.image_url)
-                            .attr('data-views', book.views)
-                            .attr('data-id', book.id)
-                            .append($('<img>').attr('src', book.image_url))
-                            .append($('<span>').text(book.title + ' by ' + book.author));
-                        $('#suggestions').append(suggestion);
-                    });
-                    $('#suggestions').show();
-                }).fail(function() {
-                    console.error('Error fetching suggestions.');
-                    $('#suggestions').hide();
-                });
-            } else {
-                $('#suggestions').hide();
-            }
-        });
-    
-        $(document).click(function(event) {
-            if (!$(event.target).closest('#search-inputs').length) {
-                $('#suggestions').hide();
-            }
-        });
-    
-        $(document).on('click', '.suggestion-item', function() {
-            var bookId = $(this).attr('data-id');
-            var bookTitle = $(this).attr('data-title');
-            var bookAuthor = $(this).attr('data-author');
-            var bookDescription = $(this).attr('data-description');
-            var bookDate = $(this).attr('data-date');
-            var bookCategory = $(this).attr('data-category');
-            var bookLanguage = $(this).attr('data-language');
-            var bookImage = $(this).attr('data-image');
-            var bookViews = $(this).attr('data-views');
-    
-            if (!bookId) {
-                console.error('Book ID is missing.');
-                return;
-            }
-    
-            // Set modal content
-            $('#modal-book-image').attr('src', bookImage);
-            $('#modal-book-title').text(bookTitle);
-            $('#modal-book-author').text(bookAuthor);
-            $('#modal-book-description').text(bookDescription);
-            $('#modal-book-date').text(bookDate);
-            $('#modal-book-category').text(bookCategory);
-            $('#modal-book-language').text(bookLanguage);
-            $('#modal-book-views').text(bookViews);
-    
-            // Construct URLs dynamically using the book ID
-            var borrowUrl = "{% url 'borrow_request' 0 %}".replace('0', bookId);
-            var previewUrl = "{% url 'prev_file' 0 %}".replace('0', bookId);
-    
-            // Set the href attributes for the borrow and preview links
-            $('#modal-borrow-link').attr('href', borrowUrl);
-            $('#modal-preview-link').attr('href', previewUrl);
+            $.ajax({
+                type: 'POST',
+                url: "{% url 'bookmark_toggle' %}",
+                data: {
+                    'book_id': bookId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.bookmarked) {
+                        $('#modal-bookmark-link').html('<i class="fas fa-bookmark"></i> Unbookmark');
+                        const toastBootstrap = new bootstrap.Toast($('#AddNotif'));
+                        toastBootstrap.show();
+                    } else {
+                        $('#modal-bookmark-link').html('<i class="fas fa-bookmark"></i> Bookmark');
+                        const toastBootstrap = new bootstrap.Toast($('#RemoveNotif'));
+                        toastBootstrap.show();
+                    }
+                    setTimeout(function() {
+                        location.reload();
+                    }, delayInMilliseconds);
+                },
+                error: function(xhr , status, error) {
+                    console.error(xhr, status, error);
+                }
+            });
         });
     });
+//end
+        document.getElementById('generate-citation').addEventListener('click', function () {
+            var title = document.getElementById('modal-book-title').textContent;
+            var author = document.getElementById('modal-book-author').textContent;
+            var date = document.getElementById('modal-book-date').textContent;
+            var publisher = document.getElementById('modal-book-category').textContent; // Assuming category as publisher for this example
     
+            var citation = `${author} (${date}). ${title}. ${publisher}.`;
+            document.getElementById('apaCitationOutput').value = citation;
+    
+            var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
+            citationModal.show();
+        });
+    
+        const borrowButton = document.getElementById('modal-borrow-link');
+        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    
+        borrowButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            const isApproved = this.getAttribute('data-approved') === 'true';
+    
+            if (isApproved) {
+                alert("You have already been approved to borrow this book.");
+            } else {
+                // Show loading spinner
+                loadingModal.show();
+    
+                // Simulate loading time
+                setTimeout(function() {
+                    window.location.href = borrowButton.href; // Proceed with the borrow request
+                }, 2000); // Set the loading time to 2 seconds (2000 ms)
+            }
+        });
+    
+        var offcanvasElement = document.getElementById('offcanvasScrolling');
+        var sideBarElement = document.querySelector('.side-bar');
+        var mainContainer = document.getElementById('main-container');
+
+        offcanvasElement.addEventListener('toggle.bs.offcanvas', function() {
+            // Toggle the minimized class instead of show
+            sideBarElement.classList.toggle('minimized');
+            mainContainer.classList.toggle('with-sidebar-minimized');
+        });
+   
+
     function copyCitation() {
         var citationText = document.getElementById('apaCitationOutput').value;
         navigator.clipboard.writeText(citationText).then(function () {
@@ -1040,7 +1048,6 @@
             console.error('Could not copy text: ', err);
         });
     }
-    
 
 </script>
 {% endblock %}
