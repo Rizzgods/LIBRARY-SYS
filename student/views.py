@@ -150,15 +150,14 @@ def book_detail(request, book_id):
 def prev_file(request, book_id):
     book = get_object_or_404(Books, id=book_id)
     
-    # Increment page views
-    Books.objects.filter(pk=book_id).update(PageViews=F('PageViews') + 1)
-    
     # Check if the file exists
     if not book.BookFile:
         return HttpResponseNotFound('File not found')
     
     # Bypass authentication and permission checks if the book is an eBook
     if book.eBook:
+        # Increment page views for eBooks since they're freely accessible
+        Books.objects.filter(pk=book_id).update(PageViews=F('PageViews') + 1)
         return render(request, 'prev.html', {'book': book})
     
     # Check if the user is authenticated
@@ -167,9 +166,11 @@ def prev_file(request, book_id):
     
     # Check if there exists an approved request for the book and user
     if ApprovedRequest.objects.filter(book=book, requested_by=request.user).exists():
+        # Only increment page views if the user has approved access
+        Books.objects.filter(pk=book_id).update(PageViews=F('PageViews') + 1)
         return render(request, 'prev.html', {'book': book})
     else:
-        # Render forbidden.html with a styled message
+        # Don't increment page views if access is forbidden
         return render(request, 'forbidden.html')
 
 def search_suggestions(request):

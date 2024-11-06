@@ -283,7 +283,102 @@
       .home-active{
         background-color:rgba(255, 255, 255, 0.1);
     }
-
+    /* Loading animation styles */
+    .loader {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+    
+    .jimu-primary-loading:before,
+    .jimu-primary-loading:after {
+        position: absolute;
+        top: 0;
+        content: '';
+    }
+    
+    .jimu-primary-loading:before {
+        left: -19.992px;
+    }
+    
+    .jimu-primary-loading:after {
+        left: 19.992px;
+        -webkit-animation-delay: 0.32s !important;
+        animation-delay: 0.32s !important;
+    }
+    
+    .jimu-primary-loading:before,
+    .jimu-primary-loading:after,
+    .jimu-primary-loading {
+        background: #076fe5;
+        -webkit-animation: loading-keys-app-loading 0.8s infinite ease-in-out;
+        animation: loading-keys-app-loading 0.8s infinite ease-in-out;
+        width: 13.6px;
+        height: 32px;
+    }
+    
+    .jimu-primary-loading {
+        text-indent: -9999em;
+        margin: auto;
+        position: absolute;
+        right: calc(50% - 6.8px);
+        top: calc(50% - 16px);
+        -webkit-animation-delay: 0.16s !important;
+        animation-delay: 0.16s !important;
+    }
+    
+    @-webkit-keyframes loading-keys-app-loading {
+        0%,
+        80%,
+        100% {
+            opacity: .75;
+            box-shadow: 0 0 #076fe5;
+            height: 32px;
+        }
+    
+        40% {
+            opacity: 1;
+            box-shadow: 0 -8px #076fe5;
+            height: 40px;
+        }
+    }
+    
+    @keyframes loading-keys-app-loading {
+        0%,
+        80%,
+        100% {
+            opacity: .75;
+            box-shadow: 0 0 #076fe5;
+            height: 32px;
+        }
+    
+        40% {
+            opacity: 1;
+            box-shadow: 0 -8px #076fe5;
+            height: 40px;
+        }
+    }
+    
+    /* Make modal background transparent */
+    #loadingModal .modal-content {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+    
+    #loadingModal .modal-body {
+        background: transparent;
+    }
+    
+    #loadingModal .modal-dialog {
+        background: transparent;
+    }
+    
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
 </style>
 
 {% endblock %}
@@ -678,10 +773,9 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body text-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only">Loading...</span>
+                <div class="loader">
+                    <div class="justify-content-center jimu-primary-loading"></div>
                 </div>
-                <p>Please wait while your request is being processed...</p>
             </div>
         </div>
     </div>
@@ -994,21 +1088,6 @@
                 }
             });
         });
-    });
-//end
-        document.getElementById('generate-citation').addEventListener('click', function () {
-            var title = document.getElementById('modal-book-title').textContent;
-            var author = document.getElementById('modal-book-author').textContent;
-            var date = document.getElementById('modal-book-date').textContent;
-            var publisher = document.getElementById('modal-book-category').textContent; // Assuming category as publisher for this example
-    
-            var citation = `${author} (${date}). ${title}. ${publisher}.`;
-            document.getElementById('apaCitationOutput').value = citation;
-    
-            var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
-            citationModal.show();
-        });
-    
         const borrowButton = document.getElementById('modal-borrow-link');
         const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
     
@@ -1028,6 +1107,21 @@
                 }, 2000); // Set the loading time to 2 seconds (2000 ms)
             }
         });
+    });
+//end
+        document.getElementById('generate-citation').addEventListener('click', function () {
+            var title = document.getElementById('modal-book-title').textContent;
+            var author = document.getElementById('modal-book-author').textContent;
+            var date = document.getElementById('modal-book-date').textContent;
+            var publisher = document.getElementById('modal-book-category').textContent; // Assuming category as publisher for this example
+    
+            var citation = `${author} (${date}). ${title}. ${publisher}.`;
+            document.getElementById('apaCitationOutput').value = citation;
+    
+            var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
+            citationModal.show();
+        });
+    
     
         var offcanvasElement = document.getElementById('offcanvasScrolling');
         var sideBarElement = document.querySelector('.side-bar');
