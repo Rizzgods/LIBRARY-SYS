@@ -105,7 +105,7 @@ class ApprovedRequest(models.Model):
     requested_at = models.DateTimeField()
     approved_at = models.DateTimeField(auto_now_add=True)
     inOut = models.BooleanField(default=True)
-    expireTime = models.DateTimeField(default=default_expiry)
+    expires_at = models.DateTimeField(default=default_expiry)
 
     def __str__(self):
         return f"{self.book} approved for {self.requested_by}"

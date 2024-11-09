@@ -29,6 +29,7 @@ urlpatterns = [
     path('borrowed-books/', views.borrowed_books_view, name='borrowed_books'),
     path('change-password/', views.change_password, name='change-password'),
     path('notifications/mark_all_read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
+    path('generate_new_password/', views.generate_new_password, name='generate_new_password'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

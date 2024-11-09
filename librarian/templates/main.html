@@ -590,6 +590,24 @@
         tr {
             font-weight: normal; /* Ensure tr elements have normal font weight */
         }
+        .author-tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            padding: 2px 8px;
+            margin: 2px;
+            font-size: 14px;
+        }
+        
+        .remove-author {
+            cursor: pointer;
+            color: #dc3545;
+            margin-left: 5px;
+        }
+        
+        #id_Author:not(:focus):not(:placeholder-shown) {
+            background-image: none;
+        }
     </style>
     {% block style %}{% endblock %}
 </head>
@@ -741,7 +759,14 @@
                             </div>
                             <div class="form-group col">
                                 <label for="id_Author">Author:</label>
-                                <input type="text" class="form-control" id="id_Author" name="Author" required>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="id_Author" name="Author">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="addAuthorBtn">Add</button>
+                                    </div>
+                                </div>
+                                <div id="authorTags" class="mt-2"></div>
+                                <input type="hidden" id="authorsList" name="authors" value="">
                             </div>
                         </div>
                         <div class="form-group">
@@ -755,7 +780,7 @@
                             </div>
                             <div class="form-group col">
                                 <label for="id_stock">Stock:</label>
-                                <input type="number" class="form-control" id="id_stock" name="stock">
+                                <input type="number" class="form-control" id="id_stock" name="stock" required>
                             </div>
                         </div>
                         <div class="row">
@@ -828,6 +853,64 @@
                         <button type="submit" class="upload" id="uploadButton">Upload</button>
                     </form>
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const authorInput = document.getElementById('id_Author');
+                        const addAuthorBtn = document.getElementById('addAuthorBtn');
+                        const authorTags = document.getElementById('authorTags');
+                        const authorsList = document.getElementById('authorsList');
+                        let authors = [];
+                    
+                        function addAuthor() {
+                            const authorName = authorInput.value.trim();
+                            if (authorName && !authors.includes(authorName)) {
+                                authors.push(authorName);
+                                updateAuthorTags();
+                                authorInput.value = '';
+                                updateAuthorsListInput();
+                            }
+                        }
+                    
+                        function removeAuthor(author) {
+                            authors = authors.filter(a => a !== author);
+                            updateAuthorTags();
+                            updateAuthorsListInput();
+                        }
+                    
+                        function updateAuthorTags() {
+                            authorTags.innerHTML = authors.map(author => 
+                                `<span class="author-tag">
+                                    ${author}
+                                    <span class="remove-author" onclick="removeAuthor('${author}')">&times;</span>
+                                 </span>`
+                            ).join('');
+                        }
+                    
+                        function updateAuthorsListInput() {
+                            authorsList.value = JSON.stringify(authors);
+                        }
+                    
+                        addAuthorBtn.addEventListener('click', addAuthor);
+                    
+                        authorInput.addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addAuthor();
+                            }
+                        });
+                    
+                        // Expose removeAuthor to global scope
+                        window.removeAuthor = removeAuthor;
+                    
+                        // Add form submission validation
+                        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+                            if (authors.length === 0) {
+                                e.preventDefault();
+                                alert('Please add at least one author.');
+                            }
+                        });
+                    });
+                </script>
 
                 <!-- Batch Book Upload Form -->
                 <div id="batchBookUploadForm" style="display: none;">
@@ -1022,43 +1105,50 @@
                                     </td>
                                 </tr>
                                 
-                                <!-- Modal for Viewing Book Details -->
-                                <div class="modal fade" id="viewBookModal-{{ book.id }}" tabindex="-1" role="dialog" aria-labelledby="viewBookModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="viewBookModalLabel">{{ book.BookTitle }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <!-- Book Image on the left side with larger size -->
-                                                    <div class="col-md-5 d-flex align-items-center justify-content-center">
-                                                        {% if book.BookImage %}
-                                                            <img src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid" style="max-width: 100%; height: auto; max-height: 400px; object-fit: cover;">
-                                                        {% else %}
-                                                            <p>No image available</p>
-                                                        {% endif %}
-                                                    </div>
+<!-- Modal for Viewing Book Details -->
+<div class="modal fade" id="viewBookModal-{{ book.id }}" tabindex="-1" role="dialog" aria-labelledby="viewBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content upgraded-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewBookModalLabel">{{ book.BookTitle }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Book Image on the left side with larger size -->
+                    <div class="col-md-5 d-flex align-items-center justify-content-center">
+                        {% if book.BookImage %}
+                            <img src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid" style="max-width: 100%; height: auto; max-height: 400px; object-fit: cover;">
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                    </div>
 
-                                                    <!-- Book Details on the right side -->
-                                                    <div class="col-md-7">
-                                                        <div class="book-details">
-                                                            <p><strong>Author:</strong> {{ book.Author }}</p>
-                                                            <p><strong>Date:</strong> {{ book.Date }}</p>
-                                                            <p><strong>Description:</strong> {{ book.Description }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- Book Details on the right side -->
+                    <div class="col-md-7">
+                        <ul class="list-group">
+                            <li class="list-group-item"><strong>Author:</strong> {{ book.Author }}</li>
+                            <li class="list-group-item"><strong>Date:</strong> {{ book.Date }}</li>
+                            <li class="list-group-item"><strong>Description:</strong> {{ book.Description }}</li>
+                        </ul>
+                        <!-- View PDF and Close Buttons -->
+                        <div class="mt-3">
+                            {% if book.BookFile %}
+                                <a href="{{ book.BookFile.url }}" target="_blank" class="btn btn-primary view-pdf-btn">View PDF</a>
+                            {% else %}
+                                <p class="text-muted">No PDF available</p>
+                            {% endif %}
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
                             {% endfor %}
                         {% else %}
@@ -1456,40 +1546,47 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- Modal for Viewing Book Details -->
-                                <div class="modal fade" id="viewBookModal-{{ book.id }}" tabindex="-1" role="dialog" aria-labelledby="viewBookModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="viewBookModalLabel">{{ book.BookTitle }}</h5>
-                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <div class="row">
-                                                    <div class="col-md-5 d-flex align-items-center justify-content-center">
-                                                        {% if book.BookImage %}
-                                                            <img src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid" style="max-width: 100%; height: auto; max-height: 400px; object-fit: cover;">
-                                                        {% else %}
-                                                            <p>No image available</p>
-                                                        {% endif %}
-                                                    </div>
-                                                    <div class="col-md-7">
-                                                        <div class="book-details">
-                                                            <p><strong>Author:</strong> {{ book.Author }}</p>
-                                                            <p><strong>Date:</strong> {{ book.Date }}</p>
-                                                            <p><strong>Description:</strong> {{ book.Description }}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+<!-- Modal for Viewing Book Details -->
+<div class="modal fade" id="viewBookModal-{{ book.id }}" tabindex="-1" role="dialog" aria-labelledby="viewBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content upgraded-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewBookModalLabel">{{ book.BookTitle }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-5 text-center">
+                        {% if book.BookImage %}
+                            <img src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid book-image">
+                        {% else %}
+                            <p>No image available</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-7">
+                        <ul class="list-group">
+                            <li class="list-group-item"><strong>Author:</strong> {{ book.Author }}</li>
+                            <li class="list-group-item"><strong>Date:</strong> {{ book.Date }}</li>
+                            <li class="list-group-item"><strong>Description:</strong> {{ book.Description }}</li>
+                        </ul>
+                        <!-- View PDF and Close Buttons -->
+                        <div class="mt-3">
+                            {% if book.BookFile %}
+                                <a href="{{ book.BookFile.url }}" target="_blank" class="btn btn-primary view-pdf-btn">View PDF</a>
+                            {% else %}
+                                <p class="text-muted">No PDF available</p>
+                            {% endif %}
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
                             {% endfor %}
                         {% else %}
                             <tr>
@@ -1734,13 +1831,18 @@
             });
             thead.appendChild(headerRow);
         
+            function formatDate(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toISOString().split('T')[0]; // This will give you YYYY-MM-DD
+            }
             requests.forEach(request => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${request.book_title}</td>
                     <td>${request.requested_by_name}</td>
-                    <td>${request.requested_at}</td>
-                    <td>${request.expires_at}</td>
+                    <td>${formatDate(request.requested_at)}</td>
+                    <td>${formatDate(request.expires_at)}</td>
                     <td>${request.file_type}</td>
                     <td>
                         ${!requestType ? `

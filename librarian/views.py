@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import os
 import time
+import json
 from django.conf import settings
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
@@ -19,9 +20,9 @@ from student.models import Notification
 from django.views.decorators.http import require_POST
 
 
-
 @login_required
 def main(request):
+    # Initial Queries
     books = Books.objects.all().order_by('BookTitle').filter(available=True)
     recently_deleted_books = Books.objects.filter(deleted_at__isnull=False)
     borrow_requests = BorrowRequest.objects.filter(expires_at__gt=timezone.now())
@@ -29,7 +30,7 @@ def main(request):
     declined_requests = DeclinedRequest.objects.all()
     books_to_be_returned = Out.objects.all()
     
-    #homepagestatistics
+    # Homepage Statistics
     total_books = books.count()
     pending_borrow_requests = BorrowRequest.objects.filter(expires_at__gt=timezone.now()).count()
     current_date = timezone.now()
@@ -37,12 +38,14 @@ def main(request):
     books_added_this_month = Books.objects.filter(Date__gte=start_of_month).count()
     recently_deleted_books_count = Books.objects.filter(deleted_at__isnull=False).count()
 
+    # Book Status Queries
     book_status_approved_requests = ApprovedRequest.objects.filter(book__research_paper=False)
     book_status_books_to_be_returned = Out.objects.filter(book__research_paper=False)
     return_logs = ReturnLog.objects.all().order_by('-returnLogTime')
     language_choices = LANGUAGE_CHOICES
     years = Books.objects.annotate(year=ExtractYear('Date')).values_list('year', flat=True).distinct().order_by('-year')
 
+    # Handle POST request for book deletion
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         if book_id:
@@ -51,6 +54,32 @@ def main(request):
             book.save()
             return redirect('librarian')
 
+    # Handle form submission for new book
+    if request.method == 'POST':
+        form = BookForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                book = form.save(commit=False)
+                
+                # Handle author data
+                authors_json = request.POST.get('authors')
+                if authors_json:
+                    authors_list = json.loads(authors_json)
+                    book.Author = ', '.join(authors_list)
+                
+                book.save()
+                form.save_m2m()  # Save many-to-many relationships
+                
+                messages.success(request, 'The book was uploaded successfully.')
+                return redirect('librarian')
+            except Exception as e:
+                messages.error(request, f'Error saving book: {str(e)}')
+        else:
+            messages.error(request, 'There was an error uploading the book. Please check the form for errors and try again.')
+    else:
+        form = BookForm()
+
+    # Handle Filters
     year_filter = request.GET.get('year')
     language_filter = request.GET.get('language')
     file_type_filter = request.GET.get('file_type')
@@ -58,8 +87,8 @@ def main(request):
     search_query = request.GET.get('search')
     status_search_query = request.GET.get('status_search')
     status_reset = request.GET.get('status_reset')
-    
 
+    # Apply Filters
     if year_filter:
         try:
             year = int(year_filter)
@@ -69,15 +98,21 @@ def main(request):
 
     if language_filter:
         books = books.filter(Language=language_filter)
+
     if file_type_filter:
         if file_type_filter == 'eBook':
             books = books.filter(eBook=True)
         elif file_type_filter == 'Research Paper':
             books = books.filter(research_paper=True)
+
     if category_filter:
         books = books.filter(Category__name=category_filter)
+
     if search_query:
-        books = books.filter(BookTitle__icontains=search_query) | books.filter(Author__icontains=search_query)
+        books = books.filter(
+            Q(BookTitle__icontains=search_query) |
+            Q(Author__icontains=search_query)
+        )
 
     if status_search_query:
         book_status_approved_requests = book_status_approved_requests.filter(
@@ -88,10 +123,11 @@ def main(request):
             Q(book__BookTitle__icontains=status_search_query) |
             Q(book__Author__icontains=status_search_query)
         )
+
     if status_reset:
         return redirect('librarian')
-    
 
+    # Handle AJAX requests
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         books_data = []
         for book in books:
@@ -111,27 +147,17 @@ def main(request):
             })
         return JsonResponse({'books': books_data})
 
+    # Clear existing messages
     storage = messages.get_messages(request)
     for _ in storage:
-        pass  # This clears existing messages
+        pass
 
-    if request.method == 'POST':
-        form = BookForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'The book was uploaded successfully.')
-            return redirect('librarian')
-        else:
-            messages.error(request, 'There was an error uploading the book. Please check the form for errors and try again.')
-    else:
-        form = BookForm()
-    
+    # Get additional data for template
     subcategories = SubCategory.objects.all()
     categories = Category.objects.all()
     subsections = SubSection.objects.all()
-    
-    
-    
+
+    # Prepare context for template
     context = {
         'books': books,
         'recently_deleted_books': recently_deleted_books,
@@ -153,6 +179,7 @@ def main(request):
         'books_added_this_month': books_added_this_month,
         'recently_deleted_books_count': recently_deleted_books_count,
     }
+
     return render(request, 'main.html', context)
 
 def batch_upload_view(request):
@@ -290,10 +317,13 @@ def edit_book(request, book_id):
 @login_required
 def approve_request(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    ApprovedRequest.objects.create(
+    
+    # Create an approved request with the expiration time set
+    approved_request = ApprovedRequest.objects.create(
         book=borrow_request.book,
         requested_by=borrow_request.requested_by,
         requested_at=borrow_request.requested_at,
+        expires_at=timezone.now() + timedelta(days=7)  # Set expiration to 7 days from now
     )
     borrow_request.delete()
     return redirect('librarian')

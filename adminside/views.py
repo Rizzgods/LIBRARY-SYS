@@ -333,3 +333,10 @@ def logout_user(request):
     messages.success(request, ("You were Logged Out!"))
     url = reverse('login_user')
     return redirect(url)
+
+
+def password_generator(password, request):
+    import random
+    import string
+    password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(8))
+    return password
