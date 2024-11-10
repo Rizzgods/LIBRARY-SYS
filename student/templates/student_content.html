@@ -376,8 +376,8 @@
         background: transparent;
     }
     
-    .modal-backdrop {
-        background-color: rgba(0, 0, 0, 0.5);
+    .loading-modal {
+        background-color: rgba(152,152,152, .5);
     }
 </style>
 
@@ -770,7 +770,7 @@
     </div>
 </div>
 <!-- Loading Modal -->
-<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
+<div class="modal fade loading-modal" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body text-center">
@@ -1121,17 +1121,6 @@
     
             var citationModal = new bootstrap.Modal(document.getElementById('citationModal'));
             citationModal.show();
-        });
-    
-    
-        var offcanvasElement = document.getElementById('offcanvasScrolling');
-        var sideBarElement = document.querySelector('.side-bar');
-        var mainContainer = document.getElementById('main-container');
-
-        offcanvasElement.addEventListener('toggle.bs.offcanvas', function() {
-            // Toggle the minimized class instead of show
-            sideBarElement.classList.toggle('minimized');
-            mainContainer.classList.toggle('with-sidebar-minimized');
         });
    
 

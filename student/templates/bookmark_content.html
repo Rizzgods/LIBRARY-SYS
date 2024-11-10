@@ -4,10 +4,6 @@
 
 {% block style %}
 <style>
-    .content {
-        padding: 0 50px;
-        margin-top: 150px;
-    }
     .active {
         background-color: rgba(255, 255, 255, 0.1);
     }
@@ -26,7 +22,6 @@
         flex: 1 1 calc(25% - 20px); /* Adjust the percentage as needed */
         box-sizing: border-box;
     }
-
     
     .container {
         padding: 20px;
@@ -124,19 +119,34 @@
     }
     .modalButtons {
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between; /* Space buttons evenly */
         align-items: center;
+        padding: 10px 0; /* Add vertical padding */
+        border-top: 1px solid #ccc; /* Add subtle top border for separation */
     }
-    .btn-mdl {
-        background-color: rgb(74, 128, 210);
-        padding: 10px 20px;
-        border: 1px solid white;
-        border-radius: 5px;
-        color: white;
-        font-weight: bold;
+    
+    .modalButtons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* Create 4 equal columns */
+        gap: 10px; /* Add some space between the buttons */
+        padding: 10px 0; /* Add vertical padding */
+        border-top: 1px solid #ccc; /* Add subtle top border for separation */
     }
-    .btn-mdl:hover {
-        background-color: rgba(74, 128, 210, .8);
+    
+    .modalButtons a, .modalButtons button {
+        text-align: center; /* Center the button text */
+        margin: 0; /* Remove the margin between buttons */
+        color: #fff; /* White text color */
+        border: none; /* Remove borders */
+        border-radius: 0; /* Keep the corners squared */
+        font-weight: bold; /* Make button text bold */
+        padding: 10px 0; /* Add padding */
+    }
+    /* Hover effect */
+    .modalButtons a:hover span, .modalButtons button:hover span {
+        opacity: 0.9; /* Slight opacity change on hover */
+        
+        transition: transform 0.2s ease-in-out; /* Smooth transition */
     }
     .spinner-border {
         display: none;
@@ -199,6 +209,40 @@
     .bookmark-active{
         background-color:rgba(255, 255, 255, 0.1);
     }    
+    .btn-mdl {
+        background-color: rgb(73, 110, 232);
+        padding: 10px 20px;
+        border: 1px solid white;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        overflow: hidden; /* Ensure scaling content doesn't overflow */
+        position: relative; /* For scaling effect */
+    }
+    
+    .btn-mdl span {
+        display: inline-block; /* Ensure span scales properly */
+        transition: transform 0.2s ease-in-out; /* Smooth transition */
+    }
+    
+    .btn-mdl:hover {
+        background-color: rgba(73, 110, 232, 0.8); /* Slightly darker blue on hover */
+    }
+    #modal-borrow-link {
+        
+        border-left: 10px solid #fff; /* 10px border on the left side, white color */
+    }
+    #generate-citation {
+       
+        border-right: 10px solid #fff;
+    }
+    .disable{
+        color: #aaa;           /* Lighter color for disabled effect */
+        pointer-events: none;  /* Prevents interaction */
+        opacity: 0.5;          /* Makes it appear faded */
+        text-decoration: none; /* Removes underline if any */
+    }
+
 </style>
 {% endblock %}
 
@@ -330,7 +374,7 @@
                 <a href="#" id="modal-preview-link" class="btn-mdl">
                     <span><i class="fas fa-eye"></i> Preview</span>
                 </a>
-                <a href="#" id="modal-bookmark-link" class="btn-mdl" data-book-id="">
+                <a href="#" id="modal-bookmark-link" class="btn-mdl disable" data-book-id="">
                     <span><i class="fas fa-bookmark"></i> Bookmark</span>
                 </a>
                 <button type="button" id="generate-citation" class="btn-mdl">
@@ -489,10 +533,6 @@
         });
 
     });
-
-    {% comment %} notif js {% endcomment %}
-    
-   
     
 </script>
 {% endblock %}
