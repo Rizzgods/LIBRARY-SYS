@@ -1,20 +1,22 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Access Denied</title>
-  <link rel="stylesheet">
-</head>
-<style>/* Reset styles */
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Access Denied</title>
+    <link rel="icon" href={% static "playground/NewLogo.png" %}>
+    <link rel="stylesheet" />
+  </head>
+  <style>
+    /* Reset styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
-    
+
     /* Center everything vertically and horizontally */
     body {
       display: flex;
@@ -24,7 +26,7 @@
       background-color: #d9534f; /* Soft red background */
       color: #333;
     }
-    
+
     /* Page wrapper */
     .page-wrapper {
       display: flex;
@@ -35,17 +37,17 @@
       max-width: 500px;
       padding: 1rem;
     }
-    
+
     /* Logo */
     header {
       margin-bottom: 1rem;
     }
-    
+
     .logo {
       width: 140px;
       height: auto;
     }
-    
+
     /* Main content container */
     .container {
       padding: 2rem;
@@ -53,21 +55,21 @@
       background-color: #fff;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
-    
+
     /* Hand icon */
     .hand-icon {
       width: 60px;
       height: 60px;
       margin-bottom: 1rem;
     }
-    
+
     /* Heading styling */
     h1 {
       font-size: 1.8rem;
       color: #d9534f;
       margin-bottom: 0.5rem;
     }
-    
+
     /* Paragraph styling */
     p {
       font-size: 1rem;
@@ -75,7 +77,7 @@
       margin-bottom: 1.2rem;
       line-height: 1.5;
     }
-    
+
     /* Button styling */
     .button {
       display: inline-block;
@@ -88,33 +90,41 @@
       text-decoration: none;
       transition: background-color 0.3s ease;
     }
-    
+
     .button:hover {
       background-color: #0056b3;
     }
-    
+
     /* Footer */
     footer {
       margin-top: 1.5rem;
       font-size: 0.85rem;
       color: #888;
     }
-    </style>
-<body>
-  <div class="page-wrapper">
-    <header>
-      <img src="{% static 'LOGO.png' %}" alt="Company Logo" class="logo">
-    </header>
-    <div class="container">
-      {% comment %} <img src="{% static 'warning.png' %}" alt="Warning Icon" class="warning"> {% endcomment %}
-      <h1>Access Restricted</h1>
-      <p>We're sorry, but you don't have permission to access this page.</p>
-      <p>To gain access click the "BORROW" button and wait for the approval</p>
-      <a href="/student/student" class="button">Back to Homepage</a>
+  </style>
+  <body>
+    <div class="page-wrapper">
+      <header>
+        <img src="{% static 'LOGO.png' %}" alt="Company Logo" class="logo" />
+      </header>
+      <div class="container">
+        {% comment %}
+        <img
+          src="{% static 'warning.png' %}"
+          alt="Warning Icon"
+          class="warning"
+        />
+        {% endcomment %}
+        <h1>Access Restricted</h1>
+        <p>We're sorry, but you don't have permission to access this page.</p>
+        <p>
+          To gain access click the "BORROW" button and wait for the approval
+        </p>
+        <a href="/student/student" class="button">Back to Homepage</a>
+      </div>
+      <footer>
+        <p>&copy; 2024 LBLIB. All rights reserved.</p>
+      </footer>
     </div>
-    <footer>
-      <p>&copy; 2024 LBLIB. All rights reserved.</p>
-    </footer>
-  </div>
-</body>
+  </body>
 </html>

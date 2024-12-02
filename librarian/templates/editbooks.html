@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="{% static 'playground/school_Logo.png' %}">
+    <link rel="icon" href="{% static 'playground/NewLogo.png' %}">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <title>Edit Book</title>
@@ -105,15 +105,15 @@
 <body>
     <div class="container">
         <div class="card p-4">
-            <h1 class="main-title">Edit Book</h1>
+            <div>
+                
+                <h1 class="main-title">Edit Book</h1>
+            </div>
             <div class="text-center">
                 <h2 class="book-cover-title">Book Cover Preview</h2>
-                {% if book.BookImage %}
-                    <img id="preview-image" src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid prev-img">
-                {% else %}
-                    <img id="preview-image" src="" alt="No image available" class="img-fluid prev-img" style="display:none;">
-                    <p id="no-image-text">No image available</p>
-                {% endif %}
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <img id="preview-image" src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }} Image" class="img-fluid prev-img" onerror="handleImageError(this);">
+                </div>
             </div>
             <form method="post" enctype="multipart/form-data" action="{% url 'edit_book' book.id %}">
                 {% csrf_token %}
@@ -180,17 +180,17 @@
                             </select>
                         </div>
 
-                        <div class="row">
-                            <div class="form-group col">
-                                <label class="checkbox-label">Ebook:</label>
+                        <div class="row pl-3">
+                            <div class="form-group col-3">
+                                <label class="checkbox-label pr-4">Ebook:</label>
                                 <input class="form-check-input" type="checkbox" id="id_eBook" name="eBook" {% if book.ebook %}checked{% endif %}>
                             </div>
                             <div class="form-group col">
-                                <label class="checkbox-label">Research Paper:</label>
+                                <label class="checkbox-label pr-4">Research Paper:</label>
                                 <input class="form-check-input" type="checkbox" id="id_research_paper" name="research_paper" {% if book.research_paper %}checked{% endif %}>
                             </div>
                             <div class="form-group col">
-                                <label class="checkbox-label">HardCopy:</label>
+                                <label class="checkbox-label pr-4">HardCopy:</label>
                                 <input class="form-check-input" type="checkbox" id="id_hardCopy" name="hardCopy" {% if book.hardCopy %}checked{% endif %}>
                             </div>
                         </div>
@@ -277,6 +277,9 @@
                     });
                 })
         });
+        function handleImageError(image) {
+            image.src = '../../media/books/images/backup-img.jpg';
+        }
     </script>
 </body>
 </html>

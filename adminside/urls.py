@@ -14,4 +14,5 @@ urlpatterns = [
     path('import-csv/', views.import_csv, name='import_csv'),
     path('batch-upload/', views.batch_upload_view, name='batch-upload'),
     path('logout/', views.logout_user, name='logout'),
+    path('generate_new_password', views.password_generator, name='generate_new_password'),
     ]

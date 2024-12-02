@@ -1,116 +1,143 @@
-{% extends 'student.html' %}
+{% extends 'student.html' %} 
 
 {% block title %} Change Password {% endblock %}
-
+ 
 {% block style %}
 <style>
-    .notification-time {
-        font-size: 0.8rem;
-        color: grey;
-        margin-left: auto;
-    }
-    .content {
-        padding: 0 50px;
-        margin-top: 150px;
-    }
-    .active {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
-    .bookmark-head {
-        display: flex;
-        flex-direction: row;
-    }
-    .bookmark-content {
-        padding: 20px 50px;
-    }
-    .container {
-        padding: 20px;
-        animation: fadeIn 1s ease-in-out;
-    }
-    .changeP-active{
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+  .notification-time {
+    font-size: 0.8rem;
+    color: grey;
+    margin-left: auto;
+  }
+  .content {
+    padding: 0 50px;
+    margin-top: 150px;
+  }
+  .active {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  .bookmark-head {
+    display: flex;
+    flex-direction: row;
+  }
+  .bookmark-content {
+    padding: 20px 50px;
+  }
+  .container {
+    padding: 20px;
+    animation: fadeIn 1s ease-in-out;
+  }
+  .changeP-active {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 </style>
-{% endblock %}
-
-{% block nav %}
-
-
-{% endblock %}
+{% endblock %} 
 
 {% block body %}
 <div class="d-flex justify-content-center change-pass-title">
-    <h5 class="fs-3">Change Password</h5>
+  <h5 class="fs-3">Change Password</h5>
 </div>
 
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3 d-flex align-items-center">
-                            <h5 class="me-2 mb-0">Username:</h5>
-                            <h1 class="mb-0 fs-4">{{ user.username }}</h1>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="id_old_password" class="form-label">Old Password</label>
-                            <input type="password" class="form-control" id="id_old_password" name="old_password" required>
-                            {% if form.old_password.errors %}
-                                <div class="text-danger">{{ form.old_password.errors }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="id_new_password1" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="id_new_password1" name="new_password1" required>
-                            {% if form.new_password1.errors %}
-                                <div class="text-danger">{{ form.new_password1.errors }}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="id_new_password2" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="id_new_password2" name="new_password2" required>
-                            {% if form.new_password2.errors %}
-                                <div class="text-danger">{{ form.new_password2.errors }}</div>
-                            {% endif %}
-                        </div>
-
-                        <button type="submit" class="btn w-100" style="background-color: rgb(74, 128, 210); color: white;">Change Password</button>
-                    </form>
-                </div>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3 d-flex align-items-center">
+              <h5 class="me-2 mb-0">Username:</h5>
+              <h1 class="mb-0 fs-4">{{ user.username }}</h1>
             </div>
+
+            <div class="mb-3">
+              <label for="id_old_password" class="form-label"
+                >Old Password</label
+              >
+              <input
+                type="password"
+                class="form-control pass-input"
+                id="id_old_password"
+                name="old_password"
+                required
+              />
+              {% if form.old_password.errors %}
+              <div class="text-danger">{{ form.old_password.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="id_new_password1" class="form-label"
+                >New Password</label
+              >
+              <input
+                type="password"
+                class="form-control pass-input"
+                id="id_new_password1"
+                name="new_password1"
+                required
+              />
+              {% if form.new_password1.errors %}
+              <div class="text-danger">{{ form.new_password1.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="id_new_password2" class="form-label"
+                >Confirm New Password</label
+              >
+              <input
+                type="password"
+                class="form-control pass-input"
+                id="id_new_password2"
+                name="new_password2"
+                required
+              />
+              {% if form.new_password2.errors %}
+              <div class="text-danger">{{ form.new_password2.errors }}</div>
+              {% endif %}
+            </div>
+
+            <button
+              type="submit"
+              class="btn w-100"
+              style="background-color: rgb(74, 128, 210); color: white"
+            >
+              Change Password
+            </button>
+          </form>
         </div>
+      </div>
     </div>
+  </div>
 </div>
+{% endblock %}
 
+{% block script %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var offcanvasElement = document.getElementById('offcanvasScrolling');
-        var sideBarElement = document.querySelector('.side-bar');
-        var mainContainer = document.getElementById('main-container'); // Select the main container
-        
-        // Add event listener to the offcanvas element
-        offcanvasElement.addEventListener('hidden.bs.offcanvas', function() {
-            sideBarElement.classList.remove('show');
-            mainContainer.classList.remove('with-sidebar');
-        });
-        
-        // Add event listener to the offcanvas element
-        offcanvasElement.addEventListener('show.bs.offcanvas', function() {
-            sideBarElement.classList.add('show');
-            mainContainer.classList.add('with-sidebar');
-        });
+    document.addEventListener("DOMContentLoaded", function () {
+      var offcanvasElement = document.getElementById("offcanvasScrolling");
+      var sideBarElement = document.querySelector(".side-bar");
+      var mainContainer = document.getElementById("main-container"); // Select the main container
+  
+      // Add event listener to the offcanvas element
+      offcanvasElement.addEventListener("hidden.bs.offcanvas", function () {
+        sideBarElement.classList.remove("show");
+        mainContainer.classList.remove("with-sidebar");
+      });
+  
+      // Add event listener to the offcanvas element
+      offcanvasElement.addEventListener("show.bs.offcanvas", function () {
+        sideBarElement.classList.add("show");
+        mainContainer.classList.add("with-sidebar");
+      });
     });
-
+  
     // Hide dropdown when clicking outside
-    $(document).click(function(event) {
-        if (!$(event.target).closest('.notification-icon').length) {
-            $('#notification-dropdown').hide();
-        }
+    $(document).click(function (event) {
+      if (!$(event.target).closest(".notification-icon").length) {
+        $("#notification-dropdown").hide();
+      }
     });
 </script>
 {% endblock %}

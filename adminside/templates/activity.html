@@ -1,0 +1,57 @@
+<div id="active-section" style="display: none;">
+    <h2 class="mb-4">User Activity Logs</h2>
+
+    <!-- Filters Row -->
+    <div class="row mb-3">
+    <!-- Dropdown filter for selecting the month -->
+    <div class="col-md-2">
+        <label for="month-filter" class="form-label">Filter by Month:</label>
+        <select id="month-filter" class="form-select" onchange="filterTableByMonth()">
+        <option value="">All Months</option>
+        <option value="01">January</option>
+        <option value="02">February</option>
+        <option value="03">March</option>
+        <option value="04">April</option>
+        <option value="05">May</option>
+        <option value="06">June</option>
+        <option value="07">July</option>
+        <option value="08">August</option>
+        <option value="09">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+        </select>
+    </div>
+
+    <!-- Search input for filtering by username -->
+    <div class="col-md-10">
+        <label for="search-input" class="form-label">Search by Username:</label>
+        <input type="text" id="search-input" class="form-control" onkeyup="searchTableByUsernameActivity()" placeholder="Search for usernames..">
+    </div>
+    </div>
+
+    <div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+        <tr>
+            <th>User</th>
+            <th>Login Time</th>
+            <th>Logout Time</th>
+        </tr>
+        </thead>
+        <tbody id="activity-log-tbody">
+        {% for user_logs in user_logs %}
+        <tr>
+            <td>{{ user_logs.user.username }}</td>
+            <td>{{ user_logs.login_time }}</td>
+            <td>{{ user_logs.logout_time }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="text-center">No user activities</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>

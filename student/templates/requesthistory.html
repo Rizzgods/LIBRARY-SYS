@@ -1,301 +1,311 @@
-{% extends 'student.html' %}
+{% extends 'student.html' %} 
 
-{% block title %} Request History {% endblock %}
+{% block title %} Request History {% endblock %} 
 
 {% block style %}
 <style>
-    .content {
-        padding: 0 50px;
-        margin-top: 100px;
-        margin-bottom: 50px;
-    }
-    .container {
-        margin-top: 5rem;
-    }
-    .card {
-        width: 75%;
-        margin: auto;
-        border: 1px solid #dee2e6;
-        border-radius: 0.25rem;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        background-color: #fff;
-    }
-    .card-header {
-        background-color: rgb(74, 128, 210);
-        color: #fff;
-        padding: 1rem;
-        text-align: center;
-        border-bottom: 1px solid #dee2e6;
-    }
-    .card-header h2 {
-        margin: 0;
-    }
-    .card-body {
-        padding: 2rem;
-    }
-    .card-body h3 {
-        color: #343a40;
-    }
-    .table {
-        width: 100%;
-        margin-bottom: 1rem;
-        border-collapse: collapse;
-    }
-    .table thead {
-        background-color: #007bff;
-        color: #fff;
-    }
-    .table th, .table td {
-        padding: 0.75rem;
-        border: 1px solid #dee2e6;
-    }
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: #f8f9fa;
-    }
-    .table-hover tbody tr:hover {
-        background-color: #e9ecef;
-    }
-    .table-danger {
-        background-color: #f8d7da;
-    }
-    .text-center {
-        text-align: center;
-    }
-    .sections {
-        text-align: center;
-    }
-    .sec-mar {
-        margin-top: 50px;
-    }
-    .btn-close{
-        width: 10px;
-        height: 10px;
-        margin-right: 10px;
-    }
-    .book-title{
-        text-transform: capitalize;
-    }
-      .history-active{
-        background-color:rgba(255, 255, 255, 0.1);
-    }
-        
+  .content {
+    padding: 0 50px;
+    margin-top: 100px;
+    margin-bottom: 50px;
+  }
+  .container {
+    margin-top: 5rem;
+  }
+  .card {
+    width: 75%;
+    margin: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  .card-header {
+    background-color: rgb(74, 128, 210);
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+  }
+  .card-header h2 {
+    margin: 0;
+  }
+  .card-body {
+    padding: 2rem;
+  }
+  .card-body h3 {
+    color: #343a40;
+  }
+  .table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+  }
+  .table thead {
+    background-color: #007bff;
+    color: #fff;
+  }
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+  }
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f8f9fa;
+  }
+  .table-hover tbody tr:hover {
+    background-color: #e9ecef;
+  }
+  .table-danger {
+    background-color: #f8d7da;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .sections {
+    text-align: center;
+  }
+  .sec-mar {
+    margin-top: 50px;
+  }
+  .btn-close {
+    width: 10px;
+    height: 10px;
+    margin-right: 10px;
+  }
+  .book-title {
+    text-transform: capitalize;
+  }
+  .history-active {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 </style>
-{% endblock %}
+{% endblock %} 
 
 {% block body %}
 <div class="container mt-4">
-    <h1>Request History</h1>
-    <div class="row mb-3 align-items-end">
-        <div class="col-md-3">
-            <div class="form-group">
-                <select class="form-select" id="requestTypeSelect" onchange="toggleRequestTable()">
-                    <option value="pending">Pending Requests</option>
-                    <option value="approved">Approved Requests</option>
-                    <option value="declined">Declined Requests</option>
-                    <option value="expired">Expired Requests</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-9">
-            <div class="form-group">
-                <input type="text" class="form-control" id="searchInput" onkeyup="searchTable()" placeholder="Search for requests...">
-            </div>
-        </div>
+  <h1>Request History</h1>
+  <div class="row mb-3 align-items-end">
+    <div class="col-md-3">
+      <div class="form-group">
+        <select
+          class="form-select"
+          id="requestTypeSelect"
+          onchange="toggleRequestTable()"
+        >
+          <option value="pending">Pending Requests</option>
+          <option value="approved">Approved Requests</option>
+          <option value="declined">Declined Requests</option>
+          <option value="expired">Expired Requests</option>
+        </select>
+      </div>
     </div>
+    <div class="col-md-9">
+      <div class="form-group">
+        <input
+          type="text"
+          class="form-control"
+          id="searchInput"
+          onkeyup="searchTable()"
+          placeholder="Search for requests..."
+        />
+      </div>
+    </div>
+  </div>
 
-    <!-- No results message -->
-    <div id="noResults" class="no-results">No such request found.</div>
+  <!-- No results message -->
+  <div id="noResults" class="no-results">No such request found.</div>
 
-    <!-- Pending Requests Table -->
-    <div id="pendingRequestsTable" class="request-table">
-        {% if pending_requests %}
-            <table class="table table-striped">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Book</th>
-                        <th>Requested At</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for request in pending_requests %}
-                        <tr>
-                            <td>{{ request.book }}</td>
-                            <td>{{ request.requested_at }}</td>
-                            <td>{{ request.status }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="alert alert-warning">No pending requests found.</div>
-        {% endif %}
-    </div>
+  <!-- Pending Requests Table -->
+  <div id="pendingRequestsTable" class="request-table">
+    {% if pending_requests %}
+    <table class="table table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>Book</th>
+          <th>Requested At</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in pending_requests %}
+        <tr>
+          <td>{{ request.book }}</td>
+          <td>{{ request.requested_at }}</td>
+          <td>{{ request.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning">No pending requests found.</div>
+    {% endif %}
+  </div>
 
-    <!-- Approved Requests Table -->
-    <div id="approvedRequestsTable" class="request-table" style="display: none;">
-        {% if approved_requests %}
-            <table class="table table-striped">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Book</th>
-                        <th>Requested At</th>
-                        <th>Approved At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for request in approved_requests %}
-                        <tr>
-                            <td>{{ request.book }}</td>
-                            <td>{{ request.requested_at }}</td>
-                            <td>{{ request.approved_at }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="alert alert-warning">No approved requests found.</div>
-        {% endif %}
-    </div>
+  <!-- Approved Requests Table -->
+  <div id="approvedRequestsTable" class="request-table" style="display: none">
+    {% if approved_requests %}
+    <table class="table table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>Book</th>
+          <th>Requested At</th>
+          <th>Approved At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in approved_requests %}
+        <tr>
+          <td>{{ request.book }}</td>
+          <td>{{ request.requested_at }}</td>
+          <td>{{ request.approved_at }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning">No approved requests found.</div>
+    {% endif %}
+  </div>
 
-    <!-- Declined Requests Table -->
-    <div id="declinedRequestsTable" class="request-table" style="display: none;">
-        {% if declined_requests %}
-            <table class="table table-striped">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Book</th>
-                        <th>Requested At</th>
-                        <th>Declined At</th>
-                        <th>Reason</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for request in declined_requests %}
-                        <tr>
-                            <td data-label="Book">{{ request.book }}</td>
-                            <td data-label="Requested At">{{ request.requested_at }}</td>
-                            <td data-label="Declined At">{{ request.declined_at }}</td>
-                            <td data-label="Reason">{{ request.decline_reason }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="alert alert-warning">No declined requests found.</div>
-        {% endif %}
-    </div>
-    
-    <!-- Expired Requests Table -->
-    <div id="expiredRequestsTable" class="request-table" style="display: none;">
-        {% if expired_requests %}
-            <table class="table table-striped">
-                <thead class="thead-light">
-                    <tr>
-                        <th>Book</th>
-                        <th>Requested At</th>
-                        <th>Expired At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for request in expired_requests %}
-                        <tr>
-                            <td>{{ request.book }}</td>
-                            <td>{{ request.requested_at }}</td>
-                            <td>{{ request.expired_at }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="alert alert-warning">No expired requests found.</div>
-        {% endif %}
-    </div>
+  <!-- Declined Requests Table -->
+  <div id="declinedRequestsTable" class="request-table" style="display: none">
+    {% if declined_requests %}
+    <table class="table table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>Book</th>
+          <th>Requested At</th>
+          <th>Declined At</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in declined_requests %}
+        <tr>
+          <td data-label="Book">{{ request.book }}</td>
+          <td data-label="Requested At">{{ request.requested_at }}</td>
+          <td data-label="Declined At">{{ request.declined_at }}</td>
+          <td data-label="Reason">{{ request.decline_reason }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning">No declined requests found.</div>
+    {% endif %}
+  </div>
+
+  <!-- Expired Requests Table -->
+  <div id="expiredRequestsTable" class="request-table" style="display: none">
+    {% if expired_requests %}
+    <table class="table table-striped">
+      <thead class="thead-light">
+        <tr>
+          <th>Book</th>
+          <th>Requested At</th>
+          <th>Expired At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for request in expired_requests %}
+        <tr>
+          <td>{{ request.book }}</td>
+          <td>{{ request.requested_at }}</td>
+          <td>{{ request.expired_at }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-warning">No expired requests found.</div>
+    {% endif %}
+  </div>
 </div>
-{% endblock %}
+{% endblock %} 
 
 {% block script %}
 <script>
-    // Toggle the table visibility based on the selected request type
-    function toggleRequestTable() {
-        const requestType = document.getElementById('requestTypeSelect').value;
-        const pendingTable = document.getElementById('pendingRequestsTable');
-        const approvedTable = document.getElementById('approvedRequestsTable');
-        const declinedTable = document.getElementById('declinedRequestsTable');
-        const expiredTable = document.getElementById('expiredRequestsTable');
-        const noResults = document.getElementById('noResults');
-    
-        // Hide all tables and no results message initially
-        pendingTable.style.display = 'none';
-        approvedTable.style.display = 'none';
-        declinedTable.style.display = 'none';
-        expiredTable.style.display = 'none';
-        noResults.style.display = 'none';
-    
-        // Show the selected table
-        if (requestType === 'pending') {
-            pendingTable.style.display = 'block';
-        } else if (requestType === 'approved') {
-            approvedTable.style.display = 'block';
-        } else if (requestType === 'declined') {
-            declinedTable.style.display = 'block';
-        } else if (requestType === 'expired') {
-            expiredTable.style.display = 'block';
+  // Toggle the table visibility based on the selected request type
+  function toggleRequestTable() {
+    const requestType = document.getElementById("requestTypeSelect").value;
+    const pendingTable = document.getElementById("pendingRequestsTable");
+    const approvedTable = document.getElementById("approvedRequestsTable");
+    const declinedTable = document.getElementById("declinedRequestsTable");
+    const expiredTable = document.getElementById("expiredRequestsTable");
+    const noResults = document.getElementById("noResults");
+
+    // Hide all tables and no results message initially
+    pendingTable.style.display = "none";
+    approvedTable.style.display = "none";
+    declinedTable.style.display = "none";
+    expiredTable.style.display = "none";
+    noResults.style.display = "none";
+
+    // Show the selected table
+    if (requestType === "pending") {
+      pendingTable.style.display = "block";
+    } else if (requestType === "approved") {
+      approvedTable.style.display = "block";
+    } else if (requestType === "declined") {
+      declinedTable.style.display = "block";
+    } else if (requestType === "expired") {
+      expiredTable.style.display = "block";
+    }
+  }
+
+  // Search functionality for filtering rows and toggling headers
+  function searchTable() {
+    const input = document.getElementById("searchInput").value.toLowerCase();
+    const requestType = document.getElementById("requestTypeSelect").value;
+    const tableId = requestType + "RequestsTable"; // Get the current active table
+    const table = document.querySelector(`#${tableId} tbody`); // Select the tbody within the current table
+    const rows = table.getElementsByTagName("tr");
+    const noResults = document.getElementById("noResults");
+    const tableHeader = document.querySelector(`#${tableId} thead`);
+    let noMatchFound = true;
+
+    // Loop through all table rows, and hide those that don't match the search query
+    for (let i = 0; i < rows.length; i++) {
+      const tds = rows[i].getElementsByTagName("td");
+      let found = false;
+      for (let j = 0; j < tds.length; j++) {
+        if (tds[j].textContent.toLowerCase().includes(input)) {
+          found = true;
+          break;
         }
+      }
+      rows[i].style.display = found ? "" : "none"; // Toggle the visibility based on the search match
+      if (found) {
+        noMatchFound = false;
+      }
     }
 
-    // Search functionality for filtering rows and toggling headers
-    function searchTable() {
-        const input = document.getElementById('searchInput').value.toLowerCase();
-        const requestType = document.getElementById('requestTypeSelect').value;
-        const tableId = requestType + 'RequestsTable';  // Get the current active table
-        const table = document.querySelector(`#${tableId} tbody`); // Select the tbody within the current table
-        const rows = table.getElementsByTagName('tr');
-        const noResults = document.getElementById('noResults');
-        const tableHeader = document.querySelector(`#${tableId} thead`);
-        let noMatchFound = true;
-
-        // Loop through all table rows, and hide those that don't match the search query
-        for (let i = 0; i < rows.length; i++) {
-            const tds = rows[i].getElementsByTagName('td');
-            let found = false;
-            for (let j = 0; j < tds.length; j++) {
-                if (tds[j].textContent.toLowerCase().includes(input)) {
-                    found = true;
-                    break;
-                }
-            }
-            rows[i].style.display = found ? '' : 'none';  // Toggle the visibility based on the search match
-            if (found) {
-                noMatchFound = false;
-            }
-        }
-
-        // Show or hide the "No such request found" message and the table header
-        if (noMatchFound) {
-            noResults.style.display = 'block';  // Show the no results message
-            tableHeader.style.display = 'none';  // Hide the table header
-        } else {
-            noResults.style.display = 'none';  // Hide the no results message
-            tableHeader.style.display = 'table-header-group';  // Show the table header
-        }
+    // Show or hide the "No such request found" message and the table header
+    if (noMatchFound) {
+      noResults.style.display = "block"; // Show the no results message
+      tableHeader.style.display = "none"; // Hide the table header
+    } else {
+      noResults.style.display = "none"; // Hide the no results message
+      tableHeader.style.display = "table-header-group"; // Show the table header
     }
+  }
 
-    // Automatically select the correct table based on URL parameter
-    document.addEventListener('DOMContentLoaded', function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const requestType = urlParams.get('requestType') || 'pending'; // Default to 'pending' if not specified
-        document.getElementById('requestTypeSelect').value = requestType;
-        toggleRequestTable();  // Ensure the correct table is shown based on the URL parameter
-    });
-    window.onload = function() {
-        // Target the dropdown menu element
-        var dropdownMenu = document.querySelector('.dropdown-menu');
+  // Automatically select the correct table based on URL parameter
+  document.addEventListener("DOMContentLoaded", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestType = urlParams.get("requestType") || "pending"; // Default to 'pending' if not specified
+    document.getElementById("requestTypeSelect").value = requestType;
+    toggleRequestTable(); // Ensure the correct table is shown based on the URL parameter
+  });
+  window.onload = function () {
+    // Target the dropdown menu element
+    var dropdownMenu = document.querySelector(".dropdown-menu");
 
-        // Add the 'show' class to make it visible on load
-        if (dropdownMenu) {
-            dropdownMenu.classList.add('show');
-        }
-    };
+    // Add the 'show' class to make it visible on load
+    if (dropdownMenu) {
+      dropdownMenu.classList.add("show");
+    }
+  };
 </script>
 {% endblock %}
