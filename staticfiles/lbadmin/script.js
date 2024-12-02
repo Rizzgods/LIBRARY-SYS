@@ -49,17 +49,62 @@ $(document).ready(function() {
         });
     });
 
+    // Function to show the specified section
+    function showSection(sectionId) {
+        // Hide all sections
+        $('#overview-section').hide();
+        $('#active-section').hide();
+        $('#analytics-section').hide();
+        $('#Create-section').hide();
+        $('#csv-section').hide();
+        
+        // Show the specified section
+        $('#' + sectionId).show();
+        
+        // Store the active section in localStorage
+        localStorage.setItem('activeSection', sectionId);
+    }
+
     // Check local storage for active section and display it
     var activeSection = localStorage.getItem('activeSection');
     if (activeSection) {
-        document.getElementById('overview-section').style.display = 'none';
-        document.getElementById('active-section').style.display = 'none';
-        document.getElementById('analytics-section').style.display = 'none';
-        document.getElementById('Create-section').style.display = 'none';
-        document.getElementById('csv-section').style.display = 'none';
-        document.getElementById(activeSection).style.display = 'block';
+        showSection(activeSection);
+    } else {
+        showSection('overview-section'); // Default to overview section
     }
-    localStorage.removeItem('activeSection'); // Clear the stored section after activation
+
+    // Event listeners for sidebar links
+    $('#overview-link').click(function() {
+        showSection('overview-section');
+    });
+
+    $('#active-link').click(function() {
+        showSection('active-section');
+    });
+
+    $('#analytics-link').click(function() {
+        showSection('analytics-section');
+    });
+
+    $('#Create-link').click(function() {
+        showSection('Create-section');
+    });
+
+    $('#CSV-link').click(function() {
+        showSection('csv-section');
+    });
+
+    // Example of storing the active section after an AJAX request
+    $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
+    localStorage.setItem('activeSection', 'analytics-section'); // Store the active section
+    setTimeout(function() {
+        $('#successModalMessage').text('Successfully ' + (newStatus ? 'activated' : 'disabled'));
+        $('#successModal').modal('show');
+        setTimeout(function() {
+            $('#successModal').modal('hide');
+            location.reload(); // Refresh the page
+        }, 2000);
+    }, 500);
 
     function filterTableByRole() {
         var filterValue = document.getElementById("role-filter").value.toLowerCase();
