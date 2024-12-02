@@ -1,0 +1,70 @@
+<div id="borrow-req" class="content" style="display: none;">
+    <h2 class="sections">Borrow Requests</h2>
+    {% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% elif message.tags == 'error' %}
+            <div class="alert alert-danger">
+                <ul class="mb-0"> 
+                    <li>{{ message }}</li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endfor %}
+    {% endif %}
+<!-- Dropdown and Search Field in the Same Row -->
+<div class="d-flex align-items-center mb-3">
+    <!-- Dropdown for Borrow Requests -->
+    <div class="dropdown mr-2">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="borrowRequestDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Pending Requests
+        </button>
+        <div class="dropdown-menu" aria-labelledby="borrowRequestDropdown">
+            <a class="dropdown-item" href="#" onclick="selectTab('pending', 'Pending Requests'); return false;">Pending Requests</a>
+            <a class="dropdown-item" href="#" onclick="selectTab('approved', 'Approved Requests'); return false;">Approved Requests</a>
+            <a class="dropdown-item" href="#" onclick="selectTab('declined', 'Declined Requests'); return false;">Declined Requests</a>
+        </div>
+    </div>
+
+    <!-- Search Field -->
+    <div class="input-group">
+        <input type="text" class="form-control" id="requestsSearch" placeholder="Search Requests" onkeyup="fetchRequests()">
+        <div class="input-group-append">
+            <span class="input-group-text" id="search-addon"><i class="fas fa-search"></i></span>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Content -->
+<div class="tab-content" id="borrowRequestTabContent">
+    <!-- Pending Requests Tab -->
+    <div class="tab-pane fade show" id="pending" role="tabpanel">
+        <hr>
+        <div id="pendingRequestsContainer">
+            <!-- Pending requests will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Approved Requests Tab -->
+    <div class="tab-pane fade" id="approved" role="tabpanel">
+        <hr>
+        <div id="approvedRequestsContainer">
+            <!-- Approved requests will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Declined Requests Tab -->
+    <div class="tab-pane fade" id="declined" role="tabpanel">
+        <hr>
+        <div id="declinedRequestsContainer">
+            <!-- Declined requests will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
+</div>

@@ -1,0 +1,66 @@
+<div id="home" class="content home-lib" style="display: block;">
+    <!-- Welcome Banner -->
+    <div class="bg-blue-500 text-white p-5 rounded-lg shadow-md mb-4 text-center">
+        <h1 class="text-4xl font-bold mb-2">Welcome, Librarian!</h1>
+        <p class="text-lg">Manage your library efficiently with our easy-to-use system.</p>
+    </div>
+
+    <!-- Statistics Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center mb-6">
+        <!-- Total Books -->
+        <div class="bg-green-500 text-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <h4 class="font-bold text-2xl mb-2">{{ total_books }}</h4>
+            <p class="text-sm">Total Books in Library</p>
+        </div>
+        <!-- Borrow Requests -->
+        <div class="bg-yellow-500 text-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <h4 class="font-bold text-2xl mb-2">{{ pending_borrow_requests }}</h4>
+            <p class="text-sm">Pending Borrow Requests</p>
+        </div>
+        <!-- Recently Added Books -->
+        <div class="bg-blue-500 text-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <h4 class="font-bold text-2xl mb-2">{{ books_added_this_month }}</h4>
+            <p class="text-sm">Books Added This Month</p>
+        </div>
+        <!-- Deleted Books -->
+        <div class="bg-red-500 text-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <h4 class="font-bold text-2xl mb-2">{{ recently_deleted_books_count }}</h4>
+            <p class="text-sm">Recently Deleted Books</p>
+        </div>
+    </div>
+
+    <!-- Key Features Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center mt-6">
+        <!-- Upload Books Feature -->
+        <div class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <span class="material-symbols-outlined text-5xl text-blue-500 mb-3">upload</span>
+            <h4 class="font-bold text-lg mb-2">Upload Books</h4>
+            <p class="text-sm text-gray-700 mb-3">Add new books to the library, including title, author, category, and more.</p>
+            <a href="javascript:void(0);" onclick="showContent('upload')" class="text-blue-500 font-bold hover:text-blue-700">Start Uploading</a>
+        </div>
+
+        <!-- View Books Feature -->
+        <div class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <span class="material-symbols-outlined text-5xl text-blue-500 mb-3">book</span>
+            <h4 class="font-bold text-lg mb-2">View Books</h4>
+            <p class="text-sm text-gray-700 mb-3">Browse and manage all the books available in the library system.</p>
+            <a href="javascript:void(0);" onclick="showContent('books')" class="text-blue-500 font-bold hover:text-blue-700">View All Books</a>
+        </div>
+
+        <!-- Borrow Requests Feature -->
+        <div class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <span class="material-symbols-outlined text-5xl text-blue-500 mb-3">menu_book</span>
+            <h4 class="font-bold text-lg mb-2">Borrow Requests</h4>
+            <p class="text-sm text-gray-700 mb-3">Approve or decline book borrow requests from library users.</p>
+            <a href="javascript:void(0);" onclick="showContent('borrow-req')" class="text-blue-500 font-bold hover:text-blue-700">Manage Requests</a>
+        </div>
+
+        <!-- Recently Deleted Feature -->
+        <div class="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow">
+            <span class="material-symbols-outlined text-5xl text-blue-500 mb-3">archive</span>
+            <h4 class="font-bold text-lg mb-2">Recently Deleted</h4>
+            <p class="text-sm text-gray-700 mb-3">Restore or permanently delete books recently removed from the system.</p>
+            <a href="javascript:void(0);" onclick="showContent('recent-delete')" class="text-blue-500 font-bold hover:text-blue-700">View Deleted Books</a>
+        </div>
+    </div>
+</div>

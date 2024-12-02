@@ -1,0 +1,197 @@
+<div id="book-status" class="content hidden">
+    <h2 class="sections">Book Status</h2>
+    <hr>
+    <!-- Flex container for dropdown and search bar -->
+    <div class="d-flex align-items-center mb-3">
+        <!-- Dropdown for Book Status Sections -->
+        <div class="dropdown mr-2">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="bookStatusDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Books to be Borrowed
+            </button>
+            <div class="dropdown-menu" aria-labelledby="bookStatusDropdown">
+                <a class="dropdown-item" href="#borrowed" onclick="showBookStatusTab(event, 'borrowed', 'Books to be Borrowed')">Books to be Borrowed</a>
+                <a class="dropdown-item" href="#returned" onclick="showBookStatusTab(event, 'returned', 'Books to be Returned')">Books to be Returned</a>
+                <a class="dropdown-item" href="#logs" onclick="showBookStatusTab(event, 'logs', 'Logs')">Logs</a>
+            </div>
+        </div>
+        <!-- Search Field -->
+        <div class="input-group">
+            <input type="text" class="form-control" id="searchRequests" placeholder="Search Books to be Borrowed" onkeyup="filterRequests()">
+            <div class="input-group-append">
+                <span class="input-group-text" id="search-addon"><i class="fas fa-search"></i></span>
+            </div>
+        </div>
+    </div>
+
+    <!--Books to be borrowed-->
+    <div class="tab-content" id="bookStatusTabContent">
+        <div class="tab-pane fade show active" id="borrowed" role="tabpanel" aria-labelledby="borrowed-tab">
+            <table class="table" id="borrowedTable">
+                <thead>
+                    <tr>
+                        <th>Borrowed by</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>File Type</th>
+                        <th>Expires at</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in book_status_approved_requests %}
+                    <tr data-title="{{ request.book.BookTitle }}" data-author="{{ request.book.Author }}">
+                        <td>{{ request.requested_by }}</td>
+                        <td>{{ request.book.BookTitle }}</td>
+                        <td>{{ request.book.Author }}</td>
+                        <td>
+                            {% if request.book.eBook %}
+                                eBook
+                            {% elif request.book.research_paper %}
+                                Research Paper
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                        <td>{{ request.expireTime }}</td>
+                        <td>
+                            <!-- Adjusted logic to check stock properly -->
+                            <button type="button" 
+                                    class="btn {% if request.book.stock > 0 %}btn-success{% else %}btn-secondary{% endif %}" 
+                                    {% if request.book.stock == 0 %}disabled{% endif %} 
+                                    data-toggle="modal" data-target="#statusModal{{ request.id }}">
+                                {% if request.inOut %}TO CLAIM{% else %}TO RETURN{% endif %}
+                            </button>
+
+                            <button type="button" 
+                                    class="btn btn-info" 
+                                    onclick="viewBookDetails('{{ request.book.BookImage.url }}', '{{ request.book.BookTitle }}', '{{ request.book.Description }}')">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!--Books to be returned-->
+        <div class="tab-pane fade" id="returned" role="tabpanel" aria-labelledby="returned-tab">
+            <table class="table" id="returnedTable">
+                <thead>
+                    <tr>
+                        <th>Borrowed by</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Return Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for out in book_status_books_to_be_returned %}
+                    <tr data-title="{{ out.book.BookTitle }}" data-author="{{ out.book.Author }}">
+                        <td>{{out.requested_by}}</td>
+                        <td>{{ out.book.BookTitle }}</td>
+                        <td>{{ out.book.Author }}</td>
+                        <td>{{ out.returnTime }}</td>
+                        <td>
+                            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#statusModal{{ out.id }}">
+                                TO RETURN
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ out.book.BookImage.url }}', '{{ out.book.BookTitle }}', '{{ out.book.Description }}')">View</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <!--Return logs-->
+        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="logs-tab">
+            <div class="return-logs">
+                {% if return_logs %}
+                <table class="table" id="logsTable">
+                    <thead>
+                        <tr>
+                            <th>Borrowed by</th>
+                            <th>Title</th>
+                            <th>Date Returned</th>
+                            <th>Log Expiry</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in return_logs %}
+                        <tr data-title="{{ log.book.BookTitle }}">
+                            <td>{{ log.requested_by }}</td>
+                            <td>{{ log.book.BookTitle }}</td>
+                            <td>{{ log.returnLogTime }}</td>
+                            <td>{{ log.expiryLogTime }}</td>
+                            <td>
+                                <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ log.book.BookImage.url }}', '{{ log.book.BookTitle }}', '{{ log.book.Description }}')">View</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>No Recent Logs</p>
+                {% endif %}
+            </div>
+        </div>
+    
+
+        <!-- Modals for Changing Status -->
+        {% for request in book_status_approved_requests %}
+        <div class="modal fade" id="statusModal{{ request.id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel{{ request.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="statusModalLabel{{ request.id }}">Book claimed?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure the book is claimed?<b>This action cannot be reversed</b>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                        <form method="post" action="{% url 'toggle_book_status' request.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if request.inOut %}btn-success{% else %}btn-success{% endif %}">
+                                {% if request.inOut %}Yes{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% for out in book_status_books_to_be_returned %}
+        <div class="modal fade" id="statusModal{{ out.id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel{{ out.id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="statusModalLabel{{ out.id }}">Book Returned?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure the book is returned?<b>This action cannot be reversed</b>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                        <form method="post" action="{% url 'toggle_out_status' out.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn {% if out.out %}btn-success{% else %}btn-success{% endif %}">
+                                {% if out.out %}Yes{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
