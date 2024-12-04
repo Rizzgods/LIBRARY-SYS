@@ -265,7 +265,7 @@ function selectTab(tabId, tabName) {
 }
 
 // Fetch borrow requests every 10 seconds
-setInterval(fetchBorrowRequests, 3000);
+setInterval(fetchBorrowRequests, 10000);
 
 // Initial fetch
 fetchBorrowRequests();

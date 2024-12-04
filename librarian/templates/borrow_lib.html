@@ -26,9 +26,9 @@
             Pending Requests
         </button>
         <div class="dropdown-menu" aria-labelledby="borrowRequestDropdown">
-            <a class="dropdown-item" href="#" onclick="selectTab('pending', 'Pending Requests'); return false;">Pending Requests</a>
-            <a class="dropdown-item" href="#" onclick="selectTab('approved', 'Approved Requests'); return false;">Approved Requests</a>
-            <a class="dropdown-item" href="#" onclick="selectTab('declined', 'Declined Requests'); return false;">Declined Requests</a>
+            <a class="dropdown-item active" href="#pending" onclick="selectTab('pending', 'Pending Requests'); return false;">Pending Requests</a>
+            <a class="dropdown-item" href="#approved" onclick="selectTab('approved', 'Approved Requests'); return false;">Approved Requests</a>
+            <a class="dropdown-item" href="#declined" onclick="selectTab('declined', 'Declined Requests'); return false;">Declined Requests</a>
         </div>
     </div>
 
@@ -44,7 +44,7 @@
 <!-- Tab Content -->
 <div class="tab-content" id="borrowRequestTabContent">
     <!-- Pending Requests Tab -->
-    <div class="tab-pane fade show" id="pending" role="tabpanel">
+    <div class="tab-pane fade show active" id="pending" role="tabpanel">
         <hr>
         <div id="pendingRequestsContainer">
             <!-- Pending requests will be dynamically inserted here -->

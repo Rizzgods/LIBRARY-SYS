@@ -52,7 +52,7 @@ $(document).ready(function() {
     // Function to show the specified section
     function showSection(sectionId) {
         // Hide all sections
-        $('#overview-section').hide();
+        $('#overview-section').hide(); 
         $('#active-section').hide();
         $('#analytics-section').hide();
         $('#Create-section').hide();

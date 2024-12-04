@@ -142,6 +142,8 @@ class Out(models.Model):
     out = models.BooleanField(default=False)
     returnTime = models.DateTimeField(default=three_days_from_now)
     
+
+
     def __str__(self):
         return f"{self.book} status"
     
