@@ -96,7 +96,6 @@
           <option value="pending">Pending Requests</option>
           <option value="approved">Approved Requests</option>
           <option value="declined">Declined Requests</option>
-          <option value="expired">Expired Requests</option>
         </select>
       </div>
     </div>
@@ -195,32 +194,6 @@
     <div class="alert alert-warning">No declined requests found.</div>
     {% endif %}
   </div>
-
-  <!-- Expired Requests Table -->
-  <div id="expiredRequestsTable" class="request-table" style="display: none">
-    {% if expired_requests %}
-    <table class="table table-striped">
-      <thead class="thead-light">
-        <tr>
-          <th>Book</th>
-          <th>Requested At</th>
-          <th>Expired At</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for request in expired_requests %}
-        <tr>
-          <td>{{ request.book }}</td>
-          <td>{{ request.requested_at }}</td>
-          <td>{{ request.expired_at }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <div class="alert alert-warning">No expired requests found.</div>
-    {% endif %}
-  </div>
 </div>
 {% endblock %} 
 
@@ -232,14 +205,12 @@
     const pendingTable = document.getElementById("pendingRequestsTable");
     const approvedTable = document.getElementById("approvedRequestsTable");
     const declinedTable = document.getElementById("declinedRequestsTable");
-    const expiredTable = document.getElementById("expiredRequestsTable");
     const noResults = document.getElementById("noResults");
 
     // Hide all tables and no results message initially
     pendingTable.style.display = "none";
     approvedTable.style.display = "none";
     declinedTable.style.display = "none";
-    expiredTable.style.display = "none";
     noResults.style.display = "none";
 
     // Show the selected table
@@ -249,8 +220,6 @@
       approvedTable.style.display = "block";
     } else if (requestType === "declined") {
       declinedTable.style.display = "block";
-    } else if (requestType === "expired") {
-      expiredTable.style.display = "block";
     }
   }
 
