@@ -12,7 +12,73 @@ async function fetchBorrowRequests() {
         console.error('Error fetching borrow requests:', error);
     }
 }
+function showAlert(message, type) {
+    const alertContainer = document.getElementById('alertContainer'); // Make sure this container exists in your HTML
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.role = 'alert';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    `;
+    alertContainer.appendChild(alertDiv);
 
+    // Automatically remove the alert after a few seconds
+    setTimeout(() => {
+        alertDiv.classList.remove('show');
+        alertDiv.classList.add('fade');
+        setTimeout(() => alertDiv.remove(), 150); // Remove after fade out
+    }, 5000); // Adjust the time as needed
+}
+async function approveRequest(requestId) {
+    try {
+        console.log(`Approving request ID: ${requestId}`); // Debug log
+
+        // Disable the approve button
+        const approveButton = document.querySelector(`#approveModal${requestId} .btn-success`);
+        approveButton.disabled = true;
+
+        // Close the approval modal
+        $(`#approveModal${requestId}`).modal('hide');
+
+        // Show loading modal
+        $('#loadingModal').modal('show');
+
+        const response = await fetch(`/borrow_requests/approve/${requestId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'An unexpected error occurred.');
+        }
+
+        console.log('Approval successful:', data.message);
+        alert(data.message); // Show a success message
+
+        // Refresh the borrow requests
+        fetchBorrowRequests();
+    } catch (error) {
+        console.error('Error approving request:', error);
+        alert(`Approval failed: ${error.message}`);
+    } finally {
+        // Hide loading modal
+        $('#loadingModal').modal('hide');
+
+        // Re-enable the approve button in case of failure
+        const approveButton = document.querySelector(`#approveModal${requestId} .btn-success`);
+        if (approveButton) {
+            approveButton.disabled = false;
+        }
+    }
+}
 function updateRequests(containerId, requests, requestType = false) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
@@ -61,34 +127,31 @@ function updateRequests(containerId, requests, requestType = false) {
         `;
         tbody.appendChild(row);
 
-        // Approve modal for pending requests
-        if (!requestType) {
-            document.body.insertAdjacentHTML('beforeend', `
-                <div class="modal fade" id="approveModal${request.id}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel${request.id}" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="approveModalLabel${request.id}">Approve Request</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                Are you sure you want to approve this request?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <form method="post" action="/borrow_requests/approve/${request.id}/">
-                                    <input type="hidden" name="csrfmiddlewaretoken" value="${getCsrfToken()}">
-                                    <button type="submit" class="btn btn-success">Approve</button>
-                                </form>
-                            </div>
+    // Approve modal for pending requests
+    if (!requestType) {
+        document.body.insertAdjacentHTML('beforeend', `
+            <div class="modal fade" id="approveModal${request.id}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel${request.id}" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="approveModalLabel${request.id}">Approve Request</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to approve this request?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success" onclick="approveRequest(${request.id})">Approve</button>
                         </div>
                     </div>
                 </div>
-            `);
-        }
-
+            </div>
+        `);
+    }
+    
         // Decline modal for pending requests
         if (!requestType) {
             document.body.insertAdjacentHTML('beforeend', `

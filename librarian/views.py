@@ -18,7 +18,10 @@ from django.db.models.functions import TruncYear, ExtractYear
 from librarian.utils import delete_expired_borrow_requests
 from student.models import Notification
 from django.views.decorators.http import require_POST
-
+from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import send_mail
+from userauth.models import Account  # Ensure these models are imported
+from django.core.mail import EmailMessage
 
 @login_required
 def main(request):
@@ -316,17 +319,46 @@ def edit_book(request, book_id):
 
 @login_required
 def approve_request(request, request_id):
-    borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    
-    # Create an approved request with the expiration time set
-    approved_request = ApprovedRequest.objects.create(
-        book=borrow_request.book,
-        requested_by=borrow_request.requested_by,
-        requested_at=borrow_request.requested_at,
-        expires_at=timezone.now() + timedelta(days=7)  # Set expiration to 7 days from now
-    )
-    borrow_request.delete()
-    return redirect('librarian')
+    if request.method == 'POST':
+        try:
+            borrow_request = get_object_or_404(BorrowRequest, id=request_id)
+            
+            # Create ApprovedRequest
+            ApprovedRequest.objects.create(
+                book=borrow_request.book,
+                requested_by=borrow_request.requested_by,
+                requested_at=borrow_request.requested_at,
+            )
+
+            # Send approval email
+            email_response = send_approval_email(request, request_id)
+            if email_response.status_code != 200:
+                return JsonResponse({'status': 'error', 'message': 'Failed to send approval email.'}, status=500)
+
+            # Create notification if it doesn't exist
+            message = f"Your request for {borrow_request.book.BookTitle} has been approved."
+            notification_exists = Notification.objects.filter(
+                user=borrow_request.requested_by,
+                message=message,
+                notification_type='approved'
+            ).exists()
+
+            if not notification_exists:
+                Notification.objects.create(
+                    user=borrow_request.requested_by,
+                    message=message,
+                    notification_type='approved'
+                )
+
+            # Delete borrow request
+            borrow_request.delete()
+
+            return JsonResponse({'status': 'success', 'message': 'Request approved successfully!'})
+
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)  
 
 def decline_request(request, request_id):
     borrow_request = get_object_or_404(BorrowRequest, id=request_id)
@@ -434,25 +466,6 @@ def logout_user(request):
     logout(request)
     messages.success(request, "You were Logged Out!")
     return redirect('login_user')
-
-@login_required
-def approve_request_view(request, request_id):
-    borrow_request = get_object_or_404(BorrowRequest, id=request_id)
-    ApprovedRequest.objects.create(
-        book=borrow_request.book,
-        requested_by=borrow_request.requested_by,
-        requested_at=borrow_request.requested_at,
-    )
-    
-    # Create a notification for the approved request
-    Notification.objects.create(
-        user=borrow_request.requested_by,
-        message=f"Your request for {borrow_request.book.BookTitle} has been approved.",
-        notification_type='approved'  # Set notification type
-    )
-    
-    borrow_request.delete()
-    return redirect('librarian')
 
 
 @require_POST
@@ -610,3 +623,289 @@ def get_borrow_requests(request):
         'approved_requests': approved_requests_serializer.data,
         'declined_requests': declined_requests_serializer.data,
     })
+
+@csrf_exempt  # Be cautious using this in production
+def send_reminder(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        book_title = data.get('book_title')
+        user_id = data.get('user_id')
+
+        try:
+            # Retrieve the User instance
+            user = User.objects.get(id=user_id)
+            # Retrieve the Account instance using the user instance
+            account = Account.objects.get(user=user)  # This should work if the relationship is correct
+
+            user_email = account.email  # Get the email from the Account model
+
+            # Create a notification
+            Notification.objects.create(
+                user=account.user,
+                message=f"Reminder: The book '{book_title}' is due for return.",
+                notification_type='reminder'
+            )
+
+            # Email subject
+            subject = 'Reminder: Book Due Soon'
+            from_email = 'lawangbatolibrary@gmail.com'  # Replace with your actual email
+
+            # HTML email content
+            html_message = f"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Reminder: Book Due Soon</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #f4f4f4;
+                    }}
+                    .email-container {{
+                        width: 100%;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        border-radius: 10px;
+                        overflow: hidden;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    }}
+                    .email-header {{
+                        background-color: #3E91CA; /* Updated to match the new color */
+                        padding: 20px;
+                        text-align: center;
+                        color: #ffffff;
+                    }}
+                    .email-header img {{
+                        width: 150px;
+                        margin-bottom: 10px;
+                    }}
+                    .email-header h1 {{
+                        margin: 0;
+                        font-size: 24px;
+                    }}
+                    .email-body {{
+                        padding: 20px;
+                    }}
+                    .email-body h2 {{
+                        color: #333;
+                        font-size: 22px;
+                    }}
+                    .email-body p {{
+                        font-size: 16px;
+                        color: #555;
+                        line-height: 1.6;
+                    }}
+                    .email-body .button {{
+                        background-color: #38b6ff;  /* Button color matching logo */
+                        color: #fff;
+                        text-decoration: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        display: inline-block;
+                        margin-top: 20px;
+                    }}
+                    .email-footer {{
+                        background-color: #3E91CA;/* Also applied the color to the footer */
+                        color: #ffffff;
+                        text-align: center;
+                        padding: 10px;
+                        font-size: 14px;
+                    }}
+                    .email-footer p {{
+                        margin: 0;
+                    }}
+                    .email-footer .disclaimer {{
+                        font-size: 12px;
+                        color: #f1f1f1;
+                    }}
+                </style>
+            </head>
+            <body>
+
+            <div class="email-container">
+                <div class="email-header">
+                    <img src="http://127.0.0.1:8000/static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
+                    <h1>LBLIB - Your Library at Your Fingertips</h1>
+                </div>
+                <div class="email-body">
+                    <h2>Reminder: Book Due Soon</h2>
+                    <p>This is a reminder that the book <strong>"{book_title}"</strong> is due soon.</p>
+                    <p>Please return the book at your earliest convenience.</p>
+                    <p>This is an automated email. Please do not reply to this message. For further inquiries, contact us through the appropriate channels.</p>
+                    <a href="http://your-library-url.com/borrow" class="button">View Borrow Details</a>
+                </div>
+                <div class="email-footer">
+                    <p>Thank you for using LBLIB - Your Library at Your Fingertips!</p>
+                    <p class="disclaimer">Property of Lawang Bato.</p> <!-- Changed disclaimer here -->
+                </div>
+            </div>
+
+            </body>
+            </html>
+            """
+
+            # Send the email with HTML content
+            email = EmailMessage(
+                subject,
+                html_message,
+                from_email,
+                [user_email],
+            )
+            email.content_subtype = 'html'  # This tells the email that it contains HTML content
+            email.send(fail_silently=False)
+
+            return JsonResponse({'status': 'success', 'message': 'Reminder sent and email notification sent successfully!'})
+
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'User not found.'}, status=404)
+        except Account.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Account not found.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
+
+
+@csrf_exempt  # Be cautious using this in production
+def send_approval_email(request, request_id):
+    if request.method == 'POST':
+        try:
+            # Ensure the request_id is provided
+            if not request_id:
+                return JsonResponse({'status': 'error', 'message': 'Request ID is required.'}, status=400)
+
+            # Get the BorrowRequest and User information
+            borrow_request = BorrowRequest.objects.get(id=request_id)
+            user = borrow_request.requested_by
+            account = Account.objects.get(user=user)
+
+            user_email = account.email  # Get the email from the Account model
+
+            # Email subject
+            subject = 'Your Borrow Request Has Been Approved'
+            from_email = 'lawangbatolibrary@gmail.com'  # Replace with your actual email
+
+            # HTML email content
+            html_message = f"""
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Your Borrow Request Has Been Approved</title>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 0;
+                        background-color: #f4f4f4;
+                    }}
+                    .email-container {{
+                        width: 100%;
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background-color: #ffffff;
+                        border-radius: 10px;
+                        overflow: hidden;
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                    }}
+                    .email-header {{
+                        background-color: #3E91CA; /* Updated to match the new color */
+                        padding: 20px;
+                        text-align: center;
+                        color: #ffffff;
+                    }}
+                    .email-header img {{
+                        width: 150px;
+                        margin-bottom: 10px;
+                    }}
+                    .email-header h1 {{
+                        margin: 0;
+                        font-size: 24px;
+                    }}
+                    .email-body {{
+                        padding: 20px;
+                    }}
+                    .email-body h2 {{
+                        color: #333;
+                        font-size: 22px;
+                    }}
+                    .email-body p {{
+                        font-size: 16px;
+                        color: #555;
+                        line-height: 1.6;
+                    }}
+                    .email-body .button {{
+                        background-color: #38b6ff;  /* Button color matching logo */
+                        color: #fff;
+                        text-decoration: none;
+                        padding: 10px 20px;
+                        border-radius: 5px;
+                        display: inline-block;
+                        margin-top: 20px;
+                    }}
+                    .email-footer {{
+                        background-color: #3E91CA;/* Also applied the color to the footer */
+                        color: #ffffff;
+                        text-align: center;
+                        padding: 10px;
+                        font-size: 14px;
+                    }}
+                    .email-footer p {{
+                        margin: 0;
+                    }}
+                    .email-footer .disclaimer {{
+                        font-size: 12px;
+                        color: #f1f1f1;
+                    }}
+                </style>
+            </head>
+            <body>
+
+            <div class="email-container">
+                <div class="email-header">
+                    <img src="http://127.0.0.1:8000/static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
+                    <h1>LBLIB - Your Library at Your Fingertips</h1>
+                </div>
+                <div class="email-body">
+                    <h2>Congratulations!</h2>
+                    <p>Your borrow request for the book <strong>"{borrow_request.book.BookTitle}"</strong> has been approved.</p>
+                    <p>We are happy to let you know that your request is now processed, and the book will be ready for you to pick up at the specified time. We hope you enjoy reading it!</p>
+                    <p>This is an automated email. Please do not reply to this message. If you have any questions, feel free to contact us through the proper channels.</p>
+                    <a href="http://your-library-url.com/borrow" class="button">View Borrow Details</a>
+                </div>
+                <div class="email-footer">
+                    <p>Thank you for using LBLIB - Your Library at Your Fingertips!</p>
+                    <p class="disclaimer">Property of Lawang Bato.</p> <!-- Changed disclaimer here -->
+                </div>
+            </div>
+
+            </body>
+            </html>
+            """
+
+            # Send the email with HTML content
+            email = EmailMessage(
+                subject,
+                html_message,
+                from_email,
+                [user_email],
+            )
+            email.content_subtype = 'html'  # This tells the email that it contains HTML content
+            email.send(fail_silently=False)
+
+            return JsonResponse({'status': 'success', 'message': 'Approval email sent successfully!'})
+
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
+        except BorrowRequest.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Borrow request not found.'}, status=404)
+        except Account.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Account not found for the user.'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
