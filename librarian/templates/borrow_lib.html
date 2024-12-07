@@ -1,3 +1,4 @@
+
 <div id="borrow-req" class="content" style="display: none;">
     <h2 class="sections">Borrow Requests</h2>
     {% if messages %}
@@ -10,11 +11,14 @@
             </button>
         </div>
         {% elif message.tags == 'error' %}
-            <div class="alert alert-danger">
-                <ul class="mb-0"> 
-                    <li>{{ message }}</li>
-                </ul>
-            </div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                <li>{{ message }}</li>
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
         {% endif %}
     {% endfor %}
     {% endif %}
@@ -40,7 +44,19 @@
         </div>
     </div>
 </div>
-
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="loadingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <h5 id="loadingModalLabel">Sending approval email...</h5>
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Tab Content -->
 <div class="tab-content" id="borrowRequestTabContent">
     <!-- Pending Requests Tab -->

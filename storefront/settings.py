@@ -29,12 +29,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
+# Email settings for Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'your_smtp_server'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'lawangbatodigitallib@gmail.com'
-EMAIL_HOST_PASSWORD = 'dikoalam'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP server
+EMAIL_PORT = 587  # Common port for TLS
+EMAIL_USE_TLS = True  # Use TLS for security
+EMAIL_HOST_USER = 'lawangbatolibrary@gmail.com'  # Your email address
+EMAIL_HOST_PASSWORD = 'bsbt bybt kmca gghg'  # Your email password or App Password
+DEFAULT_FROM_EMAIL = 'lawangbatolibrary@gmail.com'  # Default sender email
 # Application definition
 
 INSTALLED_APPS = [
