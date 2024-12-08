@@ -10,18 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
-
+from decouple import config, Csv
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--*cfp#suz*42kdii2_7jka83231=@@=6fjec%u%4r0k@4^6k9r'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,12 +31,21 @@ ALLOWED_HOSTS = ['*']
 
 # Email settings for Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+<<<<<<< HEAD
 EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP server
 EMAIL_PORT = 587  # Common port for TLS
 EMAIL_USE_TLS = True  # Use TLS for security
 EMAIL_HOST_USER = 'lawangbatolibrary@gmail.com'  # Your email address
 EMAIL_HOST_PASSWORD = 'bsbt bybt kmca gghg'  # Your email password or App Password
 DEFAULT_FROM_EMAIL = 'lawangbatolibrary@gmail.com'  # Default sender email
+=======
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int) 
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+>>>>>>> 93b44c331de307a5119798d1005f482ecfd9ca1f
 # Application definition
 
 INSTALLED_APPS = [
