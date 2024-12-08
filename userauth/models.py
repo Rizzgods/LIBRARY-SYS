@@ -5,11 +5,6 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
 class Account(models.Model):
-    user = models.OneToOneField(
-        User, 
-        on_delete=models.CASCADE, 
-        related_name='account'  # Unique related name
-    )
     lrn = models.CharField(max_length=12, unique=True)
     fname = models.CharField(max_length=50, verbose_name="First Name")
     lname = models.CharField(max_length=50, verbose_name="Last Name")
@@ -23,7 +18,7 @@ class Account(models.Model):
 
 
 @receiver(post_save, sender=Account)
-def create_account_user_and_assign_group(sender, instance, created, **kwargs):
+def create_user_and_assign_group(sender, instance, created, **kwargs):
     if created:
         # Create the user account
         user = User.objects.create_user(
@@ -36,9 +31,6 @@ def create_account_user_and_assign_group(sender, instance, created, **kwargs):
         # Assign user to a group
         student_group, _ = Group.objects.get_or_create(name='Student')
         user.groups.add(student_group)
-        # Link the User object to the Account
-        instance.user = user
-        instance.save()
 
 
 class Librarian(models.Model):

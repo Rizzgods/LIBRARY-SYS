@@ -624,7 +624,6 @@ def get_borrow_requests(request):
         'declined_requests': declined_requests_serializer.data,
     })
 
-@csrf_exempt  # Be cautious using this in production
 def send_reminder(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -634,21 +633,22 @@ def send_reminder(request):
         try:
             # Retrieve the User instance
             user = User.objects.get(id=user_id)
-            # Retrieve the Account instance using the user instance
-            account = Account.objects.get(user=user)  # This should work if the relationship is correct
 
-            user_email = account.email  # Get the email from the Account model
+            # Retrieve the Account instance using the User's username (assumed to be `lrn`)
+            account = Account.objects.get(lrn=user.username)
 
-            # Create a notification
+            # Get the email from the Account
+            user_email = account.email
+
+            # Create a notification and send the email
             Notification.objects.create(
-                user=account.user,
+                user=user,
                 message=f"Reminder: The book '{book_title}' is due for return.",
                 notification_type='reminder'
             )
 
-            # Email subject
             subject = 'Reminder: Book Due Soon'
-            from_email = 'lawangbatolibrary@gmail.com'  # Replace with your actual email
+            from_email = 'lawangbatolibrary@gmail.com'
 
             # HTML email content
             html_message = f"""
@@ -769,8 +769,7 @@ def send_reminder(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
-
-
+    
 @csrf_exempt  # Be cautious using this in production
 def send_approval_email(request, request_id):
     if request.method == 'POST':
@@ -782,13 +781,16 @@ def send_approval_email(request, request_id):
             # Get the BorrowRequest and User information
             borrow_request = BorrowRequest.objects.get(id=request_id)
             user = borrow_request.requested_by
-            account = Account.objects.get(user=user)
 
-            user_email = account.email  # Get the email from the Account model
+            # Retrieve the Account using the User's username (assumed to be `lrn`)
+            account = Account.objects.get(lrn=user.username)
+
+            # Get the email from the Account
+            user_email = account.email
 
             # Email subject
             subject = 'Your Borrow Request Has Been Approved'
-            from_email = 'lawangbatolibrary@gmail.com'  # Replace with your actual email
+            from_email = 'lawangbatolibrary@gmail.com'
 
             # HTML email content
             html_message = f"""
@@ -901,11 +903,10 @@ def send_approval_email(request, request_id):
 
             return JsonResponse({'status': 'success', 'message': 'Approval email sent successfully!'})
 
-        except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data.'}, status=400)
         except BorrowRequest.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Borrow request not found.'}, status=404)
         except Account.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Account not found for the user.'}, status=404)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)
