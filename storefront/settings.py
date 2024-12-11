@@ -31,21 +31,12 @@ ALLOWED_HOSTS = ['128.199.98.54']
 
 # Email settings for Gmail
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-<<<<<<< HEAD
-EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP server
-EMAIL_PORT = 587  # Common port for TLS
-EMAIL_USE_TLS = True  # Use TLS for security
-EMAIL_HOST_USER = 'lawangbatolibrary@gmail.com'  # Your email address
-EMAIL_HOST_PASSWORD = 'bsbt bybt kmca gghg'  # Your email password or App Password
-DEFAULT_FROM_EMAIL = 'lawangbatolibrary@gmail.com'  # Default sender email
-=======
 EMAIL_HOST = config('EMAIL_HOST')
 EMAIL_PORT = config('EMAIL_PORT', cast=int) 
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
->>>>>>> 93b44c331de307a5119798d1005f482ecfd9ca1f
 # Application definition
 
 INSTALLED_APPS = [
@@ -210,4 +201,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'user-login'
 VIEW_COUNT_SESSION_KEY = 'book_view_count'
 # settings.py
-
