@@ -1168,36 +1168,31 @@
                         `)
                         .attr('data-id', notification.id)
                         .toggleClass('read', notification.read)
-            // Disable click for expired notifications
-           if (notification.type === 'expired' || notification.type === 'reminder') {
-                item.addClass('expired-notification'); // Add a class for styling if needed
-            } else {
-                item.click(function() {
-                    markAsReadAndRedirect(notification.id, notification.type);
+                        .click(function() {
+                            markAsReadAndRedirect(notification.id, notification.type);
+                        });
+    
+                    var deleteButton = $('<button class="btn btn-close ms-auto">').html('').click(function(event) {
+                        event.stopPropagation();
+                        deleteNotification(notification.id);
+                    });
+    
+                    item.append(deleteButton);
+                    $('#notification-list').append(item);
                 });
+    
+                // Show or hide the See More/See Less button based on the number of notifications
+                if (notifications.length > notificationsToShow) {
+                    $('#see-more-less-btn').show().text(showingMore ? 'See Less' : 'See More');
+                } else {
+                    $('#see-more-less-btn').hide();
+                }
+            } else {
+                $('#notification-list').html('<span class="dropdown-item-text no-notif">No notifications</span>');
+                $('#notification-count').hide();
+                $('#see-more-less-btn').hide();
             }
-
-            var deleteButton = $('<button class="btn btn-close ms-auto">').html('').click(function(event) {
-                event.stopPropagation();
-                deleteNotification(notification.id);
-            });
-
-            item.append(deleteButton);
-            $('#notification-list').append(item);
-        });
-
-        // Show or hide the See More/See Less button based on the number of notifications
-        if (notifications.length > notificationsToShow) {
-            $('#see-more-less-btn').show().text(showingMore ? 'See Less' : 'See More');
-        } else {
-            $('#see-more-less-btn').hide();
         }
-    } else {
-        $('#notification-list').html('<span class="dropdown-item-text no-notif">No notifications</span>');
-        $('#notification-count').hide();
-        $('#see-more-less-btn').hide();
-    }
-}
     
         // Toggle "See More" and "See Less"
         $('#see-more-less-btn').on('click', function(event) {
