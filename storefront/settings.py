@@ -26,7 +26,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['128.199.98.54']
+ALLOWED_HOSTS = ['143.198.201.190']
 
 
 # Email settings for Gmail
