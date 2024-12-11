@@ -10,3 +10,4 @@ then
 fi
 
 pip install django-import-export
+pip install python-decouple
