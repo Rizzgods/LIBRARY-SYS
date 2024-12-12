@@ -15,4 +15,6 @@ urlpatterns = [
     path('batch-upload/', views.batch_upload_view, name='batch-upload'),
     path('logout/', views.logout_user, name='logout'),
     path('generate_new_password', views.generate_new_password, name='generate_new_password'),
+    path('confirm_account_request/', views.confirm_account_request, name='confirm_account_request'),
+    path('delete_account_request/', views.delete_account_request, name='delete_account_request'),
     ]

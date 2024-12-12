@@ -221,4 +221,79 @@
             console.error('Could not copy text: ', err);
         });
     });
+
+
+    function filterTableByRole() {
+        var filterValue = document.getElementById("role-filter").value.toLowerCase();
+        var table = document.getElementById("user-list-tbody");
+        var rows = table.getElementsByTagName("tr");
+
+        for (var i = 0; i < rows.length; i++) {
+            var roleCell = rows[i].getElementsByTagName("td")[3]; // Assuming role is in the fourth column
+            if (roleCell) {
+                var role = roleCell.textContent || roleCell.innerText;
+                if (filterValue === "" || role.toLowerCase().indexOf(filterValue) > -1) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function searchTableByUsernameAndDetails() {
+        var input = document.getElementById('search-input1');
+        var filter = input.value.toLowerCase();
+        var table = document.getElementById('user-list-tbody');
+        var rows = table.getElementsByTagName("tr");
+        var anyMatch = false;
+
+        // Remove the "no matches" row if it exists
+        var noMatchesRow = document.getElementById('no-matches-row');
+        if (noMatchesRow) {
+            noMatchesRow.remove();
+        }
+
+        // If the search input is blank, reset the state of the table
+        if (filter === "") {
+            for (var i = 0; i < rows.length; i++) {
+                rows[i].style.display = ""; // Show all rows
+            }
+            return;
+        }
+
+        for (var i = 0; i < rows.length; i++) {
+            var usernameCell = rows[i].getElementsByTagName("td")[0];
+            var emailCell = rows[i].getElementsByTagName("td")[1];
+            var nameCell = rows[i].getElementsByTagName("td")[2];
+            var roleCell = rows[i].getElementsByTagName("td")[3];
+
+            // Extract text content
+            var username = usernameCell ? usernameCell.textContent.toLowerCase() : "";
+            var email = emailCell ? emailCell.textContent.toLowerCase() : "";
+            var name = nameCell ? nameCell.textContent.toLowerCase() : "";
+            var role = roleCell ? roleCell.textContent.toLowerCase() : "";
+
+            // Check if any of the fields match the search filter
+            if (username.includes(filter) || email.includes(filter) || name.includes(filter) || role.includes(filter)) {
+                rows[i].style.display = ""; // Show row
+                anyMatch = true;
+            } else {
+                rows[i].style.display = "none"; // Hide row
+            }
+        }
+
+        // If no rows match, display a "no matches" row
+        if (!anyMatch) {
+            noMatchesRow = document.createElement('tr');
+            noMatchesRow.id = 'no-matches-row';
+            noMatchesRow.innerHTML = `<td colspan="6">No "${input.value}" matches from the records</td>`;
+            table.appendChild(noMatchesRow);
+        }
+    }
+
+    // Attach event listeners
+    document.getElementById("role-filter").addEventListener("change", filterTableByRole);
+    document.getElementById("search-input1").addEventListener("input", searchTableByUsernameAndDetails);
+
 </script>

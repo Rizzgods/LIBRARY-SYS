@@ -1,51 +1,5 @@
 $(document).ready(function() {
-    var userId, userStatus;
-
-    $('#confirmDisableModal').on('show.bs.modal', function(event) {
-        var button = $(event.relatedTarget);
-        userId = button.data('user-id');
-        userStatus = button.data('user-status');
-        var actionText = userStatus ? 'disable' : 'activate';
-        $('#action-text').text(actionText);
-    });
-
-    $('#confirmAction').click(function() {
-        // Hide any open modal
-        $('.modal').modal('hide');
-
-        $.ajax({
-            url: '/toggle_user_status/', // Update this URL to match your Django URL configuration
-            method: 'POST',
-            data: {
-                'user_id': userId,
-                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
-            },
-            success: function(response) {
-                if (response.status == 'success') {
-                    var newStatus = response.new_status;
-                    $('#user-status-' + userId).text(newStatus);
-                    var newButtonText = newStatus ? 'Disable' : 'Activate';
-                    var newButtonClass = newStatus ? 'btn btn-danger' : 'btn btn-success';
-                    $('button[data-user-id="' + userId + '"]').text(newButtonText).removeClass('btn-success btn-danger').addClass(newButtonClass);
-                    $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
-                    localStorage.setItem('activeSection', 'analytics-section'); // Store the active section
-                    setTimeout(function() {
-                        $('#successModalMessage').text('Successfully ' + (newStatus ? 'activated' : 'disabled'));
-                        $('#successModal').modal('show');
-                        setTimeout(function() {
-                            $('#successModal').modal('hide');
-                            location.reload(); // Refresh the page
-                        }, 2000);
-                    }, 500);
-                } else {
-                    alert('Error: ' + response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                alert('An error occurred: ' + error);
-            }
-        });
-    });
+   
 
     // Function to show the specified section
     function showSection(sectionId) {
@@ -92,79 +46,7 @@ $(document).ready(function() {
         showSection('csv-section');
     });
 
-    function filterTableByRole() {
-        var filterValue = document.getElementById("role-filter").value.toLowerCase();
-        var table = document.getElementById("user-list-tbody");
-        var rows = table.getElementsByTagName("tr");
-
-        for (var i = 0; i < rows.length; i++) {
-            var roleCell = rows[i].getElementsByTagName("td")[3]; // Assuming role is in the fourth column
-            if (roleCell) {
-                var role = roleCell.textContent || roleCell.innerText;
-                if (filterValue === "" || role.toLowerCase().indexOf(filterValue) > -1) {
-                    rows[i].style.display = "";
-                } else {
-                    rows[i].style.display = "none";
-                }
-            }
-        }
-    }
-
-    function searchTableByUsernameAndDetails() {
-        var input = document.getElementById('search-input1');
-        var filter = input.value.toLowerCase();
-        var table = document.getElementById('user-list-tbody');
-        var rows = table.getElementsByTagName("tr");
-        var anyMatch = false;
-
-        // Remove the "no matches" row if it exists
-        var noMatchesRow = document.getElementById('no-matches-row');
-        if (noMatchesRow) {
-            noMatchesRow.remove();
-        }
-
-        // If the search input is blank, reset the state of the table
-        if (filter === "") {
-            for (var i = 0; i < rows.length; i++) {
-                rows[i].style.display = ""; // Show all rows
-            }
-            return;
-        }
-
-        for (var i = 0; i < rows.length; i++) {
-            var usernameCell = rows[i].getElementsByTagName("td")[0];
-            var emailCell = rows[i].getElementsByTagName("td")[1];
-            var nameCell = rows[i].getElementsByTagName("td")[2];
-            var roleCell = rows[i].getElementsByTagName("td")[3];
-
-            // Extract text content
-            var username = usernameCell ? usernameCell.textContent.toLowerCase() : "";
-            var email = emailCell ? emailCell.textContent.toLowerCase() : "";
-            var name = nameCell ? nameCell.textContent.toLowerCase() : "";
-            var role = roleCell ? roleCell.textContent.toLowerCase() : "";
-
-            // Check if any of the fields match the search filter
-            if (username.includes(filter) || email.includes(filter) || name.includes(filter) || role.includes(filter)) {
-                rows[i].style.display = ""; // Show row
-                anyMatch = true;
-            } else {
-                rows[i].style.display = "none"; // Hide row
-            }
-        }
-
-        // If no rows match, display a "no matches" row
-        if (!anyMatch) {
-            noMatchesRow = document.createElement('tr');
-            noMatchesRow.id = 'no-matches-row';
-            noMatchesRow.innerHTML = `<td colspan="6">No "${input.value}" matches from the records</td>`;
-            table.appendChild(noMatchesRow);
-        }
-    }
-
-    // Attach event listeners
-    document.getElementById("role-filter").addEventListener("change", filterTableByRole);
-    document.getElementById("search-input1").addEventListener("input", searchTableByUsernameAndDetails);
-
+    
     // Function to show the overview content
     function showOverview() {
         document.getElementById('overview-section').style.display = 'block';
