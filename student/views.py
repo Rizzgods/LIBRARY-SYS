@@ -213,8 +213,15 @@ def fetch_notifications(request):
         Notification.objects.create(
             user=req.requested_by,
             message=f"Your borrow request for {req.book.BookTitle} has expired.",
-            notification_type='expired'  # You can also handle expired separately if needed
+            notification_type='expired'
         )
+        
+        # Send an email to the user
+        subject = "Borrow Request Expired"
+        message = f"Your borrow request for {req.book.BookTitle} has expired. Please submit a new request if you still need the book."
+        from_email = settings.EMAIL_HOST_USER
+        to_email = req.requested_by.email
+        send_mail(subject, message, from_email, [to_email])
     
     # Fetch notifications with their types
     notifications = Notification.objects.filter(user=request.user).order_by('-created_at')

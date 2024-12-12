@@ -3,36 +3,13 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
-
-# Define user check functions
-def user_is_student(user):
-    return user.groups.filter(name='Student').exists()
-
-def user_is_librarian(user):
-    return user.groups.filter(name='Librarian').exists()
-
-def user_is_schoolAdmin(user):
-    return user.groups.filter(name='SchoolAdmin').exists()
-
-# Define views
-@login_required(login_url='login_user')
-@user_passes_test(user_is_student, login_url='login_user')
-def student_success(request):
-    url = reverse('view')  # Replace 'student_dashboard' with the URL name for the student dashboard
-    return redirect(url)
-
-@login_required(login_url='login_user')
-@user_passes_test(user_is_librarian, login_url='login_user')
-def librarian_success(request):
-    url = reverse('librarian')  # Replace 'librarian_dashboard' with the URL name for the librarian dashboard
-    return redirect(url)
-
-@login_required(login_url='login_user')
-@user_passes_test(user_is_schoolAdmin, login_url='login_user')
-def schoolAdmin_success(request):
-    url = reverse('book_page_views')  # Redirect to the correct URL for SchoolAdmin
-    return redirect(url)
-
+from django.urls import reverse_lazy
+from django.contrib.auth.views import PasswordResetConfirmView
+from .forms import AccountCreationForm
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'password-reset-confirm.html'
+    success_url = reverse_lazy('resetsuccess') 
+    
 def login_user(request):
     if request.method == 'POST':
         username = request.POST.get("username")
@@ -69,4 +46,49 @@ def login_user(request):
             return redirect('login_user')
     else:
         return render(request, 'authenticate/login.html', {})
+
+def account_request(request):
+    if request.method == 'POST':
+        form = AccountCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('account_request_success')  # Redirect to the success page
+    else:
+        form = AccountCreationForm()
+
+    return render(request, 'registration/account_request.html', {'form': form})
+
+
+def account_request_success(request):
+    return render(request, 'registration/account_request_success.html')
+
+# Define user check functions
+def user_is_student(user):
+    return user.groups.filter(name='Student').exists()
+
+def user_is_librarian(user):
+    return user.groups.filter(name='Librarian').exists()
+
+def user_is_schoolAdmin(user):
+    return user.groups.filter(name='SchoolAdmin').exists()
+
+# Define views
+@login_required(login_url='login_user')
+@user_passes_test(user_is_student, login_url='login_user')
+def student_success(request):
+    url = reverse('view')  # Replace 'student_dashboard' with the URL name for the student dashboard
+    return redirect(url)
+
+@login_required(login_url='login_user')
+@user_passes_test(user_is_librarian, login_url='login_user')
+def librarian_success(request):
+    url = reverse('librarian')  # Replace 'librarian_dashboard' with the URL name for the librarian dashboard
+    return redirect(url)
+
+@login_required(login_url='login_user')
+@user_passes_test(user_is_schoolAdmin, login_url='login_user')
+def schoolAdmin_success(request):
+    url = reverse('book_page_views')  # Redirect to the correct URL for SchoolAdmin
+    return redirect(url)
+
 
