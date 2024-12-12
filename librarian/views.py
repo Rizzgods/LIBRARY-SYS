@@ -729,7 +729,7 @@ def send_reminder(request):
 
             <div class="email-container">
                 <div class="email-header">
-                    <img src="http://127.0.0.1:8000/static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
+                    <img src="http://143.198.201.190:8000/static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
                     <h1>LBLIB - Your Library at Your Fingertips</h1>
                 </div>
                 <div class="email-body">
@@ -737,7 +737,7 @@ def send_reminder(request):
                     <p>This is a reminder that the book <strong>"{book_title}"</strong> is due soon.</p>
                     <p>Please return the book at your earliest convenience.</p>
                     <p>This is an automated email. Please do not reply to this message. For further inquiries, contact us through the appropriate channels.</p>
-                    <a href="http://your-library-url.com/borrow" class="button">View Borrow Details</a>
+                    <a href="http://143.198.201.190:8000/userauth/login_user" class="button">View Borrow Details</a>
                 </div>
                 <div class="email-footer">
                     <p>Thank you for using LBLIB - Your Library at Your Fingertips!</p>
@@ -871,7 +871,7 @@ def send_approval_email(request, request_id):
 
             <div class="email-container">
                 <div class="email-header">
-                    <img src="http://127.0.0.1:8000/static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
+                    <img src="http://143.198.201.190:8000/static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
                     <h1>LBLIB - Your Library at Your Fingertips</h1>
                 </div>
                 <div class="email-body">
@@ -879,7 +879,7 @@ def send_approval_email(request, request_id):
                     <p>Your borrow request for the book <strong>"{borrow_request.book.BookTitle}"</strong> has been approved.</p>
                     <p>We are happy to let you know that your request is now processed, and the book will be ready for you to pick up at the specified time. We hope you enjoy reading it!</p>
                     <p>This is an automated email. Please do not reply to this message. If you have any questions, feel free to contact us through the proper channels.</p>
-                    <a href="http://your-library-url.com/borrow" class="button">View Borrow Details</a>
+                    <a href="http://143.198.201.190:8000/userauth/login_user" class="button">View Borrow Details</a>
                 </div>
                 <div class="email-footer">
                     <p>Thank you for using LBLIB - Your Library at Your Fingertips!</p>

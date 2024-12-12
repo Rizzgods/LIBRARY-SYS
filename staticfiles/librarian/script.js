@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
     $('#id_Category').change(function() {
         var selectedCategoryId = $(this).val();
@@ -231,8 +230,13 @@ $(document).ready(function() {
     $('#deleteModalBook').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget);
         var bookId = button.data('bookid');
-        var modal = $(this);
-        modal.find('#confirmDeleteBtnBook').attr('onclick', 'submitDeleteForm(' + bookId + ')');
+        $('#confirmDeleteBtnBook').data('bookid', bookId);
+    });
+
+    // Add click handler for the confirm button
+    $('#confirmDeleteBtnBook').on('click', function() {
+        var bookId = $(this).data('bookid');
+        $('#deleteFormBook-' + bookId).submit();
     });
 
     $('#deleteModalRecentDel').on('show.bs.modal', function(event) {
@@ -466,4 +470,15 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
         keyboard: false,
         show: true
     });
+});
+
+function submitDeleteForm() {
+    var bookId = $('#confirmDeleteBtnBook').data('bookid');
+    $('#deleteFormBook-' + bookId).submit();
+}
+
+$('#deleteModalBook').on('show.bs.modal', function(event) {
+    var button = $(event.relatedTarget);
+    var bookId = button.data('bookid');
+    $('#confirmDeleteBtnBook').data('bookid', bookId);
 });

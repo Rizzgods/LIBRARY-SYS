@@ -59,6 +59,13 @@
                             data-user-id="{{ user.id }}">
                             Key
                         </button>
+                        <button 
+                            class="btn btn-danger" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#confirmArchiveModal" 
+                            data-user-id="{{ user.id }}">
+                            Archive
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -117,6 +124,25 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                 <button type="button" class="btn btn-primary" id="confirmAction">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Archive Modal -->
+<div class="modal fade" id="confirmArchiveModal" tabindex="-1" aria-labelledby="confirmArchiveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmArchiveModalLabel">Confirm Archive</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to archive this user?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" id="confirmArchiveAction">Yes</button>
             </div>
         </div>
     </div>
@@ -222,6 +248,44 @@
         });
     });
 
+    $('#confirmArchiveModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        userId = button.data('user-id');
+    });
+
+    $('#confirmArchiveAction').click(function() {
+        // Hide any open modal
+        $('.modal').modal('hide');
+
+        // Get CSRF token
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+        $.ajax({
+            url: '{% url "archive_user" %}', // Use Django template tag to get the URL
+            method: 'POST',
+            data: {
+                'user_id': userId,
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                if (response.status == 'success') {
+                    $('#user-row-' + userId).remove();
+                    $('#successModalMessage').text('User archived successfully');
+                    $('#successModal').modal('show');
+                    setTimeout(function() {
+                        $('#successModal').modal('hide');
+                    }, 2000);
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                console.error('Response:', xhr.responseText);
+                alert('An error occurred: ' + error);
+            }
+        });
+    });
 
     function filterTableByRole() {
         var filterValue = document.getElementById("role-filter").value.toLowerCase();

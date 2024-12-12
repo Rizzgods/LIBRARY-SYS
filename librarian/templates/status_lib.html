@@ -60,13 +60,7 @@
                                     {% if request.book.stock == 0 %}disabled{% endif %} 
                                     data-toggle="modal" data-target="#statusModal{{ request.id }}">
                                 {% if request.inOut %}TO CLAIM{% else %}TO RETURN{% endif %}
-                            </button>
-
-                            <button type="button" 
-                                    class="btn btn-info" 
-                                    onclick="viewBookDetails('{{ request.book.BookImage.url }}', '{{ request.book.BookTitle }}', '{{ request.book.Description }}')">
-                                View
-                            </button>
+                            </button>   
                         </td>
                     </tr>
                     {% endfor %}
@@ -98,7 +92,7 @@
                             <button type="button" class="btn btn-success" data-toggle="modal" data-target="#statusModal{{ out.id }}">
                                 TO RETURN
                             </button>
-                            <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ out.book.BookImage.url }}', '{{ out.book.BookTitle }}', '{{ out.book.Description }}')">View</button>
+                            
                         </td>
                         <td>
                             <button type="button" class="btn btn-warning" onclick="openReminderModal('{{ out.book.BookTitle }}', '{{ out.requested_by.id }}')">
@@ -161,7 +155,7 @@
                             <th>Title</th>
                             <th>Date Returned</th>
                             <th>Log Expiry</th>
-                            <th>Action</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -171,9 +165,7 @@
                             <td>{{ log.book.BookTitle }}</td>
                             <td>{{ log.returnLogTime }}</td>
                             <td>{{ log.expiryLogTime }}</td>
-                            <td>
-                                <button type="button" class="btn btn-info" onclick="viewBookDetails('{{ log.book.BookImage.url }}', '{{ log.book.BookTitle }}', '{{ log.book.Description }}')">View</button>
-                            </td>
+                           
                         </tr>
                         {% endfor %}
                     </tbody>
