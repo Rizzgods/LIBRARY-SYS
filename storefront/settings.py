@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
-from decouple import config, Csv
+from decouple import config, Csv # type: ignore
 from pathlib import Path
 
 
@@ -26,7 +26,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['128.199.98.54']
+ALLOWED_HOSTS = ['128.199.98.54', '127.0.0.1']
 
 
 # Email settings for Gmail

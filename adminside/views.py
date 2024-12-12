@@ -1,5 +1,7 @@
 import csv
 import io
+
+from django.db import IntegrityError
 from import_export.formats.base_formats import CSV
 
 from django.shortcuts import render
@@ -10,7 +12,7 @@ from tablib import Dataset
 from .resources import AccountResource
 from django.contrib import messages
 # Create your views here.
-
+from datetime import timedelta
 
 
 import os
@@ -178,9 +180,12 @@ def book_page_views(request):
     )
     
     # Retrieve the user activities corresponding to the most recent login time and order by latest
+    activity_threshold = timezone.now() - timedelta(minutes=30)
+
+# Retrieve user activities for users who are currently active
     user_activities = UserActivity.objects.filter(
         active=True,
-        login_time__in=[activity['latest_activity'] for activity in latest_user_activities]
+        login_time__gte=activity_threshold
     ).order_by('-login_time')
     
     # Calculate the count of distinct users who logged in this month
@@ -228,13 +233,32 @@ def book_page_views(request):
 from django.shortcuts import render, redirect
 from .forms import AccountForm, LibrarianForm
 
+from django.contrib import messages
+from .forms import AccountForm
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .forms import AccountForm, LibrarianForm
+
+from django.contrib import messages
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .forms import AccountForm
+
 def create_account(request):
     if request.method == 'POST':
         form = AccountForm(request.POST)
         if form.is_valid():
             account = form.save(commit=False)
             account.save()
-            return redirect('book_page_views')  # Redirect to a success page
+            messages.success(request, 'Student created successfully!')
+            return redirect('book_page_views')  # Redirect to the same page
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            return redirect('book_page_views') 
     else:
         form = AccountForm()
     return render(request, 'book_page_views.html', {'form': form})
@@ -243,12 +267,22 @@ def create_librarian(request):
     if request.method == 'POST':
         form = LibrarianForm(request.POST)
         if form.is_valid():
-            librarian = form.save(commit=False)
-            librarian.save()
-            return redirect('book_page_views')  # Redirect to a success page
+            try:
+                librarian = form.save(commit=False)
+                librarian.save()
+                messages.success(request, 'Librarian created successfully!')
+                return redirect('book_page_views')  # Redirect to the same page
+            except IntegrityError:
+                messages.error(request, 'Error creating librarian: Username already exists!')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            return redirect('book_page_views') 
     else:
         form = LibrarianForm()
     return render(request, 'book_page_views.html', {'form': form})
+
 
 
 
@@ -335,8 +369,25 @@ def logout_user(request):
     return redirect(url)
 
 
-def password_generator(password, request):
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+
+def password_generator():
     import random
     import string
-    password = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(8))
-    return password
+    return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(8))
+
+@csrf_exempt
+def generate_new_password(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        try:
+            user = User.objects.get(id=user_id)
+            new_password = password_generator()
+            user.set_password(new_password)
+            user.save()
+            return JsonResponse({'status': 'success', 'new_password': new_password})
+        except User.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'User not found'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})

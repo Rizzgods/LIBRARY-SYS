@@ -13,15 +13,12 @@ $(document).ready(function() {
         // Hide any open modal
         $('.modal').modal('hide');
 
-        // Show loading spinner modal
-        $('#loadingSpinnerModal').modal('show');
-
         $.ajax({
             url: '/toggle_user_status/', // Update this URL to match your Django URL configuration
             method: 'POST',
             data: {
                 'user_id': userId,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
             },
             success: function(response) {
                 if (response.status == 'success') {
@@ -40,11 +37,12 @@ $(document).ready(function() {
                             location.reload(); // Refresh the page
                         }, 2000);
                     }, 500);
+                } else {
+                    alert('Error: ' + response.message);
                 }
             },
-            complete: function() {
-                // Hide loading spinner modal
-                $('#loadingSpinnerModal').modal('hide');
+            error: function(xhr, status, error) {
+                alert('An error occurred: ' + error);
             }
         });
     });
@@ -93,18 +91,6 @@ $(document).ready(function() {
     $('#CSV-link').click(function() {
         showSection('csv-section');
     });
-
-    // Example of storing the active section after an AJAX request
-    $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
-    localStorage.setItem('activeSection', 'analytics-section'); // Store the active section
-    setTimeout(function() {
-        $('#successModalMessage').text('Successfully ' + (newStatus ? 'activated' : 'disabled'));
-        $('#successModal').modal('show');
-        setTimeout(function() {
-            $('#successModal').modal('hide');
-            location.reload(); // Refresh the page
-        }, 2000);
-    }, 500);
 
     function filterTableByRole() {
         var filterValue = document.getElementById("role-filter").value.toLowerCase();
