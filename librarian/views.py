@@ -729,7 +729,7 @@ def send_reminder(request):
 
             <div class="email-container">
                 <div class="email-header">
-                    <img src="http://127.0.0.1:8000/static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
+                    <img src="http://143.198.201.190:8000//static/playground/NewLogo.png" alt="LBLIB Logo"> <!-- Adjust URL for local -->
                     <h1>LBLIB - Your Library at Your Fingertips</h1>
                 </div>
                 <div class="email-body">
