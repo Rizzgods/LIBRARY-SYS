@@ -14,6 +14,7 @@ from django.contrib import messages
 # Create your views here.
 from datetime import timedelta
 
+from userauth.models import AccountRequest
 
 import os
 import csv
@@ -26,6 +27,7 @@ from io import TextIOWrapper  # Add this import
 from librarian.models import Books, Category, SubCategory
 
 def batch_upload_view(request):
+
     if not request.user.is_authenticated or not user_is_schoolAdmin(request.user):
         return redirect('login_user')
 
@@ -155,6 +157,7 @@ def user_is_schoolAdmin(user):
 
 
 def book_page_views(request):
+    account_requests = AccountRequest.objects.all()
     # Ensure the user is authenticated
     if not request.user.is_authenticated:
         return redirect('login_user')
@@ -225,6 +228,7 @@ def book_page_views(request):
         'times_borrowed': times_borrowed,
         'ebook_titles': ebook_titles,
         'borrow': borrow,
+        'account_requests': account_requests,
     })
 
     # Retrieve all books and sort them by page views in descending order
@@ -390,4 +394,44 @@ def generate_new_password(request):
             return JsonResponse({'status': 'success', 'new_password': new_password})
         except User.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'User not found'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from userauth.models import AccountRequest, Account
+
+@csrf_exempt
+def confirm_account_request(request):
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        try:
+            account_request = AccountRequest.objects.get(id=request_id)
+            # Transfer the account request to the Account model
+            account = Account(
+                lrn=account_request.lrn,
+                fname=account_request.fname,
+                lname=account_request.lname,
+                address=account_request.address,
+                birthday=account_request.birthday,
+                age=account_request.age,
+                email=account_request.email
+            )
+            account.save()
+            # Delete the account request
+            account_request.delete()
+            return JsonResponse({'status': 'success'})
+        except AccountRequest.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Account request not found'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+@csrf_exempt
+def delete_account_request(request):
+    if request.method == 'POST':
+        request_id = request.POST.get('request_id')
+        try:
+            account_request = AccountRequest.objects.get(id=request_id)
+            account_request.delete()
+            return JsonResponse({'status': 'success'})
+        except AccountRequest.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Account request not found'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
