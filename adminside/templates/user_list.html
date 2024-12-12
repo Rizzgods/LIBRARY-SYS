@@ -253,39 +253,6 @@
         userId = button.data('user-id');
     });
 
-    $('#confirmArchiveAction').click(function() {
-        // Hide any open modal
-        $('.modal').modal('hide');
-
-        // Get CSRF token
-        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-
-        $.ajax({
-            url: '{% url "archive_user" %}', // Use Django template tag to get the URL
-            method: 'POST',
-            data: {
-                'user_id': userId,
-                'csrfmiddlewaretoken': csrfToken
-            },
-            success: function(response) {
-                if (response.status == 'success') {
-                    $('#user-row-' + userId).remove();
-                    $('#successModalMessage').text('User archived successfully');
-                    $('#successModal').modal('show');
-                    setTimeout(function() {
-                        $('#successModal').modal('hide');
-                    }, 2000);
-                } else {
-                    alert('Error: ' + response.message);
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('AJAX Error:', error);
-                console.error('Response:', xhr.responseText);
-                alert('An error occurred: ' + error);
-            }
-        });
-    });
 
     function filterTableByRole() {
         var filterValue = document.getElementById("role-filter").value.toLowerCase();
