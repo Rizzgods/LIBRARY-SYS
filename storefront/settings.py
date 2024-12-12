@@ -26,7 +26,14 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+<<<<<<< HEAD
 ALLOWED_HOSTS = ['128.199.98.54', '127.0.0.1']
+=======
+ALLOWED_HOSTS = [
+    '143.198.201.190',
+    '127.0.0.1'
+    ]
+>>>>>>> e6a8f85f53ed0b842a62e64ec618867c23535d89
 
 
 # Email settings for Gmail
@@ -104,7 +111,7 @@ ROOT_URLCONF = 'storefront.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,12 +119,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                
             ],
         },
     },
 ]
-
 
 
 #BACKEND - NILAGAY NI PAM MARH 11 1AM NG MADALING ARAW
