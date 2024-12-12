@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset Complete</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f6f9;
+            padding-top: 50px;
+        }
+        .container {
+            max-width: 500px;
+            margin-top: 100px;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        p {
+            text-align: center;
+            color: #555;
+        }
+        .alert-heading {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #007bff;
+        }
+        .back-to-login {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-to-login a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .back-to-login a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="alert alert-success mt-5" role="alert">
+                <h4 class="alert-heading">Success!</h4>
+                <p>Your password has been successfully reset. You can now log in with your new password.</p>
+                <hr>
+                <a href="{% url 'login_user' %}" class="btn btn-primary btn-block">Go to Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

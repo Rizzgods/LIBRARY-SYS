@@ -55,6 +55,7 @@
                         <button 
                             class="btn btn-primary" 
                             data-bs-toggle="modal" 
+                            data-bs-target="#confirmKeyModal"
                             data-user-id="{{ user.id }}">
                             Key
                         </button>
@@ -63,21 +64,6 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-</div>
-
-<!-- Modals -->
-<!-- Loading Spinner Modal -->
-<div class="modal fade" id="loadingSpinnerModal" tabindex="-1" role="dialog" aria-labelledby="loadingSpinnerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="sr-only"></span>
-                </div>
-                <p>Please wait...</p>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -98,6 +84,7 @@
         <div class="modal-content">
             <div class="modal-body text-center">
                 <p>New Password: <span id="newPassword"></span></p>
+                <button type="button" class="btn btn-secondary" id="copyPasswordButton">Copy to Clipboard</button>
             </div>
         </div>
     </div>
@@ -138,3 +125,100 @@
 <!-- Include jQuery and Bootstrap JS for handling the modal -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Include Bootstrap Bundle (includes Bootstrap JS and Popper.js) -->
+
+<script>
+    var userId, userStatus;
+
+    $('#confirmDisableModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        userId = button.data('user-id');
+        userStatus = button.data('user-status');
+        var actionText = userStatus ? 'disable' : 'activate';
+        $('#action-text').text(actionText);
+    });
+
+    $('#confirmAction').click(function() {
+        // Hide any open modal
+        $('.modal').modal('hide');
+
+        // Get CSRF token
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+        $.ajax({
+            url: '{% url "toggle_user_status" %}', // Use Django template tag to get the URL
+            method: 'POST',
+            data: {
+                'user_id': userId,
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                if (response.status == 'success') {
+                    var newStatus = response.new_status;
+                    $('#user-status-' + userId).text(newStatus);
+                    var newButtonText = newStatus ? 'Disable' : 'Activate';
+                    var newButtonClass = newStatus ? 'btn btn-danger' : 'btn btn-success';
+                    $('button[data-user-id="' + userId + '"]').text(newButtonText).removeClass('btn-success btn-danger').addClass(newButtonClass);
+                    $('button[data-user-id="' + userId + '"]').data('user-status', newStatus);
+                    localStorage.setItem('activeSection', 'analytics-section'); // Store the active section
+                    $('#successModalMessage').text('Successfully ' + (newStatus ? 'activated' : 'disabled'));
+                    $('#successModal').modal('show');
+                    setTimeout(function() {
+                        $('#successModal').modal('hide');
+                        location.reload(); // Refresh the page
+                    }, 2000);
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                console.error('Response:', xhr.responseText);
+                alert('An error occurred: ' + error);
+            }
+        });
+    });
+
+    $('#confirmKeyModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget);
+        userId = button.data('user-id');
+    });
+
+    $('#confirmKeyAction').click(function() {
+        // Hide any open modal
+        $('.modal').modal('hide');
+
+        // Get CSRF token
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+
+        $.ajax({
+            url: '{% url "generate_new_password" %}', // Use Django template tag to get the URL
+            method: 'POST',
+            data: {
+                'user_id': userId,
+                'csrfmiddlewaretoken': csrfToken
+            },
+            success: function(response) {
+                if (response.status == 'success') {
+                    $('#newPassword').text(response.new_password);
+                    $('#keyModal').modal('show');
+                } else {
+                    alert('Error: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', error);
+                console.error('Response:', xhr.responseText);
+                alert('An error occurred: ' + error);
+            }
+        });
+    });
+
+    $('#copyPasswordButton').click(function() {
+        var newPassword = $('#newPassword').text();
+        navigator.clipboard.writeText(newPassword).then(function() {
+            alert('Password copied to clipboard');
+        }, function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    });
+</script>

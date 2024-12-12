@@ -16,7 +16,18 @@ class Account(models.Model):
     def __str__(self):
         return self.lrn + ' ' + str(self.birthday)
 
+class AccountRequest(models.Model):
+    lrn = models.CharField(max_length=12, unique=True, verbose_name="LRN")
+    fname = models.CharField(max_length=50, verbose_name="First Name")
+    lname = models.CharField(max_length=50, verbose_name="Last Name")
+    address = models.CharField(max_length=50, verbose_name="Address")
+    birthday = models.DateField(verbose_name="Birthday")
+    age = models.IntegerField(verbose_name="Age")
+    email = models.EmailField(max_length=50, verbose_name="Email")
 
+    def __str__(self):
+        return f"{self.fname} {self.lname} ({self.lrn})"
+        
 @receiver(post_save, sender=Account)
 def create_user_and_assign_group(sender, instance, created, **kwargs):
     if created:
@@ -54,3 +65,5 @@ def create_librarian_user_and_assign_group(sender, instance, created, **kwargs):
         # Assign user to a group
         librarian_group, _ = Group.objects.get_or_create(name='Librarian')
         user.groups.add(librarian_group)
+
+        
