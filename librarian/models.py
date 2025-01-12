@@ -67,6 +67,7 @@ class Books(models.Model):
     hardCopy = models.BooleanField(default=False)
     stock = models.IntegerField(default=0)
     TimesBorrow = models.IntegerField(default=0)
+    ISBN = models.CharField(max_length=100, default="Def")
 
     def __str__(self):
         return self.BookTitle
