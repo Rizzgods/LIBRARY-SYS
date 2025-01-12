@@ -1,0 +1,18 @@
+[0;1;38:5:185mWarning: The unit file, source configuration file or drop-ins of gunicorn.service changed on disk. Run 'systemctl daemon-reload' to reload units.[0m
+[0;1;31m×[0m gunicorn.service - gunicorn daemon
+     Loaded: loaded (]8;;file://LBLIB-SYS/etc/systemd/system/gunicorn.service/etc/systemd/system/gunicorn.service]8;;; [0;1;38:5:185mdisabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Thu 2024-12-12 07:56:44 UTC; 6min ago
+   Duration: 18ms
+ Invocation: 03d82f083d0a4052876ded8832465b0a
+TriggeredBy: [0;1;31m×[0m gunicorn.socket
+    Process: 13323 ExecStart=/root/LBLIB/LIBRARY-SYS/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/run/gunicorn.sock LIBRARY_SYS.wsgi:application [0;1;31m(code=exited, status=203/EXEC)[0m
+   Main PID: 13323 (code=exited, status=203/EXEC)
+[0;1;38:5:185mWarning: The unit file, source configuration file or drop-ins of gunicorn.service changed on disk. Run 'systemctl daemon-reload' to reload units.[0m
+[0;1;31m×[0m gunicorn.service - gunicorn daemon
+     Loaded: loaded (]8;;file://LBLIB-SYS/etc/systemd/system/gunicorn.service/etc/systemd/system/gunicorn.service]8;;; [0;1;38:5:185mdisabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Thu 2024-12-12 07:56:44 UTC; 7min ago
+   Duration: 18ms
+ Invocation: 03d82f083d0a4052876ded8832465b0a
+TriggeredBy: [0;1;31m×[0m gunicorn.socket
+    Process: 13323 ExecStart=/root/LBLIB/LIBRARY-SYS/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/run/gunicorn.sock LIBRARY_SYS.wsgi:application [0;1;31m(code=exited, status=203/EXEC)[0m
+   Main PID: 13323 (code=exited, status=203/EXEC)

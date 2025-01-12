@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> 43d9a97dce1302de564145fd09a0d1e8094a5f56
 $(document).ready(function() {
     $('#id_Category').change(function() {
         var selectedCategoryId = $(this).val();
@@ -230,6 +234,7 @@ $(document).ready(function() {
     $('#deleteModalBook').on('show.bs.modal', function(event) {
         var button = $(event.relatedTarget);
         var bookId = button.data('bookid');
+<<<<<<< HEAD
         $('#confirmDeleteBtnBook').data('bookid', bookId);
     });
 
@@ -237,6 +242,10 @@ $(document).ready(function() {
     $('#confirmDeleteBtnBook').on('click', function() {
         var bookId = $(this).data('bookid');
         $('#deleteFormBook-' + bookId).submit();
+=======
+        var modal = $(this);
+        modal.find('#confirmDeleteBtnBook').attr('onclick', 'submitDeleteForm(' + bookId + ')');
+>>>>>>> 43d9a97dce1302de564145fd09a0d1e8094a5f56
     });
 
     $('#deleteModalRecentDel').on('show.bs.modal', function(event) {
@@ -470,6 +479,7 @@ document.getElementById('uploadForm').addEventListener('submit', function(event)
         keyboard: false,
         show: true
     });
+<<<<<<< HEAD
 });
 
 function submitDeleteForm() {
@@ -481,4 +491,6 @@ $('#deleteModalBook').on('show.bs.modal', function(event) {
     var button = $(event.relatedTarget);
     var bookId = button.data('bookid');
     $('#confirmDeleteBtnBook').data('bookid', bookId);
+=======
+>>>>>>> 43d9a97dce1302de564145fd09a0d1e8094a5f56
 });
