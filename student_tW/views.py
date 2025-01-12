@@ -7,6 +7,7 @@ def sstudent(request):
     end_year = request.GET.get('end_year')
     language = request.GET.get('language')
     categories_filter = request.GET.get('categories')
+    book_type = request.GET.get('book_type')  # Add this line
 
     books = Books.objects.all()
 
@@ -29,7 +30,13 @@ def sstudent(request):
         except ValueError:
             pass
 
-    paginator = Paginator(books, 15) 
+    if book_type and book_type != 'all':
+        if book_type == 'ebook':
+            books = books.filter(eBook=True)
+        elif book_type == 'research':
+            books = books.filter(research_paper=True)
+
+    paginator = Paginator(books, 15)
     page_number = request.GET.get('page', 1)
     books_page = paginator.get_page(page_number)
 
@@ -43,7 +50,8 @@ def sstudent(request):
         'start_year': start_year or '',
         'end_year': end_year or '',
         'language': language or 'all',
-        'categories_filter': categories_filter or ''
+        'categories_filter': categories_filter or '',
+        'book_type': book_type or 'all'  # Add this line
     }
 
     return render(request, 's_main.html', context)

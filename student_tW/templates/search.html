@@ -1,22 +1,22 @@
-<div class="bg-white shadow-lg rounded-xl p-6">
-    <form class="flex flex-col lg:flex-row gap-4">
+<div class="bg-white shadow-lg rounded-xl p-4 sm:p-6">
+    <form class="flex flex-col sm:flex-row gap-4">
         <!-- Search Bar -->
         <div class="flex-grow relative">
             <input 
                 type="text" 
                 name="search" 
                 placeholder="Search books..." 
-                class="w-full border-gray-300 rounded-lg shadow-sm p-3 pl-12 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full border-gray-300 rounded-lg shadow-sm p-2 sm:p-3 pl-10 sm:pl-12 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-            <svg class="absolute left-4 top-3.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <svg class="absolute left-3 sm:left-4 top-2.5 sm:top-3.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
             </svg>
         </div>
         <!-- Filters -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-3 sm:gap-4">
             <select 
                 name="year" 
-                class="border-gray-300 rounded-lg shadow-sm p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                class="w-full sm:w-auto border-gray-300 rounded-lg shadow-sm p-2 sm:p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                 <option value="">Year</option>
                 <option value="2023">2023</option>
                 <option value="2022">2022</option>
@@ -24,7 +24,7 @@
             </select>
             <button 
                 type="submit" 
-                class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-sm hover:bg-blue-700 transition duration-150">
+                class="w-full sm:w-auto bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg shadow-sm hover:bg-blue-700 transition duration-150 text-sm sm:text-base">
                 Search
             </button>
         </div>

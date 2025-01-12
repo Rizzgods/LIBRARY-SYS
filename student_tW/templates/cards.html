@@ -1,7 +1,7 @@
 {% load custom_filters %}
 
 <!-- Placeholder Cards -->
-<div id="cards-container" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div id="cards-container" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
     {% for _ in 20|times %}
     <div class="bg-gray-200 shadow-lg rounded-xl flex flex-col h-128 animate-pulse">
         <div class="flex-shrink-0 bg-gray-300 h-72 rounded-t-xl"></div>
@@ -15,11 +15,19 @@
 </div>
 
 <!-- Actual Book Cards -->
-<div id="actual-cards-container" class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div id="actual-cards-container" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
     {% if books_page %}
         {% if books_page.object_list %}
             {% for book in books_page %}
-            <div class="bg-white shadow-lg rounded-xl flex flex-col h-128 book-card overflow-hidden">
+            <div class="bg-white shadow-lg rounded-xl flex flex-col h-128 book-card overflow-hidden cursor-pointer hover:shadow-xl transition-shadow duration-300"
+                 onclick="showPreviewPage({
+                    image: '{{ book.BookImage.url }}',
+                    title: '{{ book.BookTitle|escapejs }}',
+                    author: 'By {{ book.Author|escapejs }}',
+                    date: 'Published: {{ book.Date }}',
+                    description: '{{ book.Description|escapejs|default:"No description available." }}',
+                    categories: '{% for category in book.Category.all %}<span class=\'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800\'>{{ category.name }}</span>{% endfor %}'
+                 })">
                 <div class="flex-shrink-0">
                     <img src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }}" 
                          class="w-full h-72 object-cover rounded-t-xl">
@@ -54,15 +62,15 @@
 </div>
 
 <!-- Pagination Controls -->
-<div class="pagination-controls mt-8">
+<div class="pagination-controls mt-6 md:mt-8">
     <div class="flex justify-center">
-        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+        <nav class="relative z-0 inline-flex flex-wrap justify-center rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             {% if books_page.has_previous %}
-            <a href="?page=1&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}" class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <a href="?page=1&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}&book_type={{ book_type }}" class="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                 <span class="sr-only">First</span>
                 &laquo; First
             </a>
-            <a href="?page={{ books_page.previous_page_number }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}" class="relative inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <a href="?page={{ books_page.previous_page_number }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}&book_type={{ book_type }}" class="relative inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                 <span class="sr-only">Previous</span>
                 &lsaquo; Prev
             </a>
@@ -74,18 +82,18 @@
                 {{ num }}
             </span>
             {% elif num > books_page.number|add:'-3' and num < books_page.number|add:'3' %}
-            <a href="?page={{ num }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+            <a href="?page={{ num }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}&book_type={{ book_type }}" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
                 {{ num }}
             </a>
             {% endif %}
             {% endfor %}
         
             {% if books_page.has_next %}
-            <a href="?page={{ books_page.next_page_number }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}" class="relative inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <a href="?page={{ books_page.next_page_number }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}&book_type={{ book_type }}" class="relative inline-flex items-center px-3 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                 <span class="sr-only">Next</span>
                 Next &rsaquo;
             </a>
-            <a href="?page={{ books_page.paginator.num_pages }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}" class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+            <a href="?page={{ books_page.paginator.num_pages }}&start_year={{ start_year }}&end_year={{ end_year }}&language={{ language }}&categories={{ categories_filter }}&book_type={{ book_type }}" class="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                 <span class="sr-only">Last</span>
                 Last &raquo;
             </a>
