@@ -1,0 +1,109 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Books Search</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .filter-section {
+      transition: all 0.3s ease;
+    }
+    .filter-section:hover {
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .book-card {
+      transition: transform 0.2s ease;
+    }
+    .book-card:hover {
+      transform: translateY(-4px);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 font-sans antialiased min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 shadow-md">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-2xl font-bold tracking-tight">Books Search</h1>
+      <div class="space-x-6">
+        <a href="#" class="text-white hover:text-blue-200 transition duration-150">About</a>
+        <a href="#" class="text-white hover:text-blue-200 transition duration-150">Contact</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content with FILTER -->
+  <div class="container mx-auto px-4 lg:px-16 p-8 flex-grow flex flex-col lg:flex-row gap-8 max-w-screen-xl ">
+    <!-- FILTER -->
+    <div class="lg:w-1/4">
+      <div class="bg-white shadow-lg rounded-xl p-8 filter-section sticky top-8">
+        <!-- Publication Year -->
+        <div class="pb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Publication Year</h3>
+          <div class="flex items-center space-x-2">
+            <label for="range-start-input" class="text-sm text-gray-500">From:</label>
+            <input id="range-start-input" type="number" min="1950" max="2024" value="1950" class="w-20 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm font-medium text-gray-700" oninput="applyFilters()">
+            <label for="range-end-input" class="text-sm text-gray-500">To:</label>
+            <input id="range-end-input" type="number" min="1950" max="2024" value="2024" class="w-20 border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm font-medium text-gray-700" oninput="applyFilters()">
+          </div>
+        </div>
+    
+        <!-- Language -->
+        <div class="pb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Language</h3>
+          <select id="language-filter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm font-medium text-gray-700" onchange="applyFilters()">
+            <option value="all">All Languages</option>
+            {% for code, name in languages %}
+            <option value="{{ code }}" class="text-sm font-medium text-gray-700">{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+    
+        <!-- Book Lists -->
+        <div class="pb-6">  
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Categories</h3>
+          <div class="space-y-2">
+            {% for category in categories %}
+            <div class="flex items-center">
+              <input type="checkbox" id="category-{{ category.id }}" class="h-4 w-4 text-indigo-600 border-gray-300 rounded" onchange="applyFilters()">
+              <label for="category-{{ category.id }}" class="ml-2 block text-sm text-gray-700">{{ category.name }}</label>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+    
+        <!-- Clear all filters -->
+        <div class="pt-2">
+          <button class="w-full bg-red-50 text-red-600 font-medium py-3 px-4 rounded-lg hover:bg-red-100 transition duration-150" onclick="clearFilters()">Clear all filters</button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Main Content -->
+    <div class="lg:w-3/4">
+      <!-- Search Bar -->
+      <div class="mb-6">
+        {% include "search.html" %}
+      </div>
+  
+      <!-- Results -->
+      <div class="pb-8">
+        {% include "cards.html" %}
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Preview Page -->
+  <div class="container mx-auto px-4 lg:px-16 p-8 flex-grow flex flex-col lg:flex-row gap-8 max-w-screen-xl hidden">
+    
+  </div>
+  <!-- Footer -->
+  {% include "footer.html" %}
+
+  <script src = "{% static "student_back/home.js" %}"></script>
+</body>
+</html>

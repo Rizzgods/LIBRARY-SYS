@@ -58,7 +58,17 @@ INSTALLED_APPS = [
     'StudentMobile',
     'channels',
     'rest_framework',
+    'tailwind',
+    'theme',
+    'django_browser_reload',
+    'student_tW',
 ]
+
+TAILWIND_APP_NAME = 'theme'
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
+NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
 ASGI_APPLICATION = 'storefront.asgi.application'
 
@@ -83,6 +93,7 @@ MIDDLEWARE = [
     'student.middleware.InactivityLogoutMiddleware',
     'student.middleware.HandleNoReverseMatchMiddleware',
     'django.middleware.common.CommonMiddleware',
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
    
     
 ]

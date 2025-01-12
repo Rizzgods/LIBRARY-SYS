@@ -1,0 +1,19 @@
+{% if page_obj.object_list %}
+  {% for book in page_obj %}
+  <div class="bg-white shadow rounded-lg flex flex-col h-128">
+    <div class="flex-shrink-0">
+      <img src="{{ book.BookImage.url }}" alt="{{ book.BookTitle }}" class="w-full h-72 object-cover rounded-t-md">
+    </div>
+    <div class="p-4 flex-grow">
+      <h3 class="mt-1 font-bold text-lg">{{ book.BookTitle }}</h3>
+      <p class="text-sm text-gray-600">Author(s): {{ book.Author }}</p>
+      <p class="text-sm text-gray-600">Publication: {{ book.Date }}</p>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="col-span-full text-center text-gray-500 py-8">
+    <p class="text-xl">No books found matching your filters</p>
+    <p class="mt-2">Try adjusting your search criteria</p>
+  </div>
+{% endif %}
